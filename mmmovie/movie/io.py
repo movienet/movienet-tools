@@ -61,9 +61,9 @@ class MovieReader(VideoReader):
 
         Args:
             frame_dir (str): Output root directory to store the frames.
-            size (None or tuple <width, height>): frame size, if it is not None, 
-                the frame will be resized. if height is -1 or width is -1,
-                the ratio will be kept.
+            size (None or tuple <width, height>): frame size, if it is tuple
+                of target width and height, the frame will be resized. 
+                If height is -1 or width is -1, the ratio will be kept.
             step (int): frequency of saving frames.
             start (int): start index.
             end (int or None): end index.
@@ -90,7 +90,7 @@ class MovieReader(VideoReader):
             else:
                 fn = filename_tmpl.format(i)
             cv2.imwrite(osp.join(frame_dir, fn), img)
-            
+
 
 
 
