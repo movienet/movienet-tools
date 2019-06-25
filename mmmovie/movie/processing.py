@@ -69,7 +69,8 @@ def resize_movie(in_file,
                 keep_ar = False
             else:
                 size = res_map[size]
-    mmv.resize_video(in_file, out_file, size, ratio, keep_ar, log_level, print_cmd, **kwargs)
+    mmv.resize_video(in_file, out_file, size, ratio, keep_ar, log_level,
+                     print_cmd, **kwargs)
 
 
 @requires_executable('ffmpeg')
@@ -90,7 +91,8 @@ def concat_movie(video_list,
         log_level (str): Logging level of ffmpeg.
         print_cmd (bool): Whether to print the final ffmpeg command.
     """
-    mmv.concat_video(video_list, out_file, vcodec, acodec, log_level, print_cmd, **kwargs)
+    mmv.concat_video(video_list, out_file, vcodec, acodec, log_level,
+                     print_cmd, **kwargs)
 
 
 @requires_executable('ffmpeg')
@@ -115,7 +117,8 @@ def cut_movie_by_time(in_file,
         log_level (str): Logging level of ffmpeg.
         print_cmd (bool): Whether to print the final ffmpeg command.
     """
-    mmv.cut_video(in_file, out_file, start, end, vcodec, acodec, log_level, print_cmd, **kwargs)
+    mmv.cut_video(in_file, out_file, start, end, vcodec, acodec, log_level,
+                  print_cmd, **kwargs)
 
 
 @requires_executable('ffmpeg')
@@ -166,21 +169,22 @@ def extract_audio_stream(in_file,
             if out_file already exists.
         print_cmd (bool): Whether to print the final ffmpeg command.
     """
-    assert log_level in ['quiet', 'panic', 'fatal', 'error', 'warning', 
-        'info', 'verbose', 'debug', 'trace']
+    assert log_level in [
+        'quiet', 'panic', 'fatal', 'error', 'warning', 'info', 'verbose',
+        'debug', 'trace'
+    ]
     acodec_str = acodec if acodec is not None else 'copy'
     ar_str = 'ar {}'.format(audio_rate) if audio_rate is not None else ''
     br_str = '-b:a {}'.format(byte_rate) if byte_rate is not None else ''
     overwrite_str = '-y' if overwrite else '-n'
     cmd_tmpl = 'ffmpeg {} -loglevel {} -i {} -vn -c:a {} {} {} {}'
-    cmd = cmd_tmpl.format(overwrite_str, log_level, in_file, acodec_str, ar_str, br_str, out_file)
+    cmd = cmd_tmpl.format(overwrite_str, log_level, in_file, acodec_str,
+                          ar_str, br_str, out_file)
     ret = os.system(cmd)
     if ret == 2:
-        print('Capture keyboard interrupt when execute cmd ``{}``.\nExit!'.format(cmd))
+        print('Capture keyboard interrupt when execute cmd ``{}``.\nExit!'.
+              format(cmd))
         exit()
-
-
-
 
 
 @requires_executable('ffmpeg')
@@ -213,22 +217,23 @@ def extract_video_stream(in_file,
     # TODO: add make_exists option.
 
     assert isinstance(size, tuple) and len(size) == 2
-    assert log_level in ['quiet', 'panic', 'fatal', 'error', 'warning', 
-        'info', 'verbose', 'debug', 'trace']
+    assert log_level in [
+        'quiet', 'panic', 'fatal', 'error', 'warning', 'info', 'verbose',
+        'debug', 'trace'
+    ]
 
     cmd_tmpl = 'ffmpeg {} -loglevel {} -i {} -vcodec {} {} {} {} {} {}'
     vcodec_str = vcodec if vcodec is not None else 'copy'
-    scale_str = '-filter:v scale={}:{}'.format(size[0], size[1]) if size is not None else ''
+    scale_str = '-filter:v scale={}:{}'.format(
+        size[0], size[1]) if size is not None else ''
     crf_str = '-crf {}'.format(crf) if crf is not None else ''
     pix_fmt_str = '-pix_fmt {}'.format(pix_fmt) if pix_fmt is not None else ''
     mute_str = '-an' if mute else ''
     overwrite_str = '-y' if overwrite else '-n'
-    cmd = cmd_tmpl.format(overwrite_str, log_level, in_file, vcodec_str, scale_str, crf_str, pix_fmt_str, mute_str, out_file)
+    cmd = cmd_tmpl.format(overwrite_str, log_level, in_file, vcodec_str,
+                          scale_str, crf_str, pix_fmt_str, mute_str, out_file)
     ret = os.system(cmd)
     if ret == 2:
-        print('Capture keyboard interrupt when execute cmd ``{}``.\nExit!'.format(cmd))
+        print('Capture keyboard interrupt when execute cmd ``{}``.\nExit!'.
+              format(cmd))
         exit()
-
-    
-
-
