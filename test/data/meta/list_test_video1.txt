@@ -1,0 +1,4 @@
+test1/shot_0000.mp4
+test1/shot_0001.mp4
+test1/shot_0002.mp4
+test2/shot_0000.mp4

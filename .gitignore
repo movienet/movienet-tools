@@ -1,3 +1,9 @@
+# Test data
+test/data/aud_wav
+test/data/aud_feat
+test/data/place_feat_raw
+test/data/place_feat
+
 # apikey
 *apikey.txt
 
@@ -105,3 +111,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#
+*DS_Store

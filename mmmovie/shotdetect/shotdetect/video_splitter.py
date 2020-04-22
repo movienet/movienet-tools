@@ -1,49 +1,40 @@
-""" PyshotDetect `shotdetect.video_splitter` Module
-
+""" `shotdetect.video_splitter` Module
 The `shotdetect.video_splitter` module contains functions to split videos
 with a shot list using external tools (e.g. `mkvmerge`, `ffmpeg`), as well
 as functions to check if the tools are available.
-
-These functions are mainly intended for use by the PyshotDetect command
-line interface (the `shotdetect` command).
-
-Certain distributions of PyshotDetect may include the above software. If
+Certain distributions of ShotDetect may include the above software. If
 using a source distribution, these programs can be obtained from following
 URLs (note that mkvmerge is a part of the MKVToolNix package):
-
  * FFmpeg:   [ https://ffmpeg.org/download.html ]
  * mkvmerge: [ https://mkvtoolnix.download/downloads.html ]
-
 If you are a Linux user, you can likely obtain the above programs from your
 package manager (e.g. `sudo apt-get install ffmpeg`).
-
 Once installed, ensure the program can be accessed system-wide by calling
 the `mkvmerge` or `ffmpeg` command from a terminal/command prompt.
-PyshotDetect will automatically use whichever program is available on
+ShotDetect will automatically use whichever program is available on
 the computer, depending on the specified command-line options.
 """
 
 # Standard Library Imports
+import os
 import logging
-import subprocess
 import math
+import subprocess
 import time
 from string import Template
-import pdb
 
 # Third-Party Library Imports
-from mmmovie.shotdetect.shotdetect.platform import tqdm
-from mmmovie.shotdetect.utilis import mkdir_ifmiss
+from .platform import tqdm
+# from mmmovie.shotdetect.platform import tqdm
 
+#
+# Command Availability Checking Functions
+#
 
-##
-## Command Availability Checking Functions
-##
 
 def is_mkvmerge_available():
     # type: () -> bool
     """ Is mkvmerge Available: Gracefully checks if mkvmerge command is available.
-
     Returns:
         (bool) True if the mkvmerge command is available, False otherwise.
     """
@@ -60,7 +51,6 @@ def is_mkvmerge_available():
 def is_ffmpeg_available():
     # type: () -> bool
     """ Is ffmpeg Available: Gracefully checks if ffmpeg command is available.
-
     Returns:
         (bool) True if the ffmpeg command is available, False otherwise.
     """
@@ -74,9 +64,9 @@ def is_ffmpeg_available():
     return True
 
 
-##
-## Split Video Functions
-##
+#
+# Split Video Functions
+#
 
 def split_video_mkvmerge(input_video_paths, shot_list, output_file_prefix,
                          video_name, suppress_output=False):
@@ -128,16 +118,16 @@ def split_video_mkvmerge(input_video_paths, shot_list, output_file_prefix,
         logging.error('Error splitting video (mkvmerge returned %d).', ret_val)
 
 
-def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
-                        output_file_template="${OUTPUT_DIR}/shot_${SHOT_NUMBER}.mp4",
-                        arg_override='-c:v libx264 -preset fast -crf 21 -c:a copy',
-                        hide_progress=False, suppress_output=False):
+def split_video_ffmpeg(input_video_paths, shot_list, output_dir,
+                       output_file_template="${OUTPUT_DIR}/shot_${SHOT_NUMBER}.mp4",
+                       arg_override='-crf 21',
+                       hide_progress=False, suppress_output=False):
     # type: (List[str], List[Tuple[FrameTimecode, FrameTimecode]], Optional[str],
     #        Optional[str], Optional[bool]) -> None
     """ Calls the ffmpeg command on the input video(s), generating a new video for
     each shot based on the start/end timecodes. """
-    
-    mkdir_ifmiss(output_dir)
+
+    os.makedirs(output_dir, exist_ok=True)
     if not input_video_paths or not shot_list:
         return
 
@@ -151,7 +141,7 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
         logging.error(
             'Sorry, splitting multiple appended/concatenated input videos with'
             ' ffmpeg is not supported yet. This feature will be added to a future'
-            ' version of PyshotDetect. In the meantime, you can try using the'
+            ' version of ShotDetect. In the meantime, you can try using the'
             ' -c / --copy option with the split-video to use mkvmerge, which'
             ' generates less accurate output, but supports multiple input videos.')
         raise NotImplementedError()
@@ -163,7 +153,6 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
     filename_template = Template(output_file_template)
     shot_num_format = '%0'
     shot_num_format += str(max(4, math.floor(math.log(len(shot_list), 10)) + 1)) + 'd'
-
     try:
         progress_bar = None
         total_frames = shot_list[-1][1].get_frames() - shot_list[0][0].get_frames()
@@ -171,9 +160,11 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
             progress_bar = tqdm(total=total_frames, unit='frame', miniters=1, desc="Split Video")
         processing_start_time = time.time()
         for i, (start_time, end_time) in enumerate(shot_list):
+            end_time = end_time.__sub__(1)  # Fix the last frame of a shot to be 1 less than the first frame of the next shot
             duration = (end_time - start_time)
-            # Fix FFmpeg start timecode frame shift.
-            start_time -= 1
+            # an alternative way to do it
+            # duration = (end_time.get_frames()-1)/end_time.framerate - (start_time.get_frames())/start_time.framerate
+            # duration_frame = end_time.get_frames()-1 - start_time.get_frames()
             call_list = ['ffmpeg']
             if suppress_output:
                 call_list += ['-v', 'quiet']
@@ -188,7 +179,8 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
                 start_time.get_timecode(),
                 '-i',
                 input_video_paths[0]]
-            call_list += arg_override
+            call_list += arg_override  # compress
+            call_list += ['-map_chapters', '-1']  # remove meta stream
             call_list += [
                 '-strict',
                 '-2',
@@ -197,7 +189,7 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
                 '-sn',
                 filename_template.safe_substitute(
                     OUTPUT_DIR=output_dir,
-                    SHOT_NUMBER=shot_num_format % (i + 1))
+                    SHOT_NUMBER=shot_num_format % (i))
                 ]
             ret_val = subprocess.call(call_list)
             if not suppress_output and i == 0 and len(shot_list) > 1:
@@ -206,7 +198,7 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
             if ret_val != 0:
                 break
             if progress_bar:
-                progress_bar.update(duration.get_frames())
+                progress_bar.update(duration.get_frames()+1)  # to compensate the missing one frame caused above
         if progress_bar:
             print('')
             logging.info('Average processing speed %.2f frames/sec.',
@@ -216,4 +208,3 @@ def split_video_ffmpeg(input_video_paths, shot_list,output_dir,
                       ' Please install ffmpeg to enable video output support.')
     if ret_val is not None and ret_val != 0:
         logging.error('Error splitting video (ffmpeg returned %d).', ret_val)
-

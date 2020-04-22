@@ -1,44 +1,15 @@
-# -*- coding: utf-8 -*-
-#
-#         PyshotDetect: Python-Based Video shot Detector
-#   ---------------------------------------------------------------
-#     [  Site: http://www.bcastell.com/projects/pyshotdetect/   ]
-#     [  Github: https://github.com/Breakthrough/PyshotDetect/  ]
-#     [  Documentation: http://pyshotdetect.readthedocs.org/    ]
-#
-# Copyright (C) 2012-2018 Brandon Castellano <http://www.bcastell.com>.
-#
-# PyshotDetect is licensed under the BSD 3-Clause License; see the included
-# LICENSE file, or visit one of the following pages for details:
-#  - https://github.com/Breakthrough/PyshotDetect/
-#  - http://www.bcastell.com/projects/pyshotdetect/
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-# AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
-
-""" PyshotDetect ``shotdetect.frame_timecode`` Module
-
+""" ``shotdetect.frame_timecode`` Module
 This module contains the :py:class:`FrameTimecode` object, which is used as a way for
-PyshotDetect to store frame-accurate timestamps of each cut. This is done by also
+ShotDetect to store frame-accurate timestamps of each cut. This is done by also
 specifying the video framerate with the timecode, allowing a frame number to be
 converted to/from a floating-point number of seconds, or string in the form
 `"HH:MM:SS[.nnn]"` where the `[.nnn]` part is optional.
-
 See the following examples, or the :py:class:`FrameTimecode constructor <FrameTimecode>`.
-
 Unit tests for the FrameTimecode object can be found in `tests/test_timecode.py`.
 """
 
-# Standard Library Imports
 import math
-
-# PyshotDetect Library Imports
-from mmmovie.shotdetect.shotdetect.platform import STRING_TYPE
+from .platform import STRING_TYPE
 
 
 MINIMUM_FRAMES_PER_SECOND_FLOAT = 1.0 / 1000.0
@@ -48,10 +19,8 @@ MINIMUM_FRAMES_PER_SECOND_DELTA_FLOAT = 1.0 / 100000
 class FrameTimecode(object):
     """ Object for frame-based timecodes, using the video framerate
     to compute back and forth between frame number and second/timecode formats.
-
     The timecode argument is valid only if it complies with one of the following
     three types/formats:
-
     1) string: standard timecode HH:MM:SS[.nnn]:
         `str` in form 'HH:MM:SS' or 'HH:MM:SS.nnn', or
         `list`/`tuple` in form [HH, MM, SS] or [HH, MM, SS.nnn]
@@ -61,7 +30,6 @@ class FrameTimecode(object):
     3) int: Exact number of frames N, where N >= 0:
         `int` in form `N`, or
         `str` in form 'N'
-
     Arguments:
         timecode (str, float, int, or FrameTimecode):  A timecode or frame
             number, given in any of the above valid formats/types.  This
@@ -134,63 +102,49 @@ class FrameTimecode(object):
         equivalent of accessing the self.frame_num property (which, along
         with the specified framerate, forms the base for all of the other
         time measurement calculations, e.g. the :py:meth:`get_seconds` method).
-
         If using to compare a :py:class:`FrameTimecode` with a frame number,
         you can do so directly against the object (e.g. ``FrameTimecode(10, 10.0) <= 10``).
-
         Returns:
             int: The current time in frames (the current frame number).
         """
         return int(self.frame_num)
 
-
     def get_framerate(self):
         # type: () -> float
         """ Get Framerate: Returns the framerate used by the FrameTimecode object.
-
         Returns:
             float: Framerate of the current FrameTimecode object, in frames per second.
         """
         return self.framerate
 
-
     def equal_framerate(self, fps):
         # type: (float) -> bool
         """ Equal Framerate: Determines if the passed framerate is equal to that of the
         FrameTimecode object.
-
         Arguments:
             fps:    Framerate (float) to compare against within the precision constant
                     MINIMUM_FRAMES_PER_SECOND_DELTA_FLOAT defined in this module.
-
         Returns:
             bool: True if passed fps matches the FrameTimecode object's framerate, False otherwise.
-
         """
         return math.fabs(self.framerate - fps) < MINIMUM_FRAMES_PER_SECOND_DELTA_FLOAT
-
 
     def get_seconds(self):
         # type: () -> float
         """ Get the frame's position in number of seconds.
-
         If using to compare a :py:class:`FrameTimecode` with a frame number,
         you can do so directly against the object (e.g. ``FrameTimecode(10, 10.0) <= 1.0``).
-
         Returns:
             float: The current time/position in seconds.
         """
         return float(self.frame_num) / self.framerate
 
-
     def get_timecode(self, precision=3, use_rounding=True):
         # type: (int, bool) -> str
         """ Get a formatted timecode string of the form HH:MM:SS[.nnn].
-
         Args:
             precision:     The number of decimal places to include in the output ``[.nnn]``.
             use_rounding:  True (default) to round the output to the desired precision.
-
         Returns:
             str: The current time in the form ``"HH:MM:SS[.nnn]"``.
         """
@@ -214,24 +168,20 @@ class FrameTimecode(object):
         # Return hours, minutes, and seconds as a formatted timecode string.
         return '%02d:%02d:%s' % (hrs, mins, secs)
 
-
     def _seconds_to_frames(self, seconds):
         # type: (float) -> int
         """ Converts the passed value seconds to the nearest number of frames using
         the current FrameTimecode object's FPS (self.framerate).
-
         Returns:
             Integer number of frames the passed number of seconds represents using
             the current FrameTimecode's framerate property.
         """
         return int(seconds * self.framerate)
 
-
     def _parse_timecode_number(self, timecode):
         # type: (Union[int, float]) -> int
         """ Parses a timecode number, storing it as the exact number of frames.
         Can be passed as frame number (int), seconds (float)
-
         Raises:
             TypeError, ValueError
         """
@@ -254,7 +204,6 @@ class FrameTimecode(object):
         else:
             raise TypeError('Timecode format/type unrecognized.')
 
-
     def _parse_timecode_string(self, timecode_string):
         # type: (str) -> int
         """ Parses a string based on the three possible forms (in timecode format,
@@ -263,7 +212,6 @@ class FrameTimecode(object):
         Assuming a framerate of 30.0 FPS, the strings '00:05:00.000', '00:05:00',
         '9000', '300s', and '300.0s' are all possible valid values, all representing
         a period of time equal to 5 minutes, 300 seconds, or 9000 frames (at 30 FPS).
-
         Raises:
             TypeError, ValueError
         """
@@ -297,7 +245,6 @@ class FrameTimecode(object):
             secs += (((hrs * 60.0) + mins) * 60.0)
             return int(secs * self.framerate)
 
-
     def __iadd__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> FrameTimecode
         if isinstance(other, int):
@@ -316,13 +263,11 @@ class FrameTimecode(object):
             self.frame_num = 0
         return self
 
-
     def __add__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> FrameTimecode
         to_return = FrameTimecode(timecode=self)
         to_return += other
         return to_return
-
 
     def __isub__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> FrameTimecode
@@ -341,7 +286,6 @@ class FrameTimecode(object):
         if self.frame_num < 0:
             self.frame_num = 0
         return self
-
 
     def __sub__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> FrameTimecode
@@ -369,11 +313,9 @@ class FrameTimecode(object):
         else:
             raise TypeError('Unsupported type for performing == with FrameTimecode.')
 
-
     def __ne__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> bool
         return not self == other
-
 
     def __lt__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> bool
@@ -393,7 +335,6 @@ class FrameTimecode(object):
         #    return False
         else:
             raise TypeError('Unsupported type for performing < with FrameTimecode.')
-
 
     def __le__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> bool
@@ -435,7 +376,6 @@ class FrameTimecode(object):
             raise TypeError('Unsupported type (%s) for performing > with FrameTimecode.' %
                             type(other).__name__)
 
-
     def __ge__(self, other):
         # type: (Union[int, float, str, FrameTimecode]) -> bool
         if isinstance(other, int):
@@ -450,12 +390,10 @@ class FrameTimecode(object):
             else:
                 raise TypeError(
                     'FrameTimecode objects must have the same framerate to be compared.')
-        #elif other is None:
+        # elif other is None:
         #    return False
         else:
             raise TypeError('Unsupported type for performing >= with FrameTimecode.')
-
-
 
     def __int__(self):
         return self.frame_num
@@ -468,4 +406,3 @@ class FrameTimecode(object):
 
     def __repr__(self):
         return 'FrameTimecode(frame=%d, fps=%f)' % (self.frame_num, self.framerate)
-

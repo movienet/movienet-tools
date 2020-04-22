@@ -36,7 +36,6 @@ class shotDetector(object):
             self.stats_manager is not None and
             self.stats_manager.metrics_exist(frame_num, self._metric_keys))
 
-
     def get_metrics(self):
         # type: () -> List[str]
         """ Get Metrics:  Get a list of all metric names/keys used by the detector.
@@ -46,7 +45,6 @@ class shotDetector(object):
             the detector when a StatsManager is passed to process_frame.
         """
         return self._metric_keys
-
 
     def process_frame(self, frame_num, frame_img):
         # type: (int, numpy.ndarray) -> Tuple[bool, Union[None, List[int]]
@@ -58,7 +56,6 @@ class shotDetector(object):
             List[int]: List of frame numbers of cuts to be added to the cutting list.
         """
         return []
-
 
     def post_process(self, frame_num):
         # type: (int) -> List[int]
