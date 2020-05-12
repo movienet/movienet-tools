@@ -4,6 +4,11 @@ test/data/aud_feat
 test/data/place_feat_raw
 test/data/place_feat
 
+local/
+
+# compress files
+*.tar
+
 # apikey
 *apikey.txt
 

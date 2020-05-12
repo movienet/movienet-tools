@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import os
 import os.path as osp
+from termcolor import colored
 
 class IMDBCrawler(object):
     def __init__(self):
@@ -60,7 +61,7 @@ class IMDBCrawler(object):
                                 genres.append(genres_a.string.strip())
                             info['genres'] = genres
         except Exception as e:
-            print('Cannot find storyline or genres. {}: {}'.format(mid, e))
+            print(colored('Cannot find storyline or genres. {}: {}'.format(mid, e), 'red'))
         # get country and runtime
         try:
             titleStoryLine = page_soup.find('div', {'id':'titleDetails'})
@@ -71,7 +72,7 @@ class IMDBCrawler(object):
                     title = title.string
                     if title.find('Country') >= 0:
                         country_a = div.find('a')
-                        info['country'] = country_a.string
+                        info['country'] = country_a.string.strip()
                     if title.find('Runtime') >= 0:
                         text = div.get_text().strip().replace('Runtime:', '')
                         runtimes = text.split('|')
@@ -85,7 +86,7 @@ class IMDBCrawler(object):
                                 'description': description
                             })
         except Exception as e:
-            print('Cannot find country or runtime. {}: {}'.format(mid, e))
+            print(colored('Cannot find country or runtime. {}: {}'.format(mid, e), 'red'))
         return info
     
     def parse_credits_page(self, mid):
@@ -98,17 +99,14 @@ class IMDBCrawler(object):
         Returns:
             dict: information dict
         """
-        try:
-            response = requests.get('{}/{}/{}'.format(self.url_prefix, mid, 'fullcredits'))
-            content = response.text
-        except Exception as e:
-            print(e)
         info = {
             'imdb_id': mid,
             'cast': None,
             'director': None,
             }
         try:
+            response = requests.get('{}/{}/{}'.format(self.url_prefix, mid, 'fullcredits'))
+            content = response.text
             page_soup = BeautifulSoup(content, 'lxml')
             credit_div = page_soup.find('div', {'id': 'fullcredits_content'})
             # find director
@@ -128,7 +126,7 @@ class IMDBCrawler(object):
                     if td is None:
                         continue
                     tda = td.find('a')
-                    pid = tda['href'].split('/')[2]
+                    pid = tda['href'].split('/')[2].strip()
                     name = tda.find('img')['title'].strip()
                     td = tr.find('td', class_='character')
                     character = td.get_text().strip()
@@ -138,7 +136,7 @@ class IMDBCrawler(object):
                     cast.append({'id': pid, 'name': name, 'character': character})
                 info['cast'] = cast
         except Exception as e:
-            print('Cannot find credits. {}: {}'.format(mid, e))
+            print(colored('Cannot find credits. {}: {}'.format(mid, e), 'red'))
         return info
     
     def parse_synopsis(self, mid):
@@ -150,21 +148,20 @@ class IMDBCrawler(object):
         Returns:
             dict: synopsis
         """
-        try:
-            response = requests.get('{}/{}/plotsummary'.format(self.url_prefix, mid))
-            content = response.text
-        except Exception as e:
-            print(e)
         info = {
             'synopsis': None
         }
-        page_soup = BeautifulSoup(content, 'lxml')
         try:
+            response = requests.get('{}/{}/plotsummary'.format(self.url_prefix, mid))
+            content = response.text
+            page_soup = BeautifulSoup(content, 'lxml')
             ul = page_soup.find('ul', {'id': 'plot-synopsis-content'})
             synopsis = ul.get_text().strip()
+            if synopsis.find('Edit page') >= 0:
+                synopsis = None
             info['synopsis'] = synopsis
         except Exception as e:
-            print('{} {}'.format(mid, e))
+            print(colored('{} {}'.format(mid, e), 'red'))
         return info
     
     # def parse_and_save(self, mid, save_dir='.'):
