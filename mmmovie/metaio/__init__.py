@@ -1,6 +1,3 @@
 from .parser import MetaParser
 
-
-__all__ = [
-    'MetaParser'
-]
+__all__ = ['MetaParser']

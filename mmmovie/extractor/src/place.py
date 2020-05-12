@@ -1,9 +1,6 @@
-'''
-Place extractor, supports folder input
-folders xxxx0\nxxxx1\nxxxx2\n  # folders of jpg image
-'''
+"""Place extractor, supports folder input folders xxxx0\nxxxx1\nxxxx2\n  #
+folders of jpg image."""
 from __future__ import absolute_import, print_function
-
 import os
 import os.path as osp
 import pdb
@@ -12,12 +9,11 @@ import time
 from collections import OrderedDict
 from datetime import datetime
 
-import numpy as np
-from PIL import Image
-
 import mmcv
+import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
+from PIL import Image
 from torch.utils.data import DataLoader
 from torchvision import models, transforms
 
@@ -26,13 +22,13 @@ def to_numpy(tensor):
     if torch.is_tensor(tensor):
         return tensor.cpu().numpy()
     elif type(tensor).__module__ != 'numpy':
-        raise ValueError("Cannot convert {} to numpy array"
-                         .format(type(tensor)))
+        raise ValueError('Cannot convert {} to numpy array'.format(
+            type(tensor)))
     return tensor
 
 
 class AverageMeter(object):
-    """Computes and stores the average and current value"""
+    """Computes and stores the average and current value."""
 
     def __init__(self):
         self.val = 0
@@ -54,6 +50,7 @@ class AverageMeter(object):
 
 
 class ResNet50(torch.nn.Module):
+
     def __init__(self, pretrained=True):
         super(ResNet50, self).__init__()
         self.base = models.resnet50(pretrained=pretrained)
@@ -69,6 +66,7 @@ class ResNet50(torch.nn.Module):
 
 
 class Extractor(object):
+
     def __init__(self, model):
         super(Extractor, self).__init__()
         self.model = model
@@ -97,15 +95,16 @@ class Extractor(object):
             if print_summary:
                 print('Extract Features: [{}/{}]\t'
                       'Time {:.3f} ({:.3f})\t'
-                      'Data {:.3f} ({:.3f})\t'
-                      .format(
-                        i + 1, len(data_loader),
-                        batch_time.val, batch_time.avg,
-                        data_time.val, data_time.avg))
+                      'Data {:.3f} ({:.3f})\t'.format(i + 1, len(data_loader),
+                                                      batch_time.val,
+                                                      batch_time.avg,
+                                                      data_time.val,
+                                                      data_time.avg))
         return features, scores
 
 
 class Preprocessor(object):
+
     def __init__(self, dataset, images_path, default_size, transform=None):
         super(Preprocessor, self).__init__()
         self.dataset = dataset
@@ -143,8 +142,7 @@ def get_data(video_id, src_img_path, batch_size, workers):
 
     # data transforms
     normalizer = transforms.Normalize(
-        mean=[0.485, 0.456, 0.406],
-        std=[0.229, 0.224, 0.225])
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     data_transformer = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -154,9 +152,15 @@ def get_data(video_id, src_img_path, batch_size, workers):
 
     # data loaders
     data_loader = DataLoader(
-        Preprocessor(dataset, src_img_path, default_size=(256, 256), transform=data_transformer),
-        batch_size=batch_size, num_workers=workers,
-        shuffle=False, pin_memory=True)
+        Preprocessor(
+            dataset,
+            src_img_path,
+            default_size=(256, 256),
+            transform=data_transformer),
+        batch_size=batch_size,
+        num_workers=workers,
+        shuffle=False,
+        pin_memory=True)
 
     return dataset, data_loader
 
@@ -185,12 +189,15 @@ def extract_place_feat(cfg):
         video_list = sorted(os.listdir(cfg.src_img_path))
     else:
         video_list = [x.strip() for x in open(cfg.list_file)]
-    video_list = [i.split(".m")[0] for i in video_list]  # to remove suffix .mp4 .mov etc. if applicable
+    video_list = [i.split('.m')[0] for i in video_list
+                  ]  # to remove suffix .mp4 .mov etc. if applicable
     video_list = video_list[cfg.st:cfg.ed]
     print('****** Total {} videos ******'.format(len(video_list)))
 
     for idx_m, video_id in enumerate(video_list):
-        print('****** {}, {} / {}, {} ******'.format(datetime.now(), idx_m+1, len(video_list), video_id))
+        print('****** {}, {} / {}, {} ******'.format(datetime.now(), idx_m + 1,
+                                                     len(video_list),
+                                                     video_id))
         dst_path = osp.join(cfg.dst_path, video_id)
         os.makedirs(dst_path, exist_ok=True)
         src_img_path = get_img_folder(cfg.src_img_path, video_id)
@@ -203,25 +210,30 @@ def extract_place_feat(cfg):
             print('{}, {} exist.'.format(datetime.now(), video_id))
             continue
         # create data loaders
-        dataset, data_loader = get_data(video_id, src_img_path, cfg.batch_size, cfg.workers)
+        dataset, data_loader = get_data(video_id, src_img_path, cfg.batch_size,
+                                        cfg.workers)
 
         # extract feature
         try:
             print('{}, extracting features...'.format(datetime.now()))
-            feat_dict, score_dict = extractor.extract_feature(data_loader, print_summary=False)
+            feat_dict, score_dict = extractor.extract_feature(
+                data_loader, print_summary=False)
             for key, item in feat_dict.items():
                 item = to_numpy(item)
-                os.makedirs(osp.join(cfg.dst_feat_path, video_id), exist_ok=True)
-                img_ind = key.split("_")[-1].split(".jpg")[0]
+                os.makedirs(
+                    osp.join(cfg.dst_feat_path, video_id), exist_ok=True)
+                img_ind = key.split('_')[-1].split('.jpg')[0]
                 if cfg.save_one_frame_feat:
-                    if img_ind == "1":  # for 3 images 1 shot only
-                        shot_ind = key.split("_")[1]
-                        dst_fn = osp.join(cfg.dst_feat_path, video_id, "shot_{}.npy".format(shot_ind))
+                    if img_ind == '1':  # for 3 images 1 shot only
+                        shot_ind = key.split('_')[1]
+                        dst_fn = osp.join(cfg.dst_feat_path, video_id,
+                                          'shot_{}.npy'.format(shot_ind))
                         np.save(dst_fn, item)
                     else:
                         continue
                 else:
-                    dst_fn = osp.join(cfg.dst_feat_path, video_id, "{}.npy".format(key.split(".jpg")[0]))
+                    dst_fn = osp.join(cfg.dst_feat_path, video_id,
+                                      '{}.npy'.format(key.split('.jpg')[0]))
                     np.save(dst_fn, item)
 
             print('{}, saving...'.format(datetime.now()))

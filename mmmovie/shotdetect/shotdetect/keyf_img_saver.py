@@ -1,5 +1,4 @@
 from __future__ import print_function
-
 import logging
 import math
 import os
@@ -8,14 +7,16 @@ import time
 from string import Template
 
 import cv2
+
 from .platform import get_cv2_imwrite_params, tqdm
 
 
 def get_output_file_path(file_path, output_dir=None):
     # type: (str, Optional[str]) -> str
-    """ Get Output File Path: Gets full path to output file passed as argument, in
-    the specified global output directory (scenedetect -o/--output) if set, creating
-    any required directories along the way.
+    """Get Output File Path: Gets full path to output file passed as argument,
+    in the specified global output directory (scenedetect -o/--output) if set,
+    creating any required directories along the way.
+
     Arguments:
         file_path (str): File name to get path for.  If file_path is an absolute
             path (e.g. starts at a drive/root), no modification of the path
@@ -42,9 +43,13 @@ def get_output_file_path(file_path, output_dir=None):
     return file_path
 
 
-def generate_images(video_manager, shot_list, output_dir, num_images=3,
-                    image_name_template='shot_${SHOT_NUMBER}_img_${IMAGE_NUMBER}',
-                    ):
+def generate_images(
+    video_manager,
+    shot_list,
+    output_dir,
+    num_images=3,
+    image_name_template='shot_${SHOT_NUMBER}_img_${IMAGE_NUMBER}',
+):
     # type: (List[Tuple[FrameTimecode, FrameTimecode]) -> None
     assert num_images >= 3
     os.makedirs(output_dir, exist_ok=True)
@@ -71,12 +76,14 @@ def generate_images(video_manager, shot_list, output_dir, num_images=3,
     progress_bar = None
     if tqdm and not quiet_mode:
         progress_bar = tqdm(
-            total=len(shot_list) * num_images, unit='images', desc="Save Keyf")
+            total=len(shot_list) * num_images, unit='images', desc='Save Keyf')
 
     filename_template = Template(image_name_template)
 
     shot_num_format = '%0'
-    shot_num_format += str(max(4, math.floor(math.log(len(shot_list), 10)) + 1)) + 'd'
+    shot_num_format += str(
+        max(4,
+            math.floor(math.log(len(shot_list), 10)) + 1)) + 'd'
     image_num_format = '%0'
     image_num_format += str(math.floor(math.log(num_images, 10)) + 1) + 'd'
 
@@ -88,7 +95,8 @@ def generate_images(video_manager, shot_list, output_dir, num_images=3,
     if num_images == 1:
         for i, (start_time, end_time) in enumerate(shot_list):
             duration = end_time - start_time
-            timecode_list[i].append(start_time + int(duration.get_frames() / 2))
+            timecode_list[i].append(start_time +
+                                    int(duration.get_frames() / 2))
 
     else:
         middle_images = num_images - 2  # minus the start and the end
@@ -96,11 +104,16 @@ def generate_images(video_manager, shot_list, output_dir, num_images=3,
             timecode_list[i].append(start_time)
 
             if middle_images > 0:
-                duration = (end_time.get_frames() - 1) - start_time.get_frames()
+                duration = (end_time.get_frames() -
+                            1) - start_time.get_frames()
                 duration_increment = None
-                duration_increment = int(duration / (middle_images + 1))  # middle_images + 1 is the middle segment number
+                duration_increment = int(
+                    duration /
+                    (middle_images +
+                     1))  # middle_images + 1 is the middle segment number
                 for j in range(middle_images):
-                    timecode_list[i].append(start_time + ((j+1) * duration_increment))
+                    timecode_list[i].append(start_time +
+                                            ((j + 1) * duration_increment))
 
             # End FrameTimecode is always the same frame as the next shot's start_time
             # (one frame past the end), so we need to subtract 1 here.
@@ -114,11 +127,17 @@ def generate_images(video_manager, shot_list, output_dir, num_images=3,
             if ret_val:
                 cv2.imwrite(
                     get_output_file_path(
-                        '%s.%s' % (filename_template.safe_substitute(
-                            SHOT_NUMBER=shot_num_format % (i),   # start from 0
-                            IMAGE_NUMBER=image_num_format % (j)  # start from 0
-                        ), image_extension),
-                        output_dir=output_dir), frame_im, imwrite_param)
+                        '%s.%s' % (
+                            filename_template.safe_substitute(
+                                SHOT_NUMBER=shot_num_format %
+                                (i),  # start from 0
+                                IMAGE_NUMBER=image_num_format %
+                                (j)  # start from 0
+                            ),
+                            image_extension),
+                        output_dir=output_dir),
+                    frame_im,
+                    imwrite_param)
             else:
                 completed = False
                 break
@@ -140,9 +159,13 @@ def generate_images_txt(shot_list, output_dir, num_images=5):
         if middle_images > 0:
             duration = (end_time.get_frames() - 1) - start_time.get_frames()
             duration_increment = None
-            duration_increment = int(duration / (middle_images + 1))  # middle_images + 1 is the middle segment number
+            duration_increment = int(
+                duration /
+                (middle_images +
+                 1))  # middle_images + 1 is the middle segment number
             for j in range(middle_images):
-                timecode_list[i].append(start_time + ((j+1) * duration_increment))
+                timecode_list[i].append(start_time +
+                                        ((j + 1) * duration_increment))
 
         # End FrameTimecode is always the same frame as the next shot's start_time
         # (one frame past the end), so we need to subtract 1 here.
@@ -153,11 +176,11 @@ def generate_images_txt(shot_list, output_dir, num_images=5):
         frame_list = []
         for j, image_timecode in enumerate(timecode_list[i]):
             frame_list.append(image_timecode.get_frames())
-        frames_item = "{} {} ".format(frame_list[0],frame_list[-1])
-        for i in range(num_images-2):
-            frames_item += "{} ".format(frame_list[i+1])
+        frames_item = '{} {} '.format(frame_list[0], frame_list[-1])
+        for i in range(num_images - 2):
+            frames_item += '{} '.format(frame_list[i + 1])
         frames_list.append(frames_item[:-1])
 
     with open(output_dir, 'w') as f:
         for frames in frames_list:
-            f.write("{}\n".format(frames))
+            f.write('{}\n'.format(frames))

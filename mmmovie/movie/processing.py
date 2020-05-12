@@ -1,14 +1,14 @@
 import os
-import os.path as osp
-import subprocess
-import tempfile
 
 import mmcv.video as mmv
 from mmcv.utils import requires_executable
 
 
 @requires_executable('ffmpeg')
-def convert_movie(in_file, out_file, print_cmd=False, pre_options='',
+def convert_movie(in_file,
+                  out_file,
+                  print_cmd=False,
+                  pre_options='',
                   **kwargs):
     """Convert a movie with ffmpeg.
 
@@ -105,7 +105,7 @@ def cut_movie_by_time(in_file,
                       log_level='info',
                       print_cmd=False,
                       **kwargs):
-    """Cut a clip from a video with start and end time
+    """Cut a clip from a video with start and end time.
 
     Args:
         in_file (str): Input video filename.
@@ -131,7 +131,7 @@ def cut_movie_by_frame(in_file,
                        log_level='info',
                        print_cmd=False,
                        **kwargs):
-    """Cut a clip from a video with start and end frame
+    """Cut a clip from a video with start and end frame.
 
     Args:
         in_file (str): Input video filename.
@@ -156,7 +156,7 @@ def extract_audio_stream(in_file,
                          overwrite=False,
                          print_cmd=False,
                          **kwargs):
-    """extract audio stream of a movie
+    """extract audio stream of a movie.
 
     Args:
         in_file (str): Input video filename.
@@ -198,7 +198,7 @@ def extract_video_stream(in_file,
                          pix_fmt=None,
                          mute=True,
                          overwrite=False):
-    """extract audio stream of a movie
+    """extract audio stream of a movie.
 
     Args:
         in_file (str): Input video filename.
@@ -212,7 +212,6 @@ def extract_video_stream(in_file,
         mute (bool): whether to extract audio stream.
         overwrite (bool): whether to overwrite the file
             if out_file already exists.
-
     """
     # TODO: add make_exists option.
 

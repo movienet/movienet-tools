@@ -1,21 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
-import json
-import os
-import os.path as osp
 from termcolor import colored
 
+
 class IMDBCrawler(object):
+
     def __init__(self):
         self.url_prefix = 'https://www.imdb.com/title'
 
     def parse_home_page(self, mid):
-        """get infomation of a movie from its IMDB homepage,
-           including title, storyline, genres, country and version
-        
+        """get infomation of a movie from its IMDB homepage, including title,
+        storyline, genres, country and version.
+
         Args:
             mid (str): IMDB ID
-        
+
         Returns:
             dict: information dict
         """
@@ -32,7 +31,7 @@ class IMDBCrawler(object):
             'country': None,
             'version': [],
             'storyline': None
-            }
+        }
         # get title
         try:
             title_meta = page_soup.find('meta', property='og:title')
@@ -42,7 +41,7 @@ class IMDBCrawler(object):
             print('Cannot find title. {}: {}'.format(mid, e))
         # get storyline and genres
         try:
-            titleStoryLine = page_soup.find('div', {'id':'titleStoryLine'})
+            titleStoryLine = page_soup.find('div', {'id': 'titleStoryLine'})
             divs = titleStoryLine.find_all('div', class_='canwrap')
             for div in divs:
                 p = div.find('p')
@@ -61,10 +60,13 @@ class IMDBCrawler(object):
                                 genres.append(genres_a.string.strip())
                             info['genres'] = genres
         except Exception as e:
-            print(colored('Cannot find storyline or genres. {}: {}'.format(mid, e), 'red'))
+            print(
+                colored(
+                    'Cannot find storyline or genres. {}: {}'.format(mid, e),
+                    'red'))
         # get country and runtime
         try:
-            titleStoryLine = page_soup.find('div', {'id':'titleDetails'})
+            titleStoryLine = page_soup.find('div', {'id': 'titleDetails'})
             divs = titleStoryLine.find_all('div', class_='txt-block')
             for div in divs:
                 title = div.find('h4')
@@ -86,16 +88,19 @@ class IMDBCrawler(object):
                                 'description': description
                             })
         except Exception as e:
-            print(colored('Cannot find country or runtime. {}: {}'.format(mid, e), 'red'))
+            print(
+                colored(
+                    'Cannot find country or runtime. {}: {}'.format(mid, e),
+                    'red'))
         return info
-    
+
     def parse_credits_page(self, mid):
-        """get infomation of a movie from its IMDB credits page,
-           including director and cast
-        
+        """get infomation of a movie from its IMDB credits page, including
+        director and cast.
+
         Args:
             mid (str): IMDB ID
-        
+
         Returns:
             dict: information dict
         """
@@ -103,9 +108,10 @@ class IMDBCrawler(object):
             'imdb_id': mid,
             'cast': None,
             'director': None,
-            }
+        }
         try:
-            response = requests.get('{}/{}/{}'.format(self.url_prefix, mid, 'fullcredits'))
+            response = requests.get('{}/{}/{}'.format(self.url_prefix, mid,
+                                                      'fullcredits'))
             content = response.text
             page_soup = BeautifulSoup(content, 'lxml')
             credit_div = page_soup.find('div', {'id': 'fullcredits_content'})
@@ -130,29 +136,32 @@ class IMDBCrawler(object):
                     name = tda.find('img')['title'].strip()
                     td = tr.find('td', class_='character')
                     character = td.get_text().strip()
-                    character = character.replace('\n','')
+                    character = character.replace('\n', '')
                     if character.find('uncredited') >= 0:
                         continue
-                    cast.append({'id': pid, 'name': name, 'character': character})
+                    cast.append({
+                        'id': pid,
+                        'name': name,
+                        'character': character
+                    })
                 info['cast'] = cast
         except Exception as e:
             print(colored('Cannot find credits. {}: {}'.format(mid, e), 'red'))
         return info
-    
+
     def parse_synopsis(self, mid):
-        """get synopsis of a movie
-        
+        """get synopsis of a movie.
+
         Args:
             mid (str): IMDB ID
-        
+
         Returns:
             dict: synopsis
         """
-        info = {
-            'synopsis': None
-        }
+        info = {'synopsis': None}
         try:
-            response = requests.get('{}/{}/plotsummary'.format(self.url_prefix, mid))
+            response = requests.get('{}/{}/plotsummary'.format(
+                self.url_prefix, mid))
             content = response.text
             page_soup = BeautifulSoup(content, 'lxml')
             ul = page_soup.find('ul', {'id': 'plot-synopsis-content'})
@@ -163,14 +172,3 @@ class IMDBCrawler(object):
         except Exception as e:
             print(colored('{} {}'.format(mid, e), 'red'))
         return info
-    
-    # def parse_and_save(self, mid, save_dir='.'):
-    #     try:
-    #         info = self.parse_home_page(mid)
-    #         credit_info = self.parse_credits_page(mid)
-    #         synopsis_info = self.parse_synopsis(mid)
-    #         info = {**info, **credit_info, **synopsis_info}
-    #         with open(osp.join(save_dir, '{}.json'.format(mid)), 'w') as f:
-    #             f.write(json.dumps(info, indent=2))
-    #     except Exception as e:
-    #         print('{} {}'.format(mid, e))

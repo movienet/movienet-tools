@@ -2,12 +2,10 @@ import os
 import os.path as osp
 import tempfile
 
-import sys
-sys.path.append('..')
+import pytest
+
 import mmmovie
 from mmmovie import MovieReader
-import pytest
-import math
 
 
 class TestMovie(object):
@@ -29,7 +27,7 @@ class TestMovie(object):
         assert v.opened
         import cv2
         assert isinstance(v.vcap, type(cv2.VideoCapture()))
-    
+
     def test_read(self):
         v = MovieReader(self.video_path)
         img = v.read()
@@ -48,7 +46,7 @@ class TestMovie(object):
             v.get_frame(self.num_frames + 1)
         with pytest.raises(IndexError):
             v[-self.num_frames - 1]
-    
+
     def test_slice(self):
         v = MovieReader(self.video_path)
         imgs = v[-355:-353]
@@ -85,7 +83,7 @@ class TestMovie(object):
         assert v.position == 10
         v.get_frame(99)
         assert v.position == 100
-    
+
     def test_iterator(self):
         cnt = 0
         for img in MovieReader(self.video_path):
@@ -97,7 +95,7 @@ class TestMovie(object):
         with MovieReader(self.video_path) as v:
             assert v.opened
         assert not v.opened
-    
+
     def test_cvt2frames(self):
         v = MovieReader(self.video_path)
         frame_dir = tempfile.mkdtemp()
@@ -109,43 +107,47 @@ class TestMovie(object):
             os.remove(filename)
 
         v = MovieReader(self.video_path)
-        v.cvt2frames(frame_dir, show_progress=False)
-        assert osp.isdir(frame_dir)
-        for i in range(self.num_frames):
-            filename = '{}/{:06d}.jpg'.format(frame_dir, i)
-            assert osp.isfile(filename)
-            os.remove(filename)
-
-        v = MovieReader(self.video_path)
         v.cvt2frames(
             frame_dir,
-            file_start=100,
             filename_tmpl='{:03d}.JPEG',
             start=100,
-            max_num=20)
+            end=120)
         assert osp.isdir(frame_dir)
         for i in range(100, 120):
             filename = '{}/{:03d}.JPEG'.format(frame_dir, i)
             assert osp.isfile(filename)
             os.remove(filename)
         os.removedirs(frame_dir)
-    
+
     def test_resize_video(self):
         out_file = osp.join(tempfile.gettempdir(), '.mmmovie_test.mp4')
-        mmmovie.resize_movie(self.video_path, out_file, (480, 360), log_level='error', quiet=True)
+        mmmovie.resize_movie(
+            self.video_path,
+            out_file, (480, 360),
+            log_level='error',
+            quiet=True)
         v = MovieReader(out_file)
         assert v.resolution == (480, 360)
         os.remove(out_file)
-        mmmovie.resize_movie(self.video_path, out_file, ratio=2, log_level='error')
-        v = MovieReader(out_file)
-        assert v.resolution == (852, 480)
-        os.remove(out_file)
-        mmmovie.resize_movie(self.video_path, out_file, (1000, 480), keep_ar=True, log_level='error')
+        mmmovie.resize_movie(
+            self.video_path, out_file, ratio=2, log_level='error')
         v = MovieReader(out_file)
         assert v.resolution == (852, 480)
         os.remove(out_file)
         mmmovie.resize_movie(
-            self.video_path, out_file, ratio=(3, 2), keep_ar=True, log_level='error')
+            self.video_path,
+            out_file, (1000, 480),
+            keep_ar=True,
+            log_level='error')
+        v = MovieReader(out_file)
+        assert v.resolution == (852, 480)
+        os.remove(out_file)
+        mmmovie.resize_movie(
+            self.video_path,
+            out_file,
+            ratio=(3, 2),
+            keep_ar=True,
+            log_level='error')
         v = MovieReader(out_file)
         assert v.resolution == (1278, 480)
         os.remove(out_file)
@@ -156,7 +158,11 @@ class TestMovie(object):
         assert v.resolution == (352, 240)
         os.remove(out_file)
         mmmovie.resize_movie(
-            self.video_path, out_file, size='240P',  keep_ar=True, log_level='error')
+            self.video_path,
+            out_file,
+            size='240P',
+            keep_ar=True,
+            log_level='error')
         v = MovieReader(out_file)
         assert v.resolution == (426, 240)
         os.remove(out_file)

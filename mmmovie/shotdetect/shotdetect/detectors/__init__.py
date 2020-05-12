@@ -1,2 +1,0 @@
-from mmmovie.shotdetect.shotdetect.detectors.content_detector_hsv_l2 import ContentDetectorHSVL2
-from mmmovie.shotdetect.shotdetect.detectors.content_detector_hsv_luv import ContentDetectorHSVLUV

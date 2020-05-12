@@ -1,28 +1,28 @@
-import requests
-from bs4 import BeautifulSoup
-import json
-import os
-import os.path as osp
 import random
 import time
 import urllib
 
+import requests
+from bs4 import BeautifulSoup
+
 
 class DoubanCrawler(object):
+
     def __init__(self):
         self.url_prefix = 'https://movie.douban.com/'
 
     def parse_runtime(self, douban_id):
-        """get runtime of a movie from douban homepage
+        """get runtime of a movie from douban homepage.
 
         Args:
             douban_id (str): Douban ID
-        
+
         Returns:
             list: runtimes and descritopns of each version
         """
         try:
-            response = requests.get('{}/subject/{}'.format(self.url_prefix, douban_id))
+            response = requests.get('{}/subject/{}'.format(
+                self.url_prefix, douban_id))
             content = response.text
         except Exception as e:
             print(e)
@@ -54,28 +54,29 @@ class DoubanCrawler(object):
         except Exception as e:
             print('{} {}'.format(douban_id, e))
         return ret
-    
+
     def douban2imdb(self, douban_id):
         """Convert a Douban ID to IMDB ID.
 
         Args:
             douban_id (str): Douban ID
-        
+
         Returns:
             str: IMDB ID
         """
-        url = "https://movie.douban.com/subject/{}".format(douban_id)
-        response = requests.get(url) 
-        time.sleep(random.randint(0,3))
+        url = 'https://movie.douban.com/subject/{}'.format(douban_id)
+        response = requests.get(url)
+        time.sleep(random.randint(0, 3))
         html = response.content.decode('utf-8')
         soup = BeautifulSoup(html, 'lxml')
-        all_info = soup.find('div', id="info")
+        all_info = soup.find('div', id='info')
         if all_info is None:
             return None
-        for each_info in all_info.find_all("a"):
-            if each_info.attrs.get('href').find("imdb") > 0:
-                imdbid_pos =str(each_info).rfind('</a>')
-                imdbid = str(each_info)[imdbid_pos-9:imdbid_pos]
+        for each_info in all_info.find_all('a'):
+            if each_info.attrs.get('href').find('imdb') > 0:
+                imdbid_pos = str(each_info).rfind('</a>')
+                imdbid = str(each_info)[imdbid_pos - 9:imdbid_pos]
+                print(imdbid)
         return imdbid
 
     def imdb2douban(self, mid):
@@ -83,14 +84,15 @@ class DoubanCrawler(object):
 
         Args:
             mid (str): IMDB ID
-        
+
         Returns:
             str: Douban ID
         """
         douban_id = None
         try:
-            word = mid + " 电影 豆瓣"
-            url = 'http://www.baidu.com.cn/s?wd=' + urllib.parse.quote(word) + '&pn=0'
+            word = mid + ' 电影 豆瓣'
+            url = 'http://www.baidu.com.cn/s?wd=' + urllib.parse.quote(
+                word) + '&pn=0'
             htmlpage = urllib.request.urlopen(url).read()
             soup = BeautifulSoup(htmlpage, 'lxml')
             tagh3 = soup.find_all('h3')
@@ -98,11 +100,11 @@ class DoubanCrawler(object):
                 href = h3.find('a').get('href')
                 baidu_url = requests.get(url=href, allow_redirects=False)
                 real_url = baidu_url.headers['Location']
-                request_title = "https://movie.douban.com/subject/"
+                request_title = 'https://movie.douban.com/subject/'
                 if real_url.startswith(request_title):
                     ret = real_url.split(request_title)[1].split('/')[0]
+                    print(ret)
                     if self.douban2imdb(ret) == mid:
-                        # print("Find {} and its douban id: {}".format(mid, ret))
                         douban_id = ret
                         break
         except Exception as e:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 #         PySceneDetect: Python-Based Video Scene Detector
 #   ---------------------------------------------------------------
@@ -23,8 +22,7 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-
-""" PySceneDetect `scenedetect.platform` Module
+"""PySceneDetect `scenedetect.platform` Module.
 
 This file contains all platform/library/OS-specific compatibility fixes,
 intended to improve the systems that are able to run PySceneDetect, and allow
@@ -48,17 +46,16 @@ as STRING_TYPE intended to help with parsing string types from the CLI parser.
 
 # Standard Library Imports
 from __future__ import print_function
-import sys
+import csv
 import os
 import platform
 import struct
-import csv
+import sys
 
 # Third-Party Library Imports
 import cv2
 
 # pylint: disable=unused-import
-
 
 ##
 ## Python 2/3 Queue/queue Library (scenedetect.platform.queue)
@@ -69,7 +66,6 @@ if sys.version_info[0] == 2:
 else:
     import queue
 
-
 ##
 ## tqdm Library (scenedetect.platform.tqdm will be tqdm object or None)
 ##
@@ -79,9 +75,7 @@ try:
 except ImportError:
     tqdm = None
 
-
 # pylint: enable=unused-import
-
 
 ##
 ## click/Command-Line Interface String Type
@@ -96,7 +90,6 @@ else:
     STRING_TYPE = str
 # pylint: enable=invalid-name, undefined-variable
 
-
 ##
 ## OpenCV 2.x Compatibility Fix
 ##
@@ -105,8 +98,8 @@ else:
 # cv2.cv namespace to the cv2 namespace, as the cv2.cv namespace was removed
 # with the release of OpenCV 3.0).
 # pylint: disable=c-extension-no-member
-if cv2.__version__[0] == '2' or not (
-        cv2.__version__[0].isdigit() and int(cv2.__version__[0]) >= 3):
+if cv2.__version__[0] == '2' or not (cv2.__version__[0].isdigit()
+                                     and int(cv2.__version__[0]) >= 3):
     cv2.CAP_PROP_FRAME_WIDTH = cv2.cv.CV_CAP_PROP_FRAME_WIDTH
     cv2.CAP_PROP_FRAME_HEIGHT = cv2.cv.CV_CAP_PROP_FRAME_HEIGHT
     cv2.CAP_PROP_FPS = cv2.cv.CV_CAP_PROP_FPS
@@ -115,15 +108,16 @@ if cv2.__version__[0] == '2' or not (
     cv2.CAP_PROP_FRAME_COUNT = cv2.cv.CV_CAP_PROP_FRAME_COUNT
 # pylint: enable=c-extension-no-member
 
-
 ##
 ## OpenCV DLL Check Function (Windows Only)
 ##
 
+
 def check_opencv_ffmpeg_dll():
     # type: () -> bool
-    """ Check OpenCV FFmpeg DLL: Checks if OpenCV video I/O support is available,
-    on Windows only, by checking for the appropriate opencv_ffmpeg*.dll file.
+    """Check OpenCV FFmpeg DLL: Checks if OpenCV video I/O support is
+    available, on Windows only, by checking for the appropriate
+    opencv_ffmpeg*.dll file.
 
     On non-Windows systems always returns True, or for OpenCV versions that do
     not follow the X.Y.Z version numbering pattern. Thus there may be false
@@ -136,20 +130,23 @@ def check_opencv_ffmpeg_dll():
         (bool) True if OpenCV video support is detected (e.g. the appropriate
         opencv_ffmpegXYZ.dll file is in PATH), False otherwise.
     """
-    if platform.system() == 'Windows' and (
-            cv2.__version__[0].isdigit() and cv2.__version__.find('.') > 0):
-        is_64_bit_str = '_64' if struct.calcsize("P") == 8 else ''
+    if platform.system() == 'Windows' and (cv2.__version__[0].isdigit()
+                                           and cv2.__version__.find('.') > 0):
+        is_64_bit_str = '_64' if struct.calcsize('P') == 8 else ''
         dll_filename = 'opencv_ffmpeg{OPENCV_VERSION}{IS_64_BIT}.dll'.format(
             OPENCV_VERSION=cv2.__version__.replace('.', ''),
             IS_64_BIT=is_64_bit_str)
-        return any([os.path.exists(os.path.join(path_path, dll_filename))
-                    for path_path in os.environ['PATH'].split(';')]), dll_filename
+        return any([
+            os.path.exists(os.path.join(path_path, dll_filename))
+            for path_path in os.environ['PATH'].split(';')
+        ]), dll_filename
     return True
 
 
 ##
 ## OpenCV imwrite Supported Image Types & Quality/Compression Parameters
 ##
+
 
 def _get_cv2_param(param_name):
     # type: (str) -> Union[int, None]
@@ -163,7 +160,7 @@ def _get_cv2_param(param_name):
 
 def get_cv2_imwrite_params():
     # type: () -> Dict[str, Union[int, None]]
-    """ Get OpenCV imwrite Params: Returns a dict of supported image formats and
+    """Get OpenCV imwrite Params: Returns a dict of supported image formats and
     their associated quality/compression parameter.
 
     Returns:
@@ -183,14 +180,14 @@ def get_cv2_imwrite_params():
 ## Python csv Module Wrapper (for StatsManager, and CliContext/list-scenes command)
 ##
 
+
 def get_csv_reader(file_handle):
     # type: (File) -> csv.reader
-    """ Returns a csv.reader object using the passed file handle. """
+    """Returns a csv.reader object using the passed file handle."""
     return csv.reader(file_handle, lineterminator='\n')
 
 
 def get_csv_writer(file_handle):
     # type: (File) -> csv.writer
-    """ Returns a csv.writer object using the passed file handle. """
+    """Returns a csv.writer object using the passed file handle."""
     return csv.writer(file_handle, lineterminator='\n')
-

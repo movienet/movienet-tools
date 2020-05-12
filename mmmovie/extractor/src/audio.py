@@ -1,9 +1,9 @@
-'''
-Audio extractor, supports folder and video input
-folders xxxx0\nxxxx1\nxxxx2\n  # folders of mp4 video
-videos xxxx0.mp4\nxxxx1.mp4\nxxxx2.mp4\n
-    or xxxx0/xxxx0.mp4\nxxxxx0/xxxx1.mp4\nxxxx1/xxxx0.mp4\nxxxx1/xxxx1.mp4\n\
-'''
+"""Audio extractor, supports folder and video input folders.
+
+xxxx0\nxxxx1\nxxxx2\n  # folders of mp4 video videos
+xxxx0.mp4\nxxxx1.mp4\nxxxx2.mp4\n or
+xxxx0/xxxx0.mp4\nxxxxx0/xxxx1.mp4\nxxxx1/xxxx0.mp4\nxxxx1/xxxx1.mp4\n
+"""
 import multiprocessing
 import os
 import os.path as osp
@@ -11,10 +11,9 @@ import pdb
 import subprocess
 from datetime import datetime
 
-import numpy as np
-
 import librosa
 import mmcv
+import numpy as np
 
 global parallel_cnt
 global parallel_num
@@ -26,39 +25,37 @@ def call_back(rst):
     global parallel_num
     parallel_cnt += 1
     if parallel_cnt % 100 == 0:
-        print('{}, {:5d} / {:5d} done!'.format(datetime.now(), parallel_cnt, parallel_num))
+        print('{}, {:5d} / {:5d} done!'.format(datetime.now(), parallel_cnt,
+                                               parallel_num))
 
 
 def run_mp42wav(cfg, file_item_mp4):
-    file_item = file_item_mp4.split(".m")[0]
-    src_video_fn = osp.join(cfg.src_video_path, "{}".format(file_item_mp4))
-    dst_video_fn = osp.join(cfg.dst_wav_path, "{}.wav".format(file_item))
+    file_item = file_item_mp4.split('.m')[0]
+    src_video_fn = osp.join(cfg.src_video_path, '{}'.format(file_item_mp4))
+    dst_video_fn = osp.join(cfg.dst_wav_path, '{}.wav'.format(file_item))
     if not cfg.replace_old and osp.exists(dst_video_fn):
         return 0
-    call_list  = ['ffmpeg']
+    call_list = ['ffmpeg']
     call_list += ['-v', 'quiet']
-    call_list += [
-        '-i',
-        src_video_fn,
-        '-f',
-        'wav']
+    call_list += ['-i', src_video_fn, '-f', 'wav']
     call_list += ['-map_chapters', '-1']  # remove meta stream
     call_list += [dst_video_fn]
     subprocess.call(call_list)
     if not osp.exists(dst_video_fn):
-        wav_np = np.zeros((16000*4), np.float32)
+        wav_np = np.zeros((16000 * 4), np.float32)
         librosa.output.write_wav(dst_video_fn, wav_np, sr=16000)
-        print(file_item_mp4, "not exist, and zero is written into it instead")
+        print(file_item_mp4, 'not exist, and zero is written into it instead')
 
 
 def run_wav2stft(cfg, file_item_mp4):
     k = 3  # sample episode num
     time_unit = 3  # unit: second
-    file_item = file_item_mp4.split(".m")[0]
+    file_item = file_item_mp4.split('.m')[0]
     feat_path = osp.join(cfg.dst_stft_path, '{}.npy'.format(file_item))
     if cfg.replace_old and osp.exists(feat_path):
         return 0
-    data, fs = librosa.core.load(osp.join(cfg.dst_wav_path, "{}.wav".format(file_item)), sr=16000)
+    data, fs = librosa.core.load(
+        osp.join(cfg.dst_wav_path, '{}.wav'.format(file_item)), sr=16000)
     # normalize
     mean = (data.max() + data.min()) / 2
     span = (data.max() - data.min()) / 2
@@ -84,14 +81,15 @@ def run_wav2stft(cfg, file_item_mp4):
 
     # sample
     n = freq.shape[1]
-    milestone = [x[0] for x in np.array_split(np.arange(n), k+1)[1:]]
+    milestone = [x[0] for x in np.array_split(np.arange(n), k + 1)[1:]]
     span = 15  # hard code in audio feat extractor
     stft_img = []
     for i in range(k):
-        stft_img.append(freq[:, milestone[i]-span:milestone[i]+span])
+        stft_img.append(freq[:, milestone[i] - span:milestone[i] + span])
     freq = np.concatenate(stft_img, axis=1)
     if freq.shape[1] != 90:
-        raise RuntimeError("the shape of {} is wrong {}".format(file_item_mp4, freq.shape))
+        raise RuntimeError('the shape of {} is wrong {}'.format(
+            file_item_mp4, freq.shape))
     np.save(feat_path, freq)
 
 
@@ -124,13 +122,17 @@ def extract_audio_feat(cfg):
     if flag_folder:
         file_list = []
         for video_id in video_list:
-            shot_id_mp4_list = sorted(os.listdir(osp.join(cfg.src_video_path, video_id)))
+            shot_id_mp4_list = sorted(
+                os.listdir(osp.join(cfg.src_video_path, video_id)))
             for shot_id_mp4 in shot_id_mp4_list:
                 print(osp.join(cfg.src_video_path, video_id, shot_id_mp4))
-                if osp.isdir(osp.join(cfg.src_video_path, video_id, shot_id_mp4)):
-                    raise RuntimeError("There is subfolder in {}, \
-                                    but currently the program only supports two-level folder".format(
-                                    osp.join(cfg.src_video_path, video_id, shot_id_mp4)))
+                if osp.isdir(
+                        osp.join(cfg.src_video_path, video_id, shot_id_mp4)):
+                    raise RuntimeError('There is subfolder in {}, \
+                                    but currently the program only supports two-level folder'
+                                       .format(
+                                           osp.join(cfg.src_video_path,
+                                                    video_id, shot_id_mp4)))
                 file_list.append(osp.join(video_id, shot_id_mp4))
                 parallel_num += 1
     else:
@@ -139,14 +141,15 @@ def extract_audio_feat(cfg):
     if cfg.num_workers > 1:
         pool = multiprocessing.Pool(processes=cfg.num_workers)
     for file_item_mp4 in file_list:
-        if "/" in file_item_mp4:
-            video_id = file_item_mp4.split("/")[0]
+        if '/' in file_item_mp4:
+            video_id = file_item_mp4.split('/')[0]
             os.makedirs(osp.join(cfg.dst_wav_path, video_id), exist_ok=True)
             os.makedirs(osp.join(cfg.dst_stft_path, video_id), exist_ok=True)
         if cfg.num_workers == 1:
             run(cfg_dict, file_item_mp4)
         elif cfg.num_workers > 1:
-            pool.apply_async(run, (cfg_dict, file_item_mp4), callback=call_back)
+            pool.apply_async(
+                run, (cfg_dict, file_item_mp4), callback=call_back)
     if cfg.num_workers > 1:
         pool.close()
         pool.join()

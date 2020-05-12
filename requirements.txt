@@ -1,0 +1,11 @@
+mmcv
+tqdm
+opencv-python
+requests
+bs4
+librosa
+PyHamcrest
+termcolor
+cython
+numba==0.48.0
+lxml

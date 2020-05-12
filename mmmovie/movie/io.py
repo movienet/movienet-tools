@@ -1,32 +1,20 @@
 import os.path as osp
-from collections import OrderedDict
 
 import cv2
-
-from mmcv.utils import (scandir, check_file_exist, mkdir_or_exist,
-                        track_progress)
-from mmcv.opencv_info import USE_OPENCV2
-
-if not USE_OPENCV2:
-    from cv2 import (CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS,
-                     CAP_PROP_FRAME_COUNT, CAP_PROP_FOURCC,
-                     CAP_PROP_POS_FRAMES, VideoWriter_fourcc)
-else:
-    from cv2.cv import CV_CAP_PROP_FRAME_WIDTH as CAP_PROP_FRAME_WIDTH
-    from cv2.cv import CV_CAP_PROP_FRAME_HEIGHT as CAP_PROP_FRAME_HEIGHT
-    from cv2.cv import CV_CAP_PROP_FPS as CAP_PROP_FPS
-    from cv2.cv import CV_CAP_PROP_FRAME_COUNT as CAP_PROP_FRAME_COUNT
-    from cv2.cv import CV_CAP_PROP_FOURCC as CAP_PROP_FOURCC
-    from cv2.cv import CV_CAP_PROP_POS_FRAMES as CAP_PROP_POS_FRAMES
-    from cv2.cv import CV_FOURCC as VideoWriter_fourcc
-
+from mmcv.utils import mkdir_or_exist
 from mmcv.video import VideoReader
 
 
+from cv2 import (CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS,
+                    CAP_PROP_FRAME_COUNT, CAP_PROP_FOURCC,
+                    CAP_PROP_POS_FRAMES, VideoWriter_fourcc)
+
+
 class MovieReader(VideoReader):
+
     def __init__(self, filename, cache_capacity=10):
         super(MovieReader, self).__init__(filename, cache_capacity)
-    
+
     def _adjust_size(self, size):
         w, h = size
         assert isinstance(h) and (h == -1 or h > 0)
@@ -44,10 +32,9 @@ class MovieReader(VideoReader):
             h = int(ori_h * scale + 0.5)
         else:
             scale = h / ori_h
-            w  = int(ori_w * scale)
+            w = int(ori_w * scale)
         return (w, h)
 
-    
     def cvt2frames(self,
                    frame_dir,
                    size=None,
@@ -55,20 +42,20 @@ class MovieReader(VideoReader):
                    start=0,
                    end=None,
                    filename_tmpl='{:06d}.jpg'):
-        """ This function overwrites original ``mmcv.VideoReader.cvt2frame``.
-        This function converts a video to frames and save the frames in a 
+        """This function overwrites original ``mmcv.VideoReader.cvt2frame``.
+        This function converts a video to frames and save the frames in a
         perticular pattern.
 
         Args:
             frame_dir (str): Output root directory to store the frames.
             size (None or tuple <width, height>): frame size, if it is tuple
-                of target width and height, the frame will be resized. 
+                of target width and height, the frame will be resized.
                 If height is -1 or width is -1, the ratio will be kept.
             step (int): frequency of saving frames.
             start (int): start index.
             end (int or None): end index.
             filename_tmpl (str or callable): filename template. It should be
-                a formated string or some callable function/object that 
+                a formated string or some callable function/object that
                 accept an index as input parameter.
         """
         assert isinstance(start, int) and start >= 0
@@ -80,7 +67,10 @@ class MovieReader(VideoReader):
             size = self._adjust_size(size)
         mkdir_or_exist(frame_dir)
 
-        end = min(end, self.frame_cnt)
+        if end is None:
+            end = self.frame_cnt
+        else:
+            end = min(end, self.frame_cnt)
         for i in range(start, end, step):
             img = self.get_frame(i)
             if size:
@@ -90,7 +80,3 @@ class MovieReader(VideoReader):
             else:
                 fn = filename_tmpl.format(i)
             cv2.imwrite(osp.join(frame_dir, fn), img)
-
-
-
-

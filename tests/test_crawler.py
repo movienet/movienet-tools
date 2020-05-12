@@ -1,12 +1,8 @@
-import os
 import os.path as osp
-import tempfile
 
-import sys
-sys.path.append('..')
-from mmmovie import DoubanCrawler, IMDBCrawler, TMDBCrawler
 import pytest
-import math
+
+from mmmovie import DoubanCrawler, IMDBCrawler, TMDBCrawler
 
 
 class TestCrawler(object):
@@ -32,12 +28,12 @@ class TestCrawler(object):
         assert info['cast'][0]['name'] == 'Leonardo DiCaprio'
         assert info['cast'][0]['id'] == 'nm0000138'
         assert len(info['synopsis'].split()) == 1444
-    
+
     def test_douban_crawler(self):
         crawler = DoubanCrawler()
         douban_id = crawler.imdb2douban(self.mid)
         assert douban_id == self.douban_id
-    
+
     def test_tmdb_crawler(self):
         if osp.isfile('apikey.txt'):
             crawler = TMDBCrawler('apikey.txt')

@@ -1,7 +1,7 @@
 # mmmovie
 some basic tools for movie analysis
 
-## Install 
+## Install
 > python > 3.6
 > pip install -r docs/requirements.txt
 
@@ -22,13 +22,13 @@ Some abbrevation rule, and you may negoitate with us.
 
 ```
 *mmcv*
-src = source 
+src = source
 dst = destination
 img = image
 ```
 
 ```
 *follow qq*
-st = start 
+st = start
 ed = end
 ```

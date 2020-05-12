@@ -1,14 +1,15 @@
 # Standard Library Imports
 
 from __future__ import print_function
-import sys
 import os
+import sys
 import time
+
+from .frame_timecode import FrameTimecode
+from .shot_manager import ShotManager
+from .video_manager import VideoManager
+from .content_detector_hsv_l2 import ContentDetectorHSVL2
+from .content_detector_hsv_luv import ContentDetectorHSVLUV
 
 
 # PyShotDetect Library Imports
-
-from mmmovie.shotdetect.shotdetect.shot_manager import ShotManager
-from mmmovie.shotdetect.shotdetect.frame_timecode import FrameTimecode
-from mmmovie.shotdetect.shotdetect.video_manager import VideoManager
-from mmmovie.shotdetect.shotdetect.detectors import ContentDetectorHSVL2, ContentDetectorHSVLUV

@@ -4,6 +4,7 @@ test/data/aud_feat
 test/data/place_feat_raw
 test/data/place_feat
 
+mmmovie/version.py
 local/
 
 # compress files

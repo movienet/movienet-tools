@@ -1,25 +1,26 @@
 # Standard Library Imports
 from __future__ import print_function
 import math
+import pdb
 
 import cv2
-from mmmovie.shotdetect.shotdetect.platform import tqdm
 
 # PyshotDetect Library Imports
-from mmmovie.shotdetect.shotdetect.frame_timecode import FrameTimecode
-from mmmovie.shotdetect.shotdetect.platform import get_csv_writer
-from mmmovie.shotdetect.shotdetect.stats_manager import FrameMetricRegistered
+from .frame_timecode import FrameTimecode
+from .platform import get_csv_writer, tqdm
+from .stats_manager import FrameMetricRegistered
 
-import pdb
 ##
 ## shotManager Helper Functions
 ##
 
+
 def get_shots_from_cuts(cut_list, base_timecode, num_frames, start_frame=0):
     # type: List[FrameTimecode], FrameTimecode, Union[int, FrameTimecode],
     #       Optional[Union[int, FrameTimecode]] -> List[Tuple[FrameTimecode, FrameTimecode]]
-    """ Returns a list of tuples of start/end FrameTimecodes for each shot based on a
-    list of detected shot cuts/breaks.
+    """Returns a list of tuples of start/end FrameTimecodes for each shot based
+    on a list of detected shot cuts/breaks.
+
     This function is called when using the :py:meth:`shotManager.get_shot_list` method.
     The shot list is generated from a cutting list (:py:meth:`shotManager.get_cut_list`),
     noting that each shot is contiguous, starting from the first to last frame of the input.
@@ -39,7 +40,8 @@ def get_shots_from_cuts(cut_list, base_timecode, num_frames, start_frame=0):
     # shot list, where shots are tuples of (Start FrameTimecode, End FrameTimecode).
     shot_list = []
     if not cut_list:
-        shot_list.append((base_timecode + start_frame, base_timecode + num_frames))
+        shot_list.append(
+            (base_timecode + start_frame, base_timecode + num_frames))
         return shot_list
     # Initialize last_cut to the first frame we processed,as it will be
     # the start timecode for the first shot in the list.
@@ -54,7 +56,8 @@ def get_shots_from_cuts(cut_list, base_timecode, num_frames, start_frame=0):
 
 
 def write_shot_list(output_csv_file, shot_list, cut_list=None):
-    """ Writes the given list of shots to an output file handle in CSV format.
+    """Writes the given list of shots to an output file handle in CSV format.
+
     Arguments:
         output_csv_file: Handle to open file in write mode.
         shot_list: List of pairs of FrameTimecodes denoting each shot's start/end FrameTimecode.
@@ -65,35 +68,47 @@ def write_shot_list(output_csv_file, shot_list, cut_list=None):
     # type: (File, List[Tuple[FrameTimecode, FrameTimecode]], Optional[List[FrameTimecode]]) -> None
     csv_writer = get_csv_writer(output_csv_file)
     # Output Timecode List
-    csv_writer.writerow(
-        ["Timecode List:"] +
-        cut_list if cut_list else [start.get_timecode() for start, _ in shot_list[1:]])
+    csv_writer.writerow(['Timecode List:'] + cut_list if cut_list else
+                        [start.get_timecode() for start, _ in shot_list[1:]])
     csv_writer.writerow([
-        "shot Number",
-        "Start Frame", "Start Timecode", "Start Time (seconds)",
-        "End Frame", "End Timecode", "End Time (seconds)",
-        "Length (frames)", "Length (timecode)", "Length (seconds)"])
+        'shot Number', 'Start Frame', 'Start Timecode', 'Start Time (seconds)',
+        'End Frame', 'End Timecode', 'End Time (seconds)', 'Length (frames)',
+        'Length (timecode)', 'Length (seconds)'
+    ])
     for i, (start, end) in enumerate(shot_list):
         duration = end - start
         csv_writer.writerow([
-            '%d' % (i+1),
-            '%d' % start.get_frames(), start.get_timecode(), '%.3f' % start.get_seconds(),
-            '%d' % end.get_frames(), end.get_timecode(), '%.3f' % end.get_seconds(),
-            '%d' % duration.get_frames(), duration.get_timecode(), '%.3f' % duration.get_seconds()])
+            '%d' % (i + 1),
+            '%d' % start.get_frames(),
+            start.get_timecode(),
+            '%.3f' % start.get_seconds(),
+            '%d' % end.get_frames(),
+            end.get_timecode(),
+            '%.3f' % end.get_seconds(),
+            '%d' % duration.get_frames(),
+            duration.get_timecode(),
+            '%.3f' % duration.get_seconds()
+        ])
 
 
 ##
 ## ShotManager Class Implementation
 ##
 
+
 class ShotManager(object):
-    """ The shotManager facilitates detection of shots via the :py:meth:`detect_shots` method,
-    given a video source (:py:class:`VideoManager <shotdetect.video_manager.VideoManager>`
-    or cv2.VideoCapture), and shotDetector algorithms added via the :py:meth:`add_detector` method.
-    Can also optionally take a StatsManager instance during construction to cache intermediate
-    shot detection calculations, making subsequent calls to :py:meth:`detect_shots` much faster,
-    allowing the cached values to be saved/loaded to/from disk, and also manually determining
-    the optimal threshold values or other options for various detection algorithms.
+    """The shotManager facilitates detection of shots via the
+    :py:meth:`detect_shots` method, given a video source
+    (:py:class:`VideoManager <shotdetect.video_manager.VideoManager>` or
+    cv2.VideoCapture), and shotDetector algorithms added via the
+    :py:meth:`add_detector` method.
+
+    Can also optionally take a StatsManager instance during construction
+    to cache intermediate shot detection calculations, making subsequent
+    calls to :py:meth:`detect_shots` much faster, allowing the cached
+    values to be saved/loaded to/from disk, and also manually
+    determining the optimal threshold values or other options for
+    various detection algorithms.
     """
 
     def __init__(self, stats_manager=None):
@@ -104,11 +119,12 @@ class ShotManager(object):
         self._num_frames = 0
         self._start_frame = 0
 
-
     def add_detector(self, detector):
         # type: (shotDetector) -> None
-        """ Adds/registers a shotDetector (e.g. ContentDetector, ThresholdDetector) to
-        run when detect_shots is called. The shotManager owns the detector object,
+        """Adds/registers a shotDetector (e.g. ContentDetector,
+        ThresholdDetector) to run when detect_shots is called.
+
+        The shotManager owns the detector object,
         so a temporary may be passed.
         Arguments:
             detector (shotDetector): shot detector to add to the shotManager.
@@ -126,34 +142,34 @@ class ShotManager(object):
 
     def get_num_detectors(self):
         # type: () -> int
-        """ Gets number of registered shot detectors added via add_detector. """
+        """Gets number of registered shot detectors added via add_detector."""
         return len(self._detector_list)
-
 
     def clear(self):
         # type: () -> None
-        """ Clears all cuts/shots and resets the shotManager's position.
-        Any statistics generated are still saved in the StatsManager object
-        passed to the shotManager's constructor, and thus, subsequent
-        calls to detect_shots, using the same frame source reset at the
-        initial time (if it is a VideoManager, use the reset() method),
-        will use the cached frame metrics that were computed and saved
-        in the previous call to detect_shots.
+        """Clears all cuts/shots and resets the shotManager's position.
+
+        Any statistics generated are still saved in the StatsManager
+        object passed to the shotManager's constructor, and thus,
+        subsequent calls to detect_shots, using the same frame source
+        reset at the initial time (if it is a VideoManager, use the
+        reset() method), will use the cached frame metrics that were
+        computed and saved in the previous call to detect_shots.
         """
         self._cutting_list.clear()
         self._num_frames = 0
         self._start_frame = 0
 
-
     def clear_detectors(self):
         # type: () -> None
-        """ Removes all shot detectors added to the shotManager via add_detector(). """
+        """Removes all shot detectors added to the shotManager via
+        add_detector()."""
         self._detector_list.clear()
-
 
     def get_shot_list(self, base_timecode):
         # type: (FrameTimecode) -> List[Tuple[FrameTimecode, FrameTimecode]]
-        """ Returns a list of tuples of start/end FrameTimecodes for each shot.
+        """Returns a list of tuples of start/end FrameTimecodes for each shot.
+
         The shot list is generated by calling :py:func:`get_shots_from_cuts` on the cutting
         list from :py:meth:`get_cut_list`, noting that each shot is contiguous, starting from
         the first and ending at the last frame of the input.
@@ -163,13 +179,13 @@ class ShotManager(object):
             detected shot in the video begins and ends.
         """
         return get_shots_from_cuts(
-            self.get_cut_list(base_timecode), base_timecode,
-            self._num_frames, self._start_frame)
-
+            self.get_cut_list(base_timecode), base_timecode, self._num_frames,
+            self._start_frame)
 
     def get_cut_list(self, base_timecode):
         # type: (FrameTimecode) -> List[FrameTimecode]
-        """ Returns a list of FrameTimecodes of the detected shot changes/cuts.
+        """Returns a list of FrameTimecodes of the detected shot changes/cuts.
+
         Unlike get_shot_list, the cutting list returns a list of FrameTimecodes representing
         the point in the input video(s) where a new shot was detected, and thus the frame
         where the input should be cut/split. The cutting list, in turn, is used to generate
@@ -181,55 +197,61 @@ class ShotManager(object):
             for automated splitting of the input into individual shots.
         """
 
-        return [FrameTimecode(cut, base_timecode)
-                for cut in self._get_cutting_list()]
-
+        return [
+            FrameTimecode(cut, base_timecode)
+            for cut in self._get_cutting_list()
+        ]
 
     def _get_cutting_list(self):
         # type: () -> list
-        """ Returns a sorted list of unique frame numbers of any detected shot cuts. """
+        """Returns a sorted list of unique frame numbers of any detected shot
+        cuts."""
         # We remove duplicates here by creating a set then back to a list and sort it.
         return sorted(list(set(self._cutting_list)))
-
 
     def _add_cut(self, frame_num):
         # type: (int) -> None
         # Adds a cut to the cutting list.
         self._cutting_list.append(frame_num)
 
-
     def _add_cuts(self, cut_list):
         # type: (List[int]) -> None
         # Adds a list of cuts to the cutting list.
         self._cutting_list += cut_list
 
-
     def _process_frame(self, frame_num, frame_im):
         # type(int, numpy.ndarray) -> None
-        """ Adds any cuts detected with the current frame to the cutting list. """
+        """Adds any cuts detected with the current frame to the cutting
+        list."""
         for detector in self._detector_list:
             self._add_cuts(detector.process_frame(frame_num, frame_im))
 
     def _is_processing_required(self, frame_num):
         # type(int) -> bool
-        """ Is Processing Required: Returns True if frame metrics not in StatsManager,
-        False otherwise.
-        """
-        return all([detector.is_processing_required(frame_num) for detector in self._detector_list])
-
+        """Is Processing Required: Returns True if frame metrics not in
+        StatsManager, False otherwise."""
+        return all([
+            detector.is_processing_required(frame_num)
+            for detector in self._detector_list
+        ])
 
     def _post_process(self, frame_num):
         # type(int, numpy.ndarray) -> None
-        """ Adds any remaining cuts to the cutting list after processing the last frame. """
+        """Adds any remaining cuts to the cutting list after processing the
+        last frame."""
         for detector in self._detector_list:
             self._add_cuts(detector.post_process(frame_num))
 
-
-    def detect_shots(self, frame_source, end_time=None, frame_skip=0,
-                      show_progress=True):
+    def detect_shots(self,
+                     frame_source,
+                     end_time=None,
+                     frame_skip=0,
+                     show_progress=True):
         # type: (VideoManager, Union[int, FrameTimecode],
         #        Optional[Union[int, FrameTimecode]], Optional[bool]) -> int
-        """ Perform shot detection on the given frame_source using the added shotDetectors.
+        """Perform shot detection on the given frame_source using the added
+        shotDetectors.
+
         Blocks until all frames in the frame_source have been processed. Results can
         be obtained by calling either the get_shot_list() or get_cut_list() methods.
         Arguments:
@@ -281,7 +303,8 @@ class ShotManager(object):
         if end_frame is not None:
             total_frames = end_frame
 
-        if start_frame is not None and not isinstance(start_time, FrameTimecode):
+        if start_frame is not None and not isinstance(start_time,
+                                                      FrameTimecode):
             total_frames -= start_frame
 
         if total_frames < 0:
@@ -289,8 +312,7 @@ class ShotManager(object):
 
         progress_bar = None
         if tqdm and show_progress:
-            progress_bar = tqdm(
-                total=total_frames, unit='frames')
+            progress_bar = tqdm(total=total_frames, unit='frames')
         try:
 
             while True:
@@ -299,8 +321,10 @@ class ShotManager(object):
                 # We don't compensate for frame_skip here as the frame_skip option
                 # is not allowed when using a StatsManager - thus, processing is
                 # *always* required for *all* frames when frame_skip > 0.
-                if (self._is_processing_required(self._num_frames + start_frame)
-                        or self._is_processing_required(self._num_frames + start_frame + 1)):
+                if (self._is_processing_required(self._num_frames +
+                                                 start_frame)
+                        or self._is_processing_required(self._num_frames +
+                                                        start_frame + 1)):
                     ret_val, frame_im = frame_source.read()
                 else:
                     ret_val = frame_source.grab()
@@ -332,4 +356,3 @@ class ShotManager(object):
                 progress_bar.close()
 
         return num_frames
-        

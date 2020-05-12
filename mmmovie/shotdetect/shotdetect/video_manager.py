@@ -1,26 +1,27 @@
-# Standard Library Imports
 from __future__ import print_function
-import os
 import math
+import os
 
-# Third-Party Library Imports
 import cv2
 
-# PyshotDetect Library Imports
-from mmmovie.shotdetect.shotdetect.platform import STRING_TYPE
-import mmmovie.shotdetect.shotdetect.frame_timecode
-from mmmovie.shotdetect.shotdetect.frame_timecode import FrameTimecode
-
+from .frame_timecode import FrameTimecode
+from .frame_timecode import MINIMUM_FRAMES_PER_SECOND_FLOAT
+from .platform import STRING_TYPE
 
 ##
 ## VideoManager Exceptions
 ##
 
+
 class VideoOpenFailure(Exception):
     """ VideoOpenFailure: Raised when an OpenCV VideoCapture object fails to open (i.e. calling
     the isOpened() method returns a non True value). """
-    def __init__(self, file_list=None, message=
-                 "OpenCV VideoCapture object failed to return True when calling isOpened()."):
+
+    def __init__(
+        self,
+        file_list=None,
+        message='OpenCV VideoCapture object failed to return True when calling isOpened().'
+    ):
         # type: (Iterable[(str, str)], str)
         # Pass message string to base Exception class.
         super(VideoOpenFailure, self).__init__(message)
@@ -31,9 +32,13 @@ class VideoOpenFailure(Exception):
 class VideoFramerateUnavailable(Exception):
     """ VideoFramerateUnavailable: Raised when the framerate cannot be determined from the video,
     and the framerate has not been overriden/forced in the VideoManager. """
-    def __init__(self, file_name=None, file_path=None, message=
-                 "OpenCV VideoCapture object failed to return framerate when calling "
-                 "get(cv2.CAP_PROP_FPS)."):
+
+    def __init__(
+        self,
+        file_name=None,
+        file_path=None,
+        message='OpenCV VideoCapture object failed to return framerate when calling '
+        'get(cv2.CAP_PROP_FPS).'):
         # type: (str, str, str)
         # Pass message string to base Exception class.
         super(VideoFramerateUnavailable, self).__init__(message)
@@ -45,8 +50,11 @@ class VideoFramerateUnavailable(Exception):
 class VideoParameterMismatch(Exception):
     """ VideoParameterMismatch: Raised when opening multiple videos with a VideoManager, and some
     of the video parameters (frame height, frame width, and framerate/FPS) do not match. """
-    def __init__(self, file_list=None, message=
-                 "OpenCV VideoCapture object parameters do not match."):
+
+    def __init__(
+        self,
+        file_list=None,
+        message='OpenCV VideoCapture object parameters do not match.'):
         # type: (Iterable[Tuple[int, float, float, str, str]], str)
         # Pass message string to base Exception class.
         super(VideoParameterMismatch, self).__init__(message)
@@ -79,24 +87,23 @@ class InvalidDownscaleFactor(ValueError):
 ##
 
 DEFAULT_DOWNSCALE_FACTORS = {
-    3200: 12,        # ~4k
-    2100: 8,        # ~2k
-    1700: 6,        # ~1080p
+    3200: 12,  # ~4k
+    2100: 8,  # ~2k
+    1700: 6,  # ~1080p
     1200: 5,
-    900: 4,         # ~720p
+    900: 4,  # ~720p
     600: 3,
-    400: 1        # ~480p
+    400: 1  # ~480p
 }
 """Dict[int, int]: The default downscale factor for a video of size W x H,
 which enforces the constraint that W >= 200 to ensure an adequate amount
 of pixels for shot detection while providing a speedup in processing. """
 
 
-
 def compute_downscale_factor(frame_width):
     # type: (int) -> int
-    """ Compute Downscale Factor: Returns the optimal default downscale factor based on
-    a video's resolution (specifically, the width parameter).
+    """Compute Downscale Factor: Returns the optimal default downscale factor
+    based on a video's resolution (specifically, the width parameter).
 
     Returns:
         int: The defalt downscale factor to use with a video of frame_height x frame_width.
@@ -109,7 +116,8 @@ def compute_downscale_factor(frame_width):
 
 def get_video_name(video_file):
     # type: (str) -> Tuple[str, str]
-    """ Get Video Name: Returns a string representing the video file/device name.
+    """Get Video Name: Returns a string representing the video file/device
+    name.
 
     Returns:
         str: Video file name or device ID. In the case of a video, only the file
@@ -123,11 +131,13 @@ def get_video_name(video_file):
 
 def get_num_frames(cap_list):
     # type: (List[cv2.VideoCapture]) -> int
-    """ Get Number of Frames: Returns total number of frames in the cap_list.
+    """Get Number of Frames: Returns total number of frames in the cap_list.
 
-    Calls get(CAP_PROP_FRAME_COUNT) and returns the sum for all VideoCaptures.
+    Calls get(CAP_PROP_FRAME_COUNT) and returns the sum for all
+    VideoCaptures.
     """
-    return sum([math.trunc(cap.get(cv2.CAP_PROP_FRAME_COUNT)) for cap in cap_list])
+    return sum(
+        [math.trunc(cap.get(cv2.CAP_PROP_FRAME_COUNT)) for cap in cap_list])
 
 
 def open_captures(video_files, framerate=None, validate_parameters=True):
@@ -165,27 +175,38 @@ def open_captures(video_files, framerate=None, validate_parameters=True):
     """
     is_device = False
     if not video_files:
-        raise ValueError("Expected at least 1 video file or device ID.")
+        raise ValueError('Expected at least 1 video file or device ID.')
     if isinstance(video_files[0], int):
         if len(video_files) > 1:
-            raise ValueError("If device ID is specified, no video sources may be appended.")
+            raise ValueError(
+                'If device ID is specified, no video sources may be appended.')
         elif video_files[0] < 0:
-            raise ValueError("Invalid/negative device ID specified.")
+            raise ValueError('Invalid/negative device ID specified.')
         is_device = True
-    elif not all([isinstance(video_file, (str, STRING_TYPE)) for video_file in video_files]):
-        raise ValueError("Unexpected element type in video_files list (expected str(s)/int).")
+    elif not all([
+            isinstance(video_file, (str, STRING_TYPE))
+            for video_file in video_files
+    ]):
+        raise ValueError(
+            'Unexpected element type in video_files list (expected str(s)/int).'
+        )
     elif framerate is not None and not isinstance(framerate, float):
-        raise TypeError("Expected type float for parameter framerate.")
+        raise TypeError('Expected type float for parameter framerate.')
     # Check if files exist.
-    if not is_device and any([not os.path.exists(video_file) for video_file in video_files]):
-        raise IOError("Video file(s) not found.")
+    if not is_device and any(
+        [not os.path.exists(video_file) for video_file in video_files]):
+        raise IOError('Video file(s) not found.')
     cap_list = []
 
     try:
         cap_list = [cv2.VideoCapture(video_file) for video_file in video_files]
-        video_names = [get_video_name(video_file) for video_file in video_files]
-        closed_caps = [video_names[i] for i, cap in
-                       enumerate(cap_list) if not cap.isOpened()]
+        video_names = [
+            get_video_name(video_file) for video_file in video_files
+        ]
+        closed_caps = [
+            video_names[i] for i, cap in enumerate(cap_list)
+            if not cap.isOpened()
+        ]
         if closed_caps:
             raise VideoOpenFailure(closed_caps)
 
@@ -202,8 +223,10 @@ def open_captures(video_files, framerate=None, validate_parameters=True):
         # of all open captures is identical (or almost identical in the case of FPS).
         if validate_parameters:
             validate_capture_parameters(
-                video_names=video_names, cap_frame_sizes=cap_frame_sizes,
-                check_framerate=check_framerate, cap_framerates=cap_framerates)
+                video_names=video_names,
+                cap_frame_sizes=cap_frame_sizes,
+                check_framerate=check_framerate,
+                cap_framerates=cap_framerates)
 
     except:
         release_captures(cap_list)
@@ -214,21 +237,24 @@ def open_captures(video_files, framerate=None, validate_parameters=True):
 
 def release_captures(cap_list):
     # type: (Iterable[VideoCapture]) -> None
-    """ Close Captures:  Calls the release() method on every capture in cap_list. """
+    """Close Captures:  Calls the release() method on every capture in
+    cap_list."""
     for cap in cap_list:
         cap.release()
 
 
 def close_captures(cap_list):
     # type: (Iterable[VideoCapture]) -> None
-    """ Close Captures:  Calls the close() method on every capture in cap_list. """
+    """Close Captures:  Calls the close() method on every capture in
+    cap_list."""
     for cap in cap_list:
         cap.close()
 
 
 def validate_capture_framerate(video_names, cap_framerates, framerate=None):
     # type: (List[Tuple[str, str]], List[float], Optional[float]) -> Tuple[float, bool]
-    """ Validate Capture Framerate: Ensures that the passed capture framerates are valid and equal.
+    """Validate Capture Framerate: Ensures that the passed capture framerates
+    are valid and equal.
 
     Raises:
         ValueError: Invalid framerate (must be positive non-zero value).
@@ -240,47 +266,60 @@ def validate_capture_framerate(video_names, cap_framerates, framerate=None):
     cap_framerate = cap_framerates[0]
     if framerate is not None:
         if isinstance(framerate, float):
-            if framerate < mmmovie.shotdetect.shotdetect.frame_timecode.MINIMUM_FRAMES_PER_SECOND_FLOAT:
-                raise ValueError("Invalid framerate (must be a positive non-zero value).")
+            if framerate < MINIMUM_FRAMES_PER_SECOND_FLOAT:
+                raise ValueError(
+                    'Invalid framerate (must be a positive non-zero value).')
             cap_framerate = framerate
             check_framerate = False
         else:
-            raise TypeError("Expected float for framerate, got %s." % type(framerate).__name__)
+            raise TypeError('Expected float for framerate, got %s.' %
+                            type(framerate).__name__)
     else:
-        unavailable_framerates = [(video_names[i][0], video_names[i][1]) for
-                                  i, fps in enumerate(cap_framerates) if fps <
-                                  mmmovie.shotdetect.shotdetect.frame_timecode.MINIMUM_FRAMES_PER_SECOND_FLOAT]
+        unavailable_framerates = [
+            (video_names[i][0], video_names[i][1])
+            for i, fps in enumerate(cap_framerates)
+            if fps < MINIMUM_FRAMES_PER_SECOND_FLOAT
+        ]
         if unavailable_framerates:
             raise VideoFramerateUnavailable(unavailable_framerates)
     return (cap_framerate, check_framerate)
 
 
-def validate_capture_parameters(video_names, cap_frame_sizes, check_framerate=False,
+def validate_capture_parameters(video_names,
+                                cap_frame_sizes,
+                                check_framerate=False,
                                 cap_framerates=None):
     # type: (List[Tuple[str, str]], List[Tuple[int, int]], Optional[bool],
     #        Optional[List[float]]) -> None
-    """ Validate Capture Parameters: Ensures that all passed capture frame sizes and (optionally)
-    framerates are equal.  Raises VideoParameterMismatch if there is a mismatch.
+    """Validate Capture Parameters: Ensures that all passed capture frame sizes
+    and (optionally) framerates are equal.  Raises VideoParameterMismatch if
+    there is a mismatch.
 
     Raises:
         VideoParameterMismatch
     """
     bad_params = []
-    max_framerate_delta = mmmovie.shotdetect.shotdetect.frame_timecode.MINIMUM_FRAMES_PER_SECOND_FLOAT
+    max_framerate_delta = MINIMUM_FRAMES_PER_SECOND_FLOAT
     # Check heights/widths match.
-    bad_params += [(cv2.CAP_PROP_FRAME_WIDTH, frame_size[0],
-                    cap_frame_sizes[0][0], video_names[i][0], video_names[i][1]) for
-                   i, frame_size in enumerate(cap_frame_sizes)
-                   if abs(frame_size[0] - cap_frame_sizes[0][0]) > 0]
-    bad_params += [(cv2.CAP_PROP_FRAME_HEIGHT, frame_size[1],
-                    cap_frame_sizes[0][1], video_names[i][0], video_names[i][1]) for
-                   i, frame_size in enumerate(cap_frame_sizes)
-                   if abs(frame_size[1] - cap_frame_sizes[0][1]) > 0]
+    bad_params += [
+        (cv2.CAP_PROP_FRAME_WIDTH, frame_size[0], cap_frame_sizes[0][0],
+         video_names[i][0], video_names[i][1])
+        for i, frame_size in enumerate(cap_frame_sizes)
+        if abs(frame_size[0] - cap_frame_sizes[0][0]) > 0
+    ]
+    bad_params += [
+        (cv2.CAP_PROP_FRAME_HEIGHT, frame_size[1], cap_frame_sizes[0][1],
+         video_names[i][0], video_names[i][1])
+        for i, frame_size in enumerate(cap_frame_sizes)
+        if abs(frame_size[1] - cap_frame_sizes[0][1]) > 0
+    ]
     # Check framerates if required.
     if check_framerate:
-        bad_params += [(cv2.CAP_PROP_FPS, fps, cap_framerates[0], video_names[i][0],
-                        video_names[i][1]) for i, fps in enumerate(cap_framerates)
-                       if math.fabs(fps - cap_framerates[0]) > max_framerate_delta]
+        bad_params += [
+            (cv2.CAP_PROP_FPS, fps, cap_framerates[0], video_names[i][0],
+             video_names[i][1]) for i, fps in enumerate(cap_framerates)
+            if math.fabs(fps - cap_framerates[0]) > max_framerate_delta
+        ]
 
     if bad_params:
         raise VideoParameterMismatch(bad_params)
@@ -290,13 +329,17 @@ def validate_capture_parameters(video_names, cap_frame_sizes, check_framerate=Fa
 ## VideoManager Class Implementation
 ##
 
+
 class VideoManager(object):
-    """ Provides a cv2.VideoCapture-like interface to a set of one or more video files,
-    or a single device ID. Supports seeking and setting end time/duration. """
+    """Provides a cv2.VideoCapture-like interface to a set of one or more video
+    files, or a single device ID.
+
+    Supports seeking and setting end time/duration.
+    """
 
     def __init__(self, video_files, framerate=None, logger=None):
         # type: (List[str], Optional[float])
-        """ VideoManager Constructor Method (__init__)
+        """VideoManager Constructor Method (__init__)
 
         Arguments:
             video_files (list of str(s)/int): A list of one or more paths (str), or a list
@@ -316,7 +359,9 @@ class VideoManager(object):
             VideoOpenFailure: Video(s) could not be opened.
         """
         if not video_files:
-            raise ValueError("At least one string/integer must be passed in the video_files list.")
+            raise ValueError(
+                'At least one string/integer must be passed in the video_files list.'
+            )
         # These VideoCaptures are only open in this process.
         self._cap_list, self._cap_framerate, self._cap_framesize = open_captures(
             video_files=video_files, framerate=framerate)
@@ -337,7 +382,6 @@ class VideoManager(object):
         self._downscale_factor = 1
         self._frame_length = get_num_frames(self._cap_list)
 
-
     def set_downscale_factor(self, downscale_factor=None):
         # type: (Optional[int]) -> None
         """ Set Downscale Factor - sets the downscale/subsample factor of returned frames.
@@ -350,7 +394,8 @@ class VideoManager(object):
         no downscaling.
         """
         if downscale_factor is None:
-            self._downscale_factor = compute_downscale_factor(self.get_framesize()[0])
+            self._downscale_factor = compute_downscale_factor(
+                self.get_framesize()[0])
         else:
             if not downscale_factor > 0:
                 raise InvalidDownscaleFactor()
@@ -359,8 +404,8 @@ class VideoManager(object):
             effective_framesize = self.get_framesize_effective()
             self._logger.info(
                 'Downscale factor set to %d, effective resolution: %d x %d',
-                self._downscale_factor, effective_framesize[0], effective_framesize[1])
-
+                self._downscale_factor, effective_framesize[0],
+                effective_framesize[1])
 
     def get_num_videos(self):
         # type: () -> int
@@ -372,7 +417,6 @@ class VideoManager(object):
         """
         return len(self._cap_list)
 
-
     def get_video_paths(self):
         # type: () -> List[str]
         """ Get Video Paths - returns list of strings containing paths to the open video(s).
@@ -381,7 +425,6 @@ class VideoManager(object):
             List[str]: List of paths to the video files opened by the VideoManager.
         """
         return list(self._video_file_paths)
-
 
     def get_framerate(self):
         # type: () -> float
@@ -393,7 +436,6 @@ class VideoManager(object):
             float: Framerate, in frames/sec.
         """
         return self._cap_framerate
-
 
     def get_base_timecode(self):
         # type: () -> FrameTimecode
@@ -419,7 +461,6 @@ class VideoManager(object):
         """
         return FrameTimecode(timecode=0, fps=self._cap_framerate)
 
-
     def get_current_timecode(self):
         # type: () -> FrameTimecode
         """ Get Current Timecode - returns a FrameTimecode object at current VideoManager position.
@@ -428,7 +469,6 @@ class VideoManager(object):
             FrameTimecode: Timecode at the current VideoManager position.
         """
         return self._curr_time
-
 
     def get_framesize(self):
         # type: () -> Tuple[int, int]
@@ -441,7 +481,6 @@ class VideoManager(object):
         """
         return self._cap_framesize
 
-
     def get_framesize_effective(self):
         # type: () -> Tuple[int, int]
         """ Get Frame Size - returns the frame size of the video(s) open in the
@@ -451,8 +490,10 @@ class VideoManager(object):
             Tuple[int, int]: Video frame size in the form (width, height) where width
             and height represent the size of the video frame in pixels.
         """
-        return [num_pixels / self._downscale_factor for num_pixels in self._cap_framesize]
-
+        return [
+            num_pixels / self._downscale_factor
+            for num_pixels in self._cap_framesize
+        ]
 
     def set_duration(self, duration=None, start_time=None, end_time=None):
         # type: (Optional[FrameTimecode], Optional[FrameTimecode], Optional[FrameTimecode]) -> None
@@ -480,35 +521,41 @@ class VideoManager(object):
             raise VideoDecodingInProgress()
 
         # Ensure any passed timecodes have the proper framerate.
-        if ((duration is not None and not duration.equal_framerate(self._cap_framerate)) or
-                (start_time is not None and not start_time.equal_framerate(self._cap_framerate)) or
-                (end_time is not None and not end_time.equal_framerate(self._cap_framerate))):
-            raise ValueError("FrameTimecode framerate does not match.")
+        if ((duration is not None
+             and not duration.equal_framerate(self._cap_framerate))
+                or (start_time is not None
+                    and not start_time.equal_framerate(self._cap_framerate))
+                or (end_time is not None
+                    and not end_time.equal_framerate(self._cap_framerate))):
+            raise ValueError('FrameTimecode framerate does not match.')
 
         if duration is not None and end_time is not None:
-            raise TypeError("Only one of duration and end_time may be specified, not both.")
+            raise TypeError(
+                'Only one of duration and end_time may be specified, not both.'
+            )
 
         if start_time is not None:
             self._start_time = start_time
 
         if end_time is not None:
             if end_time < start_time:
-                raise ValueError("end_time is before start_time in time.")
+                raise ValueError('end_time is before start_time in time.')
             self._end_time = end_time
         elif duration is not None:
             self._end_time = self._start_time + duration
 
         if self._end_time is not None:
-            self._frame_length = min(self._frame_length, self._end_time.get_frames() + 1)
+            self._frame_length = min(self._frame_length,
+                                     self._end_time.get_frames() + 1)
         self._frame_length -= self._start_time.get_frames()
 
         if self._logger is not None:
             self._logger.info(
                 'Duration set, start: %s, duration: %s, end: %s.',
-                start_time.get_timecode() if start_time is not None else start_time,
+                start_time.get_timecode()
+                if start_time is not None else start_time,
                 duration.get_timecode() if duration is not None else duration,
                 end_time.get_timecode() if end_time is not None else end_time)
-
 
     def start(self):
         # type: () -> None
@@ -526,7 +573,6 @@ class VideoManager(object):
         self._started = True
         self._get_next_cap()
         self.seek(self._start_time)
-
 
     def seek(self, timecode):
         # type: (FrameTimecode) -> bool
@@ -558,14 +604,12 @@ class VideoManager(object):
                     return False
         return True
 
-
     def release(self):
         # type: () -> None
-        """ Release (cv2.VideoCapture method), releases all open capture(s). """
+        """Release (cv2.VideoCapture method), releases all open capture(s)."""
         release_captures(self._cap_list)
         self._cap_list = []
         self._started = False
-
 
     def reset(self):
         # type: () -> None
@@ -583,9 +627,9 @@ class VideoManager(object):
         self._end_of_video = False
         self._curr_time = self.get_base_timecode()
         self._cap_list, self._cap_framerate, self._cap_framesize = open_captures(
-            video_files=self._video_file_paths, framerate=self._curr_time.get_framerate())
+            video_files=self._video_file_paths,
+            framerate=self._curr_time.get_framerate())
         self._curr_cap, self._curr_cap_idx = None, None
-
 
     def get(self, capture_prop, index=None):
         # type: (int, Optional[int]) -> Union[float, int]
@@ -614,7 +658,6 @@ class VideoManager(object):
             index = 0
         return self._cap_list[index].get(capture_prop)
 
-
     def grab(self):
         # type: () -> bool
         """ Grab (cv2.VideoCapture method) - retrieves a frame but does not return it.
@@ -641,7 +684,6 @@ class VideoManager(object):
             self._last_frame = None
         return grabbed
 
-
     def retrieve(self):
         # type: () -> Tuple[bool, Union[None, numpy.ndarray]]
         """ Retrieve (cv2.VideoCapture method) - retrieves and returns a frame.
@@ -667,13 +709,14 @@ class VideoManager(object):
                 if not retrieved and not self._get_next_cap():
                     break
                 if self._downscale_factor > 1:
-                    self._last_frame = self._last_frame[
-                        ::self._downscale_factor, ::self._downscale_factor, :]
+                    self._last_frame = self._last_frame[::self.
+                                                        _downscale_factor, ::
+                                                        self.
+                                                        _downscale_factor, :]
         if self._end_time is not None and self._curr_time > self._end_time:
             retrieved = False
             self._last_frame = None
         return (retrieved, self._last_frame)
-
 
     def read(self):
         # type: () -> Tuple[bool, Union[None, numpy.ndarray]]
@@ -697,15 +740,16 @@ class VideoManager(object):
                 if not read_frame and not self._get_next_cap():
                     break
                 if self._downscale_factor > 1:
-                    self._last_frame = self._last_frame[
-                        ::self._downscale_factor, ::self._downscale_factor, :]
+                    self._last_frame = self._last_frame[::self.
+                                                        _downscale_factor, ::
+                                                        self.
+                                                        _downscale_factor, :]
         if self._end_time is not None and self._curr_time > self._end_time:
             read_frame = False
             self._last_frame = None
         if read_frame:
             self._curr_time += 1
         return (read_frame, self._last_frame)
-
 
     def _get_next_cap(self):
         # type: () -> bool
@@ -721,4 +765,3 @@ class VideoManager(object):
             self._curr_cap_idx += 1
             self._curr_cap = self._cap_list[self._curr_cap_idx]
             return True
-
