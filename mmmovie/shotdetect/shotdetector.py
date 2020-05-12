@@ -4,7 +4,7 @@ import os.path as osp
 
 # Select detectors:
 from .shotdetect import ContentDetectorHSVLUV
-from .shotdetect.keyf_img_saver import (generate_images, generate_images_txt)
+from .shotdetect.keyf_img_saver import generate_images, generate_images_txt
 from .shotdetect.shot_manager import ShotManager
 # For caching detection metrics and saving/loading to a stats file
 from .shotdetect.stats_manager import StatsManager

@@ -5,11 +5,6 @@ from mmcv.utils import mkdir_or_exist
 from mmcv.video import VideoReader
 
 
-from cv2 import (CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS,
-                    CAP_PROP_FRAME_COUNT, CAP_PROP_FOURCC,
-                    CAP_PROP_POS_FRAMES, VideoWriter_fourcc)
-
-
 class MovieReader(VideoReader):
 
     def __init__(self, filename, cache_capacity=10):

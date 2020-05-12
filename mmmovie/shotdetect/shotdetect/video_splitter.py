@@ -26,7 +26,6 @@ from string import Template
 # Third-Party Library Imports
 from .platform import tqdm
 
-
 #
 # Command Availability Checking Functions
 #

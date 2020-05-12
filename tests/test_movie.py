@@ -108,10 +108,7 @@ class TestMovie(object):
 
         v = MovieReader(self.video_path)
         v.cvt2frames(
-            frame_dir,
-            filename_tmpl='{:03d}.JPEG',
-            start=100,
-            end=120)
+            frame_dir, filename_tmpl='{:03d}.JPEG', start=100, end=120)
         assert osp.isdir(frame_dir)
         for i in range(100, 120):
             filename = '{}/{:03d}.JPEG'.format(frame_dir, i)

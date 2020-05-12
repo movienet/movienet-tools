@@ -4,8 +4,7 @@ import os
 
 import cv2
 
-from .frame_timecode import FrameTimecode
-from .frame_timecode import MINIMUM_FRAMES_PER_SECOND_FLOAT
+from .frame_timecode import MINIMUM_FRAMES_PER_SECOND_FLOAT, FrameTimecode
 from .platform import STRING_TYPE
 
 ##
@@ -275,11 +274,9 @@ def validate_capture_framerate(video_names, cap_framerates, framerate=None):
             raise TypeError('Expected float for framerate, got %s.' %
                             type(framerate).__name__)
     else:
-        unavailable_framerates = [
-            (video_names[i][0], video_names[i][1])
-            for i, fps in enumerate(cap_framerates)
-            if fps < MINIMUM_FRAMES_PER_SECOND_FLOAT
-        ]
+        unavailable_framerates = [(video_names[i][0], video_names[i][1])
+                                  for i, fps in enumerate(cap_framerates)
+                                  if fps < MINIMUM_FRAMES_PER_SECOND_FLOAT]
         if unavailable_framerates:
             raise VideoFramerateUnavailable(unavailable_framerates)
     return (cap_framerate, check_framerate)

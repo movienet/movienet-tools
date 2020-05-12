@@ -4,7 +4,7 @@ import logging
 
 # PyshotDetect Library Imports
 from .frame_timecode import MINIMUM_FRAMES_PER_SECOND_FLOAT
-from .platform import (get_csv_reader, get_csv_writer)
+from .platform import get_csv_reader, get_csv_writer
 
 # pylint: disable=useless-super-delegation
 
