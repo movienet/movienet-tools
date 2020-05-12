@@ -1,8 +1,5 @@
 import os
 import os.path as osp
-import sys
-
-import pytest
 
 from mmmovie import FeatureExtractor
 
@@ -14,26 +11,17 @@ class TestExtractor(object):
         cls.video_path = osp.join(osp.dirname(__file__), 'data/test.mp4')
         cls.out_dir = osp.join(osp.dirname(__file__), 'data')
 
-    # @staticmethod
-    # def test_extract_place_feat_folder():
-    #     extractor = FeatureExtractor(mode="place", data_root=osp.join(osp.dirname(__file__), 'data'),
-    #                                  list_file=osp.join(osp.dirname(__file__), 'data/meta/list_test_folder.txt'))
-    #     extractor.extract()
-    #     assert len(os.listdir(osp.join(osp.dirname(__file__), 'data/place_feat/test1'))) > 3
-
-    # @staticmethod
-    # def test_extract_place_feat_video():
-    #     extractor = FeatureExtractor(mode="place", data_root=osp.join(osp.dirname(__file__), 'data'),
-    #                                  list_file=osp.join(osp.dirname(__file__), 'data/meta/list_test_video.txt'))
-    #     extractor.extract()
-    #     assert len(os.listdir(osp.join(osp.dirname(__file__), 'data/place_feat/test1'))) > 3
-
-    # @staticmethod
-    # def test_extract_place_feat_image():
-    #     extractor = FeatureExtractor(mode="place", data_root=osp.join(osp.dirname(__file__), 'data'),
-    #                                  list_file=osp.join(osp.dirname(__file__), 'data/meta/list_test_image.txt'))
-    #     extractor.extract()
-    #     assert len(os.listdir(osp.join(osp.dirname(__file__), 'data/place_feat/test1'))) > 3
+    @staticmethod
+    def test_extract_place_feat_folder():
+        extractor = FeatureExtractor(
+            mode='place',
+            data_root=osp.join(osp.dirname(__file__), 'data'),
+            list_file=osp.join(
+                osp.dirname(__file__), 'data/meta/list_test_folder.txt'))
+        extractor.extract()
+        assert len(
+            os.listdir(
+                osp.join(osp.dirname(__file__), 'data/place_feat/test1'))) > 3
 
     @staticmethod
     def test_extract_audio_feat_folder():

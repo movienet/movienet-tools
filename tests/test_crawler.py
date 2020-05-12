@@ -1,7 +1,5 @@
 import os.path as osp
 
-import pytest
-
 from mmmovie import DoubanCrawler, IMDBCrawler, TMDBCrawler
 
 

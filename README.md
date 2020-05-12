@@ -3,7 +3,7 @@ some basic tools for movie analysis
 
 ## Install
 > python > 3.6
-> pip install -r docs/requirements.txt
+> python setup.py develop
 
 silly
 >librosa requires numba <= 0.48.0
@@ -14,7 +14,7 @@ Silly librosa  The 'cachedir' attribute has been deprecated in version 0.12 and 
 ## Write test code
 ```
 python -m pytest
-python -m pytest test_xxxx.py
+pytest -c /dev/null tests/test_extractor.py
 ```
 
 ## Code rule

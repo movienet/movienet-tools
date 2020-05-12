@@ -2,15 +2,11 @@ from __future__ import print_function
 import os
 import os.path as osp
 
-# Select detectors:
 from .shotdetect import ContentDetectorHSVLUV
 from .shotdetect.keyf_img_saver import generate_images, generate_images_txt
 from .shotdetect.shot_manager import ShotManager
-# For caching detection metrics and saving/loading to a stats file
 from .shotdetect.stats_manager import StatsManager
-# Standard PyshotDetect imports:
 from .shotdetect.video_manager import VideoManager
-# Tools
 from .shotdetect.video_splitter import split_video_ffmpeg
 
 
@@ -55,9 +51,10 @@ class ShotDetector(object):
         """Detect shots from a video.
 
         Args:
-            video_path (str):
-            out_dir (str): Output directory to store all shot data including shot detect statistic,
-            shot detect txt, key frame image, and shot video.
+            video_path (str): The path to the video.
+            out_dir (str): Output directory to store all shot data including
+            shot detect statistic, shot detect txt, key frame image, and shot
+            video.
         """
         video_path = video_path
         stats_file_folder_path = osp.join(out_dir, 'shot_stats')
@@ -92,10 +89,12 @@ class ShotDetector(object):
                 end_frame = base_timecode + self.end_frame
                 video_manager.set_duration(
                     start_time=start_frame, end_time=end_frame)
-            # Set downscale factor to improve processing speed.
             if self.keep_resolution:
                 video_manager.set_downscale_factor(1)
+
             else:
+                # Automatically set resolution downscale factor to improve
+                # processing speed.
                 video_manager.set_downscale_factor()
             video_manager.start()
             # Perform shot detection on video_manager.

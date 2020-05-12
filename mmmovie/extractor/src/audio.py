@@ -7,7 +7,6 @@ xxxx0/xxxx0.mp4\nxxxxx0/xxxx1.mp4\nxxxx1/xxxx0.mp4\nxxxx1/xxxx1.mp4\n
 import multiprocessing
 import os
 import os.path as osp
-import pdb
 import subprocess
 from datetime import datetime
 
@@ -129,10 +128,9 @@ def extract_audio_feat(cfg):
                 if osp.isdir(
                         osp.join(cfg.src_video_path, video_id, shot_id_mp4)):
                     raise RuntimeError('There is subfolder in {}, \
-                                    but currently the program only supports two-level folder'
-                                       .format(
-                                           osp.join(cfg.src_video_path,
-                                                    video_id, shot_id_mp4)))
+                                    but currently the program only supports \
+                                    two-level folder'.format(
+                        osp.join(cfg.src_video_path, video_id, shot_id_mp4)))
                 file_list.append(osp.join(video_id, shot_id_mp4))
                 parallel_num += 1
     else:

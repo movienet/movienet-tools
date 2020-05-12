@@ -1,9 +1,10 @@
-"""Place extractor, supports folder input folders xxxx0\nxxxx1\nxxxx2\n  #
-folders of jpg image."""
+"""Place extractor supports folder input folders.
+
+xxxx0\nxxxx1\nxxxx2\n  # folders of jpg image.
+"""
 from __future__ import absolute_import, print_function
 import os
 import os.path as osp
-import pdb
 import pickle
 import time
 from collections import OrderedDict

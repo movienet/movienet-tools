@@ -15,11 +15,14 @@ class FeatureExtractor(object):
             in the form of
             folders video0\nvideo1\nvideo2\n
             videos video0.mp4\nvideo1.mp4\nvideo2.mp4\n
-                or video0/shot0.mp4\nvideo0/shot1.mp4\nvideo1/shot0.mp4\nvideo1/shot1.mp4\n\
-            images video0/shot0.jpg\nvideo0/shot1.jpg\nvideo1/shot0.jpg\nvideo1/shot1.jpg\n
+                or video0/shot0.mp4\nvideo0/shot1.mp4\n
+                   video1/shot0.mp4\nvideo1/shot1.mp4\n
+            images video0/shot0.jpg\nvideo0/shot1.jpg\n
+                   video1/shot0.jpg\nvideo1/shot1.jpg\n
             folders xxxx0\nxxxx1\nxxxx2\n
             videos xxxx0.mp4\nxxxx1.mp4\nxxxx2.mp4\n
-                or xxxx0/xxxx0.mp4\nxxxxx0/xxxx1.mp4\nxxxx1/xxxx0.mp4\nxxxx1/xxxx1.mp4\n\
+                or xxxx0/xxxx0.mp4\nxxxxx0/xxxx1.mp4\n
+                   xxxx1/xxxx0.mp4\nxxxx1/xxxx1.mp4\n
             images xxxx0/xxxx0.jpg\nxxxxx0/xxxx1.jpg\nxxxx1/xxxx0.jpg
     """
 

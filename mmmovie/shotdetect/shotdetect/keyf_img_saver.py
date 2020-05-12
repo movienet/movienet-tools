@@ -2,8 +2,6 @@ from __future__ import print_function
 import logging
 import math
 import os
-import pdb
-import time
 from string import Template
 
 import cv2
@@ -12,17 +10,17 @@ from .platform import get_cv2_imwrite_params, tqdm
 
 
 def get_output_file_path(file_path, output_dir=None):
-    # type: (str, Optional[str]) -> str
     """Get Output File Path: Gets full path to output file passed as argument,
     in the specified global output directory (scenedetect -o/--output) if set,
     creating any required directories along the way.
 
-    Arguments:
-        file_path (str): File name to get path for.  If file_path is an absolute
-            path (e.g. starts at a drive/root), no modification of the path
-            is performed, only ensuring that all output directories are created.
-        output_dir (Optional[str]): An optional output directory to override the
-            global output directory option, if set.
+    Args:
+        file_path (str): File name to get path for.  If file_path is an
+            absolute path (e.g. starts at a drive/root), no modification of
+            the path is performed, only ensuring that all output directories
+            are created.
+        output_dir (Optional[str]): An optional output directory to override
+            the global output directory option, if set.
     Returns:
         (str) Full path to output file suitable for writing.
     """
@@ -30,12 +28,13 @@ def get_output_file_path(file_path, output_dir=None):
     if file_path is None:
         return None
     output_dir = output_directory if output_dir is None else output_dir
-    # If an output directory is defined and the file path is a relative path, open
-    # the file handle in the output directory instead of the working directory.
+    # If an output directory is defined and the file path is a relative path,
+    # open the file handle in the output directory instead of the
+    # working directory.
     if output_dir is not None and not os.path.isabs(file_path):
         file_path = os.path.join(output_dir, file_path)
-    # Now that file_path is an absolute path, let's make sure all the directories
-    # exist for us to start writing files there.
+    # Now that file_path is an absolute path, let's make sure all the
+    # directories exist for us to start writing files there.
     try:
         os.makedirs(os.path.split(os.path.abspath(file_path))[0])
     except OSError:
@@ -50,7 +49,6 @@ def generate_images(
     num_images=3,
     image_name_template='shot_${SHOT_NUMBER}_img_${IMAGE_NUMBER}',
 ):
-    # type: (List[Tuple[FrameTimecode, FrameTimecode]) -> None
     assert num_images >= 3
     os.makedirs(output_dir, exist_ok=True)
     quiet_mode = False
@@ -115,8 +113,9 @@ def generate_images(
                     timecode_list[i].append(start_time +
                                             ((j + 1) * duration_increment))
 
-            # End FrameTimecode is always the same frame as the next shot's start_time
-            # (one frame past the end), so we need to subtract 1 here.
+            # End FrameTimecode is always the same frame as the next shot's
+            # start_time (one frame past the end), so we need
+            # to subtract 1 here.
             timecode_list[i].append(end_time - 1)
 
     for i in timecode_list:
@@ -167,8 +166,9 @@ def generate_images_txt(shot_list, output_dir, num_images=5):
                 timecode_list[i].append(start_time +
                                         ((j + 1) * duration_increment))
 
-        # End FrameTimecode is always the same frame as the next shot's start_time
-        # (one frame past the end), so we need to subtract 1 here.
+        # End FrameTimecode is always the same frame as the next shot's
+        # start_time (one frame past the end), so we need
+        # to subtract 1 here.
         timecode_list[i].append(end_time - 1)
 
     frames_list = []

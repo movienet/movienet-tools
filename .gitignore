@@ -1,8 +1,8 @@
 # Test data
-test/data/aud_wav
-test/data/aud_feat
-test/data/place_feat_raw
-test/data/place_feat
+tests/data/aud_wav
+tests/data/aud_feat
+tests/data/place_feat_raw
+tests/data/place_feat
 
 mmmovie/version.py
 local/

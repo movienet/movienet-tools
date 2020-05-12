@@ -1,99 +1,26 @@
-#
-#         PySceneDetect: Python-Based Video Scene Detector
-#   ---------------------------------------------------------------
-#     [  Site: http://www.bcastell.com/projects/pyscenedetect/   ]
-#     [  Github: https://github.com/Breakthrough/PySceneDetect/  ]
-#     [  Documentation: http://pyscenedetect.readthedocs.org/    ]
-#
-# Copyright (C) 2012-2018 Brandon Castellano <http://www.bcastell.com>.
-#
-# PySceneDetect is licensed under the BSD 3-Clause License; see the included
-# LICENSE file, or visit one of the following pages for details:
-#  - https://github.com/Breakthrough/PySceneDetect/
-#  - http://www.bcastell.com/projects/pyscenedetect/
-#
-# This software uses the Numpy, OpenCV, click, tqdm, and pytest libraries.
-# See the included LICENSE files or one of the above URLs for more information.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-# AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
-"""PySceneDetect `scenedetect.platform` Module.
-
-This file contains all platform/library/OS-specific compatibility fixes,
-intended to improve the systems that are able to run PySceneDetect, and allow
-for maintaining backwards compatibility with existing libraries going forwards.
-Other helper functions related to the detection of the appropriate dependency
-DLLs on Windows and getting uniform line-terminating csv reader/writer objects
-are also included in this module.
-
-With respect to the Python standard library itself and Python 2 versus 3,
-this module adds compatibility wrappers for Python's Queue/queue (Python 2/3,
-respectively) as scenedetect.platform.queue.
-
-For OpenCV 2.x, the scenedetect.platform module also makes a copy of the
-OpenCV VideoCapture property constants from the cv2.cv namespace directly
-to the cv2 namespace.  This ensures that the cv2 API is consistent
-with those changes made to it in OpenCV 3.0 and above.
-
-This module also includes an alias for the unicode/string types in Python 2/3
-as STRING_TYPE intended to help with parsing string types from the CLI parser.
-"""
-
-# Standard Library Imports
 from __future__ import print_function
 import csv
 import os
 import platform
 import struct
-import sys
 
-# Third-Party Library Imports
 import cv2
 
-# pylint: disable=unused-import
-
-##
-## Python 2/3 Queue/queue Library (scenedetect.platform.queue)
-##
-
-if sys.version_info[0] == 2:
-    import Queue as queue
-else:
-    import queue
-
-##
-## tqdm Library (scenedetect.platform.tqdm will be tqdm object or None)
-##
-
+# tqdm Library
 try:
     from tqdm import tqdm
 except ImportError:
     tqdm = None
 
-# pylint: enable=unused-import
-
-##
-## click/Command-Line Interface String Type
-##
-
-# String type (used to allow FrameTimecode object to take both unicode and native
-# string objects when being constructed via scenedetect.platform.STRING_TYPE).
+# click/Command-Line Interface String Type
+# String type (used to allow FrameTimecode object to take both unicode
+# and native string objects when being constructed via
+# scenedetect.platform.STRING_TYPE).
 # pylint: disable=invalid-name, undefined-variable
-if sys.version_info[0] == 2:
-    STRING_TYPE = unicode
-else:
-    STRING_TYPE = str
+STRING_TYPE = str
 # pylint: enable=invalid-name, undefined-variable
 
-##
-## OpenCV 2.x Compatibility Fix
-##
-
+# OpenCV 2.x Compatibility Fix
 # Compatibility fix for OpenCV v2.x (copies CAP_PROP_* properties from the
 # cv2.cv namespace to the cv2 namespace, as the cv2.cv namespace was removed
 # with the release of OpenCV 3.0).
@@ -108,9 +35,7 @@ if cv2.__version__[0] == '2' or not (cv2.__version__[0].isdigit()
     cv2.CAP_PROP_FRAME_COUNT = cv2.cv.CV_CAP_PROP_FRAME_COUNT
 # pylint: enable=c-extension-no-member
 
-##
-## OpenCV DLL Check Function (Windows Only)
-##
+# OpenCV DLL Check Function (Windows Only)
 
 
 def check_opencv_ffmpeg_dll():
@@ -143,13 +68,17 @@ def check_opencv_ffmpeg_dll():
     return True
 
 
-##
-## OpenCV imwrite Supported Image Types & Quality/Compression Parameters
-##
+# OpenCV imwrite Supported Image Types & Quality/Compression Parameters
 
 
 def _get_cv2_param(param_name):
-    # type: (str) -> Union[int, None]
+    '''
+    Args:
+        param_name (str)
+
+    Returns:
+        Union[int, None]
+    '''
     if param_name.startswith('CV_'):
         param_name = param_name[3:]
     try:
@@ -159,7 +88,6 @@ def _get_cv2_param(param_name):
 
 
 def get_cv2_imwrite_params():
-    # type: () -> Dict[str, Union[int, None]]
     """Get OpenCV imwrite Params: Returns a dict of supported image formats and
     their associated quality/compression parameter.
 
@@ -176,18 +104,28 @@ def get_cv2_imwrite_params():
     }
 
 
-##
-## Python csv Module Wrapper (for StatsManager, and CliContext/list-scenes command)
-##
+# Python csv Module Wrapper (for StatsManager, and
+# CliContext/list-scenes command)
 
 
 def get_csv_reader(file_handle):
-    # type: (File) -> csv.reader
-    """Returns a csv.reader object using the passed file handle."""
+    """Returns a csv.reader object using the passed file handle.
+
+    Args:
+        file_handle (File)
+
+    Returns:
+        csv.reader
+    """
     return csv.reader(file_handle, lineterminator='\n')
 
 
 def get_csv_writer(file_handle):
-    # type: (File) -> csv.writer
-    """Returns a csv.writer object using the passed file handle."""
+    """Returns a csv.writer object using the passed file handle.
+        Args:
+        file_handle (File)
+
+    Returns:
+        csv.reader
+    """
     return csv.writer(file_handle, lineterminator='\n')

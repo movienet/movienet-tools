@@ -1,5 +1,0 @@
-librosa == 0.7.2
-mmcv
-numba == 0.48.0
-pytest
-request

@@ -1,38 +1,14 @@
-"""`shotdetect.video_splitter` Module The `shotdetect.video_splitter` module
-contains functions to split videos with a shot list using external tools (e.g.
-`mkvmerge`, `ffmpeg`), as well as functions to check if the tools are
-available. Certain distributions of ShotDetect may include the above software.
-If using a source distribution, these programs can be obtained from following
-URLs (note that mkvmerge is a part of the MKVToolNix package):
-
- * FFmpeg:   [ https://ffmpeg.org/download.html ]
- * mkvmerge: [ https://mkvtoolnix.download/downloads.html ]
-If you are a Linux user, you can likely obtain the above programs from your
-package manager (e.g. `sudo apt-get install ffmpeg`).
-Once installed, ensure the program can be accessed system-wide by calling
-the `mkvmerge` or `ffmpeg` command from a terminal/command prompt.
-ShotDetect will automatically use whichever program is available on
-the computer, depending on the specified command-line options.
-"""
-
 import logging
 import math
-# Standard Library Imports
 import os
 import subprocess
 import time
 from string import Template
 
-# Third-Party Library Imports
 from .platform import tqdm
-
-#
-# Command Availability Checking Functions
-#
 
 
 def is_mkvmerge_available():
-    # type: () -> bool
     """Is mkvmerge Available: Gracefully checks if mkvmerge command is
     available.
 
@@ -50,7 +26,6 @@ def is_mkvmerge_available():
 
 
 def is_ffmpeg_available():
-    # type: () -> bool
     """Is ffmpeg Available: Gracefully checks if ffmpeg command is available.
 
     Returns:
@@ -66,21 +41,16 @@ def is_ffmpeg_available():
     return True
 
 
-#
-# Split Video Functions
-#
-
-
 def split_video_mkvmerge(input_video_paths,
                          shot_list,
                          output_file_prefix,
                          video_name,
                          suppress_output=False):
-    """Calls the mkvmerge command on the input video(s), splitting it at the
-    passed timecodes, where each shot is written in sequence from 001.
+    """Split video.
 
-    type: (List[str], List[FrameTimecode, FrameTimecode], Optional[str], Optional[bool])
-         -> None
+    Calls the mkvmerge command on the input video(s), splitting it at
+    the passed timecodes, where each shot is written in sequence from
+    001.
     """
 
     if not input_video_paths or not shot_list:
@@ -103,16 +73,11 @@ def split_video_mkvmerge(input_video_paths,
         if suppress_output:
             call_list.append('--quiet')
         call_list += [
-            '-o',
-            output_file_name,
-            '--split',
-            #'timecodes:%s' % ','.join(
-            #    [start_time.get_timecode() for start_time, _ in shot_list[1:]]),
+            '-o', output_file_name, '--split',
             'parts:%s' % ','.join([
                 '%s-%s' % (start_time.get_timecode(), end_time.get_timecode())
                 for start_time, end_time in shot_list
-            ]),
-            ' +'.join(input_video_paths)
+            ]), ' +'.join(input_video_paths)
         ]
         total_frames = shot_list[-1][1].get_frames(
         ) - shot_list[0][0].get_frames()
@@ -132,19 +97,20 @@ def split_video_mkvmerge(input_video_paths,
         logging.error('Error splitting video (mkvmerge returned %d).', ret_val)
 
 
-def split_video_ffmpeg(
-    input_video_paths,
-    shot_list,
-    output_dir,
-    output_file_template='${OUTPUT_DIR}/shot_${SHOT_NUMBER}.mp4',
-    arg_override='-crf 21',
-    hide_progress=False,
-    suppress_output=False):
+def split_video_ffmpeg(input_video_paths,
+                       shot_list,
+                       output_dir,
+                       output_file_template='${OUTPUT_DIR}/\
+                                             shot_${SHOT_NUMBER}.mp4',
+                       arg_override='-crf 21',
+                       hide_progress=False,
+                       suppress_output=False):
     """Calls the ffmpeg command on the input video(s), generating a new video
     for each shot based on the start/end timecodes.
 
-    type: (List[str], List[Tuple[FrameTimecode, FrameTimecode]], Optional[str],
-        Optional[str], Optional[bool]) -> None
+    Args:
+        input_video_paths (List[str])
+        shot_list (List[Tuple[FrameTimecode, FrameTimecode]],)
     """
 
     os.makedirs(output_dir, exist_ok=True)
@@ -160,11 +126,11 @@ def split_video_ffmpeg(
         # Requires generating a temporary file list for ffmpeg.
         logging.error(
             'Sorry, splitting multiple appended/concatenated input videos with'
-            ' ffmpeg is not supported yet. This feature will be added to a future'
-            ' version of ShotDetect. In the meantime, you can try using the'
-            ' -c / --copy option with the split-video to use mkvmerge, which'
-            ' generates less accurate output, but supports multiple input videos.'
-        )
+            ' ffmpeg is not supported yet. This feature will be added to a'
+            ' future version of ShotDetect. In the meantime, you can try using'
+            ' the -c / --copy option with the split-video to use mkvmerge,'
+            ' which generates less accurate output,'
+            ' but supports multiple input videos.')
         raise NotImplementedError()
 
     arg_override = arg_override.replace('\\"', '"')
@@ -188,21 +154,22 @@ def split_video_ffmpeg(
                 desc='Split Video')
         processing_start_time = time.time()
         for i, (start_time, end_time) in enumerate(shot_list):
-            end_time = end_time.__sub__(
-                1
-            )  # Fix the last frame of a shot to be 1 less than the first frame of the next shot
+            end_time = end_time.__sub__(1)
+            # Fix the last frame of a shot to be 1 less than the first frame
+            # of the next shot
             duration = (end_time - start_time)
             # an alternative way to do it
             # duration = (end_time.get_frames()-1)/end_time.framerate -
             #    (start_time.get_frames())/start_time.framerate
-            # duration_frame = end_time.get_frames()-1 - start_time.get_frames()
+            # duration_frame = end_time.get_frames() - 1 - \
+            # start_time.get_frames()
             call_list = ['ffmpeg']
             if suppress_output:
                 call_list += ['-v', 'quiet']
             elif i > 0:
-                # Only show ffmpeg output for the first call, which will display any
-                # errors if it fails, and then break the loop. We only show error messages
-                # for the remaining calls.
+                # Only show ffmpeg output for the first call, which will
+                # display any errors if it fails, and then break the loop.
+                # We only show error messages for the remaining calls.
                 call_list += ['-v', 'error']
             call_list += [
                 '-y', '-ss',
@@ -219,8 +186,8 @@ def split_video_ffmpeg(
             ret_val = subprocess.call(call_list)
             if not suppress_output and i == 0 and len(shot_list) > 1:
                 logging.info(
-                    'Output from ffmpeg for shot 1 shown above, splitting remaining shots...'
-                )
+                    'Output from ffmpeg for shot 1 shown above, splitting \
+                        remaining shots...')
             if ret_val != 0:
                 break
             if progress_bar:
