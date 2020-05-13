@@ -163,3 +163,12 @@ class TestMovie(object):
         v = MovieReader(out_file)
         assert v.resolution == (426, 240)
         os.remove(out_file)
+
+    def test_timecode(self):
+        assert mmmovie.seconds_to_timecode(123) == '00:02:03.000'
+        assert mmmovie.seconds_to_timecode(123, precision=2) == '00:02:03.00'
+        assert mmmovie.seconds_to_timecode(123.1345, precision=0) == '00:02:03'
+        assert mmmovie.seconds_to_frames(2, framerate=24) == 48
+        assert mmmovie.frames_to_seconds(480, framerate=24) == 20
+        assert mmmovie.timecode_to_seconds('300s') == 300
+        assert mmmovie.timecode_to_seconds('00:02:03.000') == 123

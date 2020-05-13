@@ -172,6 +172,7 @@ class FrameTimecode(object):
 
         Args:
             seconds (float)
+
         Returns:
             Integer number of frames the passed number of seconds represents
             using the current FrameTimecode's framerate property.

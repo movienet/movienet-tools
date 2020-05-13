@@ -236,3 +236,146 @@ def extract_video_stream(in_file,
         print('Capture keyboard interrupt when execute cmd ``{}``.\nExit!'.
               format(cmd))
         exit()
+
+
+def seconds_to_timecode(seconds, precision=3, use_rounding=False):
+    """Get a formatted timecode string of the form HH:MM:SS[.nnn].
+
+    Args:
+        precision (int): The number of decimal places to include in the
+            output ``[.nnn]``.
+        use_rounding (bool): True (default) to round the output to the
+            desired precision.
+
+    Returns:
+        timecode (str): The current time in the form ``"HH:MM:SS[.nnn]"``.
+
+    Raises:
+        TypeError, ValueError
+    """
+    # Compute hours and minutes based off of seconds, and update seconds.
+    if not isinstance(seconds, (int, float)):
+        raise TypeError('Seconds must be of type int/float.')
+    if seconds < 0:
+        raise ValueError('Seconds value must be positive.')
+    base = 60.0 * 60.0
+    hrs = int(seconds / base)
+    seconds -= (hrs * base)
+    base = 60.0
+    mins = int(seconds / base)
+    seconds -= (mins * base)
+    # Convert seconds into string based on required precision.
+    if precision > 0:
+        if use_rounding:
+            seconds = round(seconds, precision)
+        msec = format(seconds, '.%df' % precision)[-precision:]
+        seconds = '%02d.%s' % (int(seconds), msec)
+    else:
+        seconds = '%02d' % int(round(
+            seconds, 0)) if use_rounding else '%02d' % int(seconds)
+    # Return hours, minutes, and seconds as a formatted timecode string.
+    return '%02d:%02d:%s' % (hrs, mins, seconds)
+
+
+def seconds_to_frames(seconds, framerate):
+    """Converts the passed value seconds to the nearest number of frames using
+    the current FrameTimecode object's FPS (framerate).
+
+    Args:
+        seconds (float or int)
+        framerate (float or int)
+
+    Returns:
+        Integer number of frames the passed number of seconds represents
+        using the current FrameTimecode's framerate property.
+
+    Raises:
+        TypeError, ValueError
+    """
+    if not isinstance(seconds, (int, float)):
+        raise TypeError('Seconds must be of type int/float.')
+    if seconds < 0:
+        raise ValueError('Seconds value must be positive.')
+    if not isinstance(framerate, (int, float)):
+        raise TypeError('Framerate must be of type int/float.')
+    if framerate < 0:
+        raise ValueError('Framerate must be positive.')
+    return int(seconds * framerate)
+
+
+def frames_to_seconds(frames, framerate):
+    """Converts the passed value seconds to the nearest number of frames using
+    the current FrameTimecode object's FPS (framerate).
+
+    Args:
+        seconds (float or int)
+        framerate (float or int)
+
+    Returns:
+        Integer number of frames the passed number of seconds represents
+        using the current FrameTimecode's framerate property.
+
+    Raises:
+        TypeError, ValueError
+    """
+    if not isinstance(frames, (int, float)):
+        raise TypeError('Frame number must be of type int/float.')
+    if frames < 0:
+        raise ValueError('Frame number must be positive.')
+    if not isinstance(framerate, (int, float)):
+        raise TypeError('Framerate must be of type int/float.')
+    if framerate < 0:
+        raise ValueError('Framerate must be positive.')
+    return frames / framerate
+
+
+def timecode_to_seconds(timecode_string):
+    """Parses a string based on the three possible forms (in timecode format,
+    as an integer number of frames, or floating-point seconds, ending with
+    's').
+
+    Assuming the strings '00:05:00.000', '00:05:00', '300s',
+    '300.0s' and '300' are all possible valid values,
+    all representing a period of time equal to 5 minutes, 300 seconds.
+
+    Args:
+        timecode_string (str): supports '00:05:00.000',
+        '00:05:00', '300s', and '300.0s' and '300'.
+
+    Returns:
+        seconds (int)
+
+    Raises:
+        TypeError, ValueError
+    """
+    # Number of seconds S
+    if timecode_string.endswith('s'):
+        seconds = timecode_string[:-1]
+        if not seconds.replace('.', '').isdigit():
+            raise ValueError(
+                'All characters in timecode seconds string must be digits.')
+        seconds = float(seconds)
+        if seconds < 0.0:
+            raise ValueError('Timecode seconds value must be positive.')
+        return seconds
+    # Exact number of frames N
+    elif timecode_string.isdigit():
+        timecode = int(timecode_string)
+        if timecode < 0:
+            raise ValueError('Timecode seconds number must be positive.')
+        return timecode
+    # Standard timecode in string format 'HH:MM:SS[.nnn]'
+    else:
+        tc_val = timecode_string.split(':')
+        if not (len(tc_val) == 3 and tc_val[0].isdigit() and
+                tc_val[1].isdigit() and tc_val[2].replace('.', '').isdigit()):
+            raise ValueError(
+                'Unrecognized or improperly formatted timecode string.')
+        hrs, mins = int(tc_val[0]), int(tc_val[1])
+        seconds = float(tc_val[2]) if '.' in tc_val[2] else int(tc_val[2])
+        if not (hrs >= 0 and mins >= 0 and seconds >= 0 and mins < 60
+                and seconds < 60):
+            raise ValueError(
+                'Invalid timecode range (values outside allowed range).')
+        seconds += (((hrs * 60.0) + mins) * 60.0)
+        return seconds
