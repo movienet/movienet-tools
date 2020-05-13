@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import FakeUserAgentError, UserAgent
 from termcolor import colored
 
 
@@ -7,6 +8,11 @@ class IMDBCrawler(object):
 
     def __init__(self):
         self.url_prefix = 'https://www.imdb.com/title'
+        try:
+            ua = UserAgent()
+            self.header = {'User-Agent': str(ua.chrome)}
+        except FakeUserAgentError:
+            self.header = {'User-Agent': ''}
 
     def parse_home_page(self, mid):
         """get infomation of a movie from its IMDB homepage, including title,
@@ -19,7 +25,8 @@ class IMDBCrawler(object):
             dict: information dict
         """
         try:
-            response = requests.get('{}/{}'.format(self.url_prefix, mid))
+            response = requests.get(
+                '{}/{}'.format(self.url_prefix, mid), headers=self.header)
             content = response.text
         except Exception as e:
             print(e)
@@ -110,8 +117,9 @@ class IMDBCrawler(object):
             'director': None,
         }
         try:
-            response = requests.get('{}/{}/{}'.format(self.url_prefix, mid,
-                                                      'fullcredits'))
+            response = requests.get(
+                '{}/{}/{}'.format(self.url_prefix, mid, 'fullcredits'),
+                headers=self.header)
             content = response.text
             page_soup = BeautifulSoup(content, 'lxml')
             credit_div = page_soup.find('div', {'id': 'fullcredits_content'})
@@ -160,8 +168,9 @@ class IMDBCrawler(object):
         """
         info = {'synopsis': None}
         try:
-            response = requests.get('{}/{}/plotsummary'.format(
-                self.url_prefix, mid))
+            response = requests.get(
+                '{}/{}/plotsummary'.format(self.url_prefix, mid),
+                headers=self.header)
             content = response.text
             page_soup = BeautifulSoup(content, 'lxml')
             ul = page_soup.find('ul', {'id': 'plot-synopsis-content'})

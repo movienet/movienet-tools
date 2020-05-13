@@ -4,12 +4,18 @@ import urllib
 
 import requests
 from bs4 import BeautifulSoup
+from fake_useragent import FakeUserAgentError, UserAgent
 
 
 class DoubanCrawler(object):
 
     def __init__(self):
         self.url_prefix = 'https://movie.douban.com/'
+        try:
+            ua = UserAgent()
+            self.header = {'User-Agent': str(ua.chrome)}
+        except FakeUserAgentError:
+            self.header = {'User-Agent': ''}
 
     def parse_runtime(self, douban_id):
         """get runtime of a movie from douban homepage.
@@ -21,8 +27,9 @@ class DoubanCrawler(object):
             list: runtimes and descritopns of each version
         """
         try:
-            response = requests.get('{}/subject/{}'.format(
-                self.url_prefix, douban_id))
+            response = requests.get(
+                '{}/subject/{}'.format(self.url_prefix, douban_id),
+                headers=self.header)
             content = response.text
         except Exception as e:
             print(e)
@@ -65,7 +72,7 @@ class DoubanCrawler(object):
             str: IMDB ID
         """
         url = 'https://movie.douban.com/subject/{}'.format(douban_id)
-        response = requests.get(url)
+        response = requests.get(url, headers=self.header)
         time.sleep(random.randint(0, 3))
         html = response.content.decode('utf-8')
         soup = BeautifulSoup(html, 'lxml')
@@ -98,7 +105,8 @@ class DoubanCrawler(object):
             tagh3 = soup.find_all('h3')
             for h3 in tagh3:
                 href = h3.find('a').get('href')
-                baidu_url = requests.get(url=href, allow_redirects=False)
+                baidu_url = requests.get(
+                    url=href, allow_redirects=False, headers=self.header)
                 real_url = baidu_url.headers['Location']
                 request_title = 'https://movie.douban.com/subject/'
                 if real_url.startswith(request_title):
