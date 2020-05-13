@@ -14,9 +14,9 @@ class TestShotDetector(object):
     def test_shotdetect(self, ):
         sdt = ShotDetector(
             print_list=True,
-            save_keyf=True,
+            save_keyf=False,
             save_keyf_txt=True,
-            split_video=True,
+            split_video=False,
             begin_frame=0,
             end_frame=2000)
         sdt.shotdetect(self.video_path, self.out_dir)

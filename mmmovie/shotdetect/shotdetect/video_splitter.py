@@ -100,8 +100,8 @@ def split_video_mkvmerge(input_video_paths,
 def split_video_ffmpeg(input_video_paths,
                        shot_list,
                        output_dir,
-                       output_file_template='${OUTPUT_DIR}/\
-                                             shot_${SHOT_NUMBER}.mp4',
+                       output_file_template=('${OUTPUT_DIR}/'
+                                             'shot_${SHOT_NUMBER}.mp4'),
                        arg_override='-crf 21',
                        hide_progress=False,
                        suppress_output=False):
