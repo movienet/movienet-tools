@@ -1,7 +1,14 @@
 import os
+import platform
 import subprocess
 import time
-from setuptools import find_packages, setup
+from setuptools import Extension, dist, find_packages, setup
+
+import numpy as np  # noqa: E402
+from Cython.Build import cythonize  # noqa: E402
+from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+
+dist.Distribution().fetch_build_eggs(['Cython', 'numpy>=1.11.1'])
 
 
 def readme():
@@ -83,6 +90,38 @@ def get_version():
     return locals()['__version__']
 
 
+def make_cuda_ext(name, module, sources):
+
+    return CUDAExtension(
+        name='{}.{}'.format(module, name),
+        sources=[os.path.join(*module.split('.'), p) for p in sources],
+        extra_compile_args={
+            'cxx': [],
+            'nvcc': [
+                '-D__CUDA_NO_HALF_OPERATORS__',
+                '-D__CUDA_NO_HALF_CONVERSIONS__',
+                '-D__CUDA_NO_HALF2_OPERATORS__',
+            ]
+        })
+
+
+def make_cython_ext(name, module, sources):
+    extra_compile_args = None
+    if platform.system() != 'Windows':
+        extra_compile_args = {
+            'cxx': ['-Wno-unused-function', '-Wno-write-strings']
+        }
+
+    extension = Extension(
+        '{}.{}'.format(module, name),
+        [os.path.join(*module.split('.'), p) for p in sources],
+        include_dirs=[np.get_include()],
+        language='c++',
+        extra_compile_args=extra_compile_args)
+    extension, = cythonize(extension)
+    return extension
+
+
 def get_requirements(filename='requirements.txt'):
     here = os.path.dirname(os.path.realpath(__file__))
     with open(os.path.join(here, filename), 'r') as f:
@@ -113,4 +152,27 @@ if __name__ == '__main__':
         setup_requires=['pytest-runner', 'cython', 'numpy'],
         tests_require=['pytest', 'xdoctest'],
         install_requires=get_requirements(),
+        ext_modules=[
+            make_cython_ext(
+                name='soft_nms_cpu',
+                module='mmmovie.detector.persondet.modules.core.ops.nms',
+                sources=['src/soft_nms_cpu.pyx']),
+            make_cuda_ext(
+                name='nms_cpu',
+                module='mmmovie.detector.persondet.modules.core.ops.nms',
+                sources=['src/nms_cpu.cpp']),
+            make_cuda_ext(
+                name='nms_cuda',
+                module='mmmovie.detector.persondet.modules.core.ops.nms',
+                sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
+            make_cuda_ext(
+                name='roi_align_cuda',
+                module='mmmovie.detector.persondet.modules.core.ops.roi_align',
+                sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
+            make_cuda_ext(
+                name='roi_pool_cuda',
+                module='mmmovie.detector.persondet.modules.core.ops.roi_pool',
+                sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu'])
+        ],
+        cmdclass={'build_ext': BuildExtension},
         zip_safe=False)

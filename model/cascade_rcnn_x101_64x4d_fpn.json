@@ -1,0 +1,74 @@
+{
+    "num_stages": 3,
+    "backbone_cfg": {
+        "depth": 101,
+        "groups": 64,
+        "base_width": 4,
+        "num_stages": 4,
+        "out_indices": [0, 1, 2, 3],
+        "frozen_stages": 1,
+        "style": "pytorch"},
+    "neck_cfg": {
+        "in_channels": [256, 512, 1024, 2048],
+        "out_channels": 256,
+        "num_outs": 5},
+    "rpn_head_cfg": {
+        "in_channels": 256,
+        "feat_channels": 256,
+        "anchor_scales": [8],
+        "anchor_ratios": [0.5, 1.0, 2.0],
+        "anchor_strides": [4, 8, 16, 32, 64],
+        "target_means": [0.0, 0.0, 0.0, 0.0],
+        "target_stds": [1.0, 1.0, 1.0, 1.0]},
+    "bbox_roi_extractor_cfg": {
+        "roi_layer": {
+            "type": "RoIAlign", "out_size": 7, "sample_num": 2},
+        "out_channels": 256,
+        "featmap_strides": [4, 8, 16, 32]},
+    "bbox_head_cfg": [
+        {
+            "num_fcs": 2,
+            "in_channels": 256,
+            "fc_out_channels": 1024,
+            "roi_feat_size": 7,
+            "num_classes": 2,
+            "target_means": [0.0, 0.0, 0.0, 0.0],
+            "target_stds": [0.1, 0.1, 0.2, 0.2],
+            "reg_class_agnostic": true
+            },
+        {
+            "num_fcs": 2,
+            "in_channels": 256,
+            "fc_out_channels": 1024,
+            "roi_feat_size": 7,
+            "num_classes": 2,
+            "target_means": [0.0, 0.0, 0.0, 0.0],
+            "target_stds": [0.05, 0.05, 0.1, 0.1],
+            "reg_class_agnostic": true
+            },
+        {
+            "num_fcs": 2,
+            "in_channels": 256,
+            "fc_out_channels": 1024,
+            "roi_feat_size": 7,
+            "num_classes": 2,
+            "target_means": [0.0, 0.0, 0.0, 0.0],
+            "target_stds": [0.033, 0.033, 0.067, 0.067],
+            "reg_class_agnostic": true
+            }
+    ],
+    "test_cfg": {
+        "rpn": {
+            "nms_across_levels": false,
+            "nms_pre": 1000,
+            "nms_post": 1000,
+            "max_num": 1000,
+            "nms_thr": 0.7,
+            "min_bbox_size": 0},
+        "rcnn": {
+            "score_thr": 0.05,
+            "nms": {
+                "type": "nms",
+                "iou_thr": 0.5},
+            "max_per_img": 100}    }
+}
