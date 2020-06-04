@@ -120,7 +120,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                                   self.bbox_head[-1].num_classes)
         ms_bbox_result['ensemble'] = bbox_result
         results = ms_bbox_result['ensemble']
-        return results
+        return results[0]
 
     def aug_test(self, imgs, img_metas, proposals=None, rescale=False):
         """Test with augmentations.
@@ -187,7 +187,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         bbox_result = bbox2result(det_bboxes, det_labels,
                                   self.bbox_head[-1].num_classes)
 
-        return bbox_result
+        return bbox_result[0]
 
     def show_result(self, data, result, **kwargs):
         if isinstance(result, dict):

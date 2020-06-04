@@ -57,12 +57,7 @@ class BaseDetector(nn.Module):
     def forward(self, img, img_meta, **kwargs):
         return self.simple_test(img, img_meta, **kwargs)
 
-    def show_result(self, data, result, dataset=None, score_thr=0.3):
-        if isinstance(result, tuple):
-            bbox_result, _ = result
-        else:
-            bbox_result = result
-
+    def show_result(self, data, bboxes, dataset=None, score_thr=0.3):
         img_tensor = data['img']
         if isinstance(data['img_meta'], list):
             img_metas = data['img_meta']
@@ -74,14 +69,7 @@ class BaseDetector(nn.Module):
         for img, img_meta in zip(imgs, img_metas):
             h, w, _ = img_meta['img_shape']
             img_show = img[:h, :w, :]
-
-            bboxes = np.vstack(bbox_result)
-            # draw bounding boxes
-            labels = [
-                np.full(bbox.shape[0], i, dtype=np.int32)
-                for i, bbox in enumerate(bbox_result)
-            ]
-            labels = np.concatenate(labels)
+            labels = np.full(bboxes.shape[0], 0, dtype=np.int32)
             mmcv.imshow_det_bboxes(
                 img_show,
                 bboxes,

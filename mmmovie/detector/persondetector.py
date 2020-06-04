@@ -42,7 +42,8 @@ class PersonDetector(object):
         load_checkpoint(model, weight_path, map_location='cpu')
         return model
 
-    def detect(self, img):
+    def detect(self, img, conf_thr=0.5, show=False):
+        assert conf_thr >= 0 and conf_thr < 1
         if isinstance(img, str):
             filename = img
             assert osp.isfile(filename)
@@ -50,5 +51,7 @@ class PersonDetector(object):
         data = self.data_processor(img)
         with torch.no_grad():
             result = self.model(rescale=False, **data)
-        self.model.show_result(data, result)
+        result = result[result[:, -1] > conf_thr]
+        if show:
+            self.model.show_result(data, result)
         return result
