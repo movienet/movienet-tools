@@ -150,10 +150,12 @@ class DistPersonDetector(object):
                                     device='cuda')
             if rank == 0:
                 tmpdir = tempfile.mkdtemp()
+                # pylint: disable=not-callable
                 tmpdir = torch.tensor(
                     bytearray(tmpdir.encode()),
                     dtype=torch.uint8,
                     device='cuda')
+                # pylint: enable=not-callable
                 dir_tensor[:len(tmpdir)] = tmpdir
             dist.broadcast(dir_tensor, 0)
             tmpdir = dir_tensor.cpu().numpy().tobytes().decode().rstrip()
