@@ -19,9 +19,9 @@ class TestDetector(object):
         cls.retina_conf = np.array([0.879, 0.866])
 
     def test_rcnn(self):
-        cfg = './model/cascade_rcnn_x101_64x4d_fpn.json'
+        cfg = osp.join(os.getcwd(), 'model/cascade_rcnn_x101_64x4d_fpn.json')
         assert osp.isfile(cfg)
-        weight = './model/cascade_rcnn_x101_64x4d_fpn.pth'
+        weight = osp.join(os.getcwd(), 'model/cascade_rcnn_x101_64x4d_fpn.pth')
         assert osp.isfile(weight)
         detector = PersonDetector('rcnn', cfg, weight)
         assert detector is not None

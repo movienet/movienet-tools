@@ -1,5 +1,3 @@
-from .persondetector import PersonDetector
+from .persondetector import DistPersonDetector, PersonDetector
 
-__all__ = [
-    'PersonDetector',
-]
+__all__ = ['PersonDetector', 'DistPersonDetector']

@@ -45,12 +45,17 @@ class DataProcessor(object):
 class CustomDataset(Dataset):
     """Custom dataset for detection."""
 
-    def __init__(self, listfile, img_scale=(1333, 800), img_prefix=None):
-        self.listfile = listfile
+    def __init__(self, img_list, img_scale=(1333, 800), img_prefix=None):
+        if isinstance(img_list, list):
+            self.img_list = img_list
+        elif isinstance(img_list, str):
+            assert osp.isfile(img_list)
+            self.img_list = [x.strip() for x in open(img_list)]
+        else:
+            raise ValueError(
+                'param "img_list" must be list or str, now it is {}'.format(
+                    type(img_list)))
         self.img_prefix = img_prefix
-
-        # load img list
-        self.img_list = [x.strip() for x in open(listfile)]
         self.pipeline = Compose([
             Resize(img_scale, True),
             Normalize(
