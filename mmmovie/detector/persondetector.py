@@ -32,7 +32,7 @@ class PersonDetector(object):
             raise KeyError('{} is not supported now.'.format(arch))
         self.model.eval()
         self.model.cuda(gpu)
-        self.data_processor = DataProcessor(img_scale)
+        self.data_processor = DataProcessor(gpu, img_scale)
 
     def build_retinanet(self, cfg_path, weight_path):
         with open(cfg_path) as f:

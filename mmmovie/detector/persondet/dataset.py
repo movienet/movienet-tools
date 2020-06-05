@@ -11,7 +11,7 @@ from .data_pipelines import (Collect, ImageToTensor, Normalize,
 class DataProcessor(object):
     """image preprocess pipeline."""
 
-    def __init__(self, img_scale=(1333, 800)):
+    def __init__(self, gpu, img_scale=(1333, 800)):
         self.pipeline = Compose([
             Resize(img_scale, True),
             Normalize(
@@ -24,7 +24,7 @@ class DataProcessor(object):
                 keys=['img'],
                 meta_keys=('ori_shape', 'img_shape', 'pad_shape',
                            'scale_factor', 'flip', 'img_norm_cfg')),
-            OneSampleCollate(device=1),
+            OneSampleCollate(device=gpu),
         ])
 
     def __call__(self, img):
