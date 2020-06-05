@@ -25,7 +25,7 @@ class TestDetector(object):
         assert osp.isfile(weight)
         detector = PersonDetector('rcnn', cfg, weight)
         assert detector is not None
-        img_path = osp.join(osp.dirname(__file__), 'data/test.jpg')
+        img_path = osp.join(osp.dirname(__file__), 'data/test01.jpg')
         assert osp.isfile(img_path)
         img = mmcv.imread(img_path)
         results = detector.detect(img)
@@ -42,7 +42,7 @@ class TestDetector(object):
         assert osp.isfile(weight)
         detector = PersonDetector('retina', cfg, weight)
         assert detector is not None
-        img_path = osp.join(osp.dirname(__file__), 'data/test.jpg')
+        img_path = osp.join(osp.dirname(__file__), 'data/test01.jpg')
         assert osp.isfile(img_path)
         img = mmcv.imread(img_path)
         results = detector.detect(img)

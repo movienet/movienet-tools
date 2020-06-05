@@ -1,6 +1,6 @@
 import os.path as osp
 
-from .src import extract_audio_feat, extract_place_feat
+from .src import extract_audio_feat
 
 
 class FeatureExtractor(object):
@@ -29,7 +29,7 @@ class FeatureExtractor(object):
     def __init__(
         self,
         # for common
-        mode='place',
+        mode='audio',
         data_root='/mnt/SSD/ayrao/mmmovie/test/data',
         list_file='/mnt/SSD/ayrao/mmmovie/test/data/meta/list_test.txt',
         # for place
@@ -45,18 +45,7 @@ class FeatureExtractor(object):
         assert mode in ['place', 'action', 'cast', 'audio']
         self.mode = mode
         self.cfg = {}
-        if mode == 'place':
-            self.cfg['data_root'] = data_root
-            self.cfg['list_file'] = list_file
-            self.cfg['save_one_frame_feat'] = save_one_frame_feat
-            self.cfg['batch_size'] = batch_size
-            self.cfg['workers'] = 32
-            self.cfg['src_img_path'] = osp.join(data_root, 'shot_keyf')
-            self.cfg['dst_path'] = osp.join(data_root, 'place_feat_raw')
-            self.cfg['dst_feat_path'] = osp.join(data_root, 'place_feat')
-            self.cfg['st'] = 0
-            self.cfg['ed'] = 99999999
-        elif mode == 'audio':
+        if mode == 'audio':
             self.cfg['data_root'] = data_root
             self.cfg['list_file'] = list_file
             self.cfg['replace_old'] = replace_old
@@ -74,7 +63,5 @@ class FeatureExtractor(object):
 
     def extract(self, ):
         print('*' * 20 + ' Extract {} feat '.format(self.mode) + '*' * 20)
-        if self.mode == 'place':
-            extract_place_feat(self.cfg)
         if self.mode == 'audio':
             extract_audio_feat(self.cfg)

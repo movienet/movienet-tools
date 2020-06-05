@@ -11,7 +11,7 @@ if __name__ == '__main__':
     detector = PersonDetector('rcnn', cfg, weight)
     print('build model done: {:.2f}s'.format(time.time() - st))
 
-    img_path = './tests/data/test.jpg'
+    img_path = './tests/data/test01.jpg'
     img = mmcv.imread(img_path)
     result = detector.detect(img, show=True)
 
