@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-__all__ = ['resnet50_place']
+__all__ = ['resnet50_person']
 
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
@@ -140,7 +140,7 @@ class ResNet(nn.Module):
     def __init__(self,
                  block,
                  layers,
-                 num_classes=365,
+                 num_features=256,
                  zero_init_residual=False,
                  groups=1,
                  width_per_group=64,
@@ -188,7 +188,10 @@ class ResNet(nn.Module):
             stride=2,
             dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+
+        # Append new layers
+        self.feat = nn.Linear(512 * block.expansion, num_features)
+        self.feat_bn = nn.BatchNorm1d(num_features)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -254,7 +257,9 @@ class ResNet(nn.Module):
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
-        # x = self.fc(x)
+
+        x = self.feat(x)
+        # x = self.feat_bn(x)
 
         return x
 
@@ -268,7 +273,7 @@ def _resnet(arch, block, layers, state_dict, progress, **kwargs):
     return model
 
 
-def resnet50_place(state_dict, progress=True, **kwargs):
+def resnet50_person(state_dict, progress=True, **kwargs):
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition"
         <https://arxiv.org/pdf/1512.03385.pdf>`_

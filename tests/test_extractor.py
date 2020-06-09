@@ -4,7 +4,7 @@ import os.path as osp
 import mmcv
 import numpy as np
 
-from mmmovie import FeatureExtractor, PlaceExtractor
+from mmmovie import FeatureExtractor, PersonExtractor, PlaceExtractor
 
 
 class TestExtractor(object):
@@ -14,6 +14,10 @@ class TestExtractor(object):
         cls.video_path = osp.join(osp.dirname(__file__), 'data/test.mp4')
         cls.img_list = [
             osp.join(osp.dirname(__file__), 'data/test{:02d}.jpg'.format(x))
+            for x in range(1, 4)
+        ]
+        cls.person_img_list = [
+            osp.join(osp.dirname(__file__), 'data/person{:02d}.jpg'.format(x))
             for x in range(1, 4)
         ]
         cls.out_dir = osp.join(osp.dirname(__file__), 'data')
@@ -34,6 +38,23 @@ class TestExtractor(object):
         assert int(confuse_matrix[0, 1] * 1000) == 633
         assert int(confuse_matrix[0, 2] * 1000) == 523
         assert int(confuse_matrix[1, 2] * 1000) == 880
+
+    def test_extract_person_feat(self):
+        weight = osp.join(os.getcwd(), 'model/resnet50_csm.pth')
+        extractor = PersonExtractor(weight, gpu=0)
+        features = []
+        for img_path in self.person_img_list:
+            img = mmcv.imread(img_path)
+            output = extractor.extract(img)
+            feature = output.detach().cpu().numpy().squeeze()
+            feature /= np.linalg.norm(feature)
+            features.append(feature)
+
+        features = np.stack(features)
+        confuse_matrix = features.dot(features.T)
+        assert int(confuse_matrix[0, 1] * 1000) == 560
+        assert int(confuse_matrix[0, 2] * 1000) == 662
+        assert int(confuse_matrix[1, 2] * 1000) == 520
 
     @staticmethod
     def test_extract_audio_feat_folder():

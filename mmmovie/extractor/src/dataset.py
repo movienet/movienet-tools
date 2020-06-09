@@ -7,20 +7,10 @@ from torchvision.transforms import Compose, ToTensor
 from .transforms import CenterCrop, Normalize, OneImageCollate, Resize
 
 
-class PlaceDataProcessor(object):
-    """image preprocess pipeline."""
+class BaseDataProcessor(object):
 
     def __init__(self, gpu=0):
-        self.pipeline = Compose([
-            Resize((256, 256)),
-            CenterCrop((224, 224)),
-            Normalize(
-                mean=[123.675, 116.28, 103.53],
-                std=[58.395, 57.12, 57.375],
-                to_rgb=True),
-            ToTensor(),
-            OneImageCollate(gpu)
-        ])
+        self.pipeline = self.build_data_pipline(gpu)
 
     def __call__(self, img):
         """process an image.
@@ -30,9 +20,44 @@ class PlaceDataProcessor(object):
         """
         return self.pipeline(img)
 
+    def build_data_pipline(self, gpu):
+        raise NotImplementedError
 
-class PlaceDataset(Dataset):
-    """Place dataset for detection."""
+
+class PlaceDataProcessor(BaseDataProcessor):
+    """image preprocess pipeline for place feature extractor."""
+
+    def build_data_pipline(self, gpu):
+        pipeline = Compose([
+            Resize((256, 256)),
+            CenterCrop((224, 224)),
+            Normalize(
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            ToTensor(),
+            OneImageCollate(gpu)
+        ])
+        return pipeline
+
+
+class PersonDataProcessor(BaseDataProcessor):
+    """image preprocess pipeline for person feature extractor."""
+
+    def build_data_pipline(self, gpu):
+        pipeline = Compose([
+            Resize((128, 256)),
+            Normalize(
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            ToTensor(),
+            OneImageCollate(gpu)
+        ])
+        return pipeline
+
+
+class BaseDataset(Dataset):
 
     def __init__(self, img_list, img_prefix=None):
         if isinstance(img_list, list):
@@ -45,7 +70,25 @@ class PlaceDataset(Dataset):
                 'param "img_list" must be list or str, now it is {}'.format(
                     type(img_list)))
         self.img_prefix = img_prefix
-        self.pipeline = Compose([
+        self.pipeline = self.build_data_pipline()
+
+    def build_data_pipline(self):
+        raise NotImplementedError
+
+    def __len__(self):
+        return len(self.img_list)
+
+    def __getitem__(self, idx):
+        filename = osp.join(self.img_prefix, self.img_list[idx])
+        img = mmcv.imread(filename)
+        return self.pipeline(img)
+
+
+class PersonDataset(BaseDataset):
+    """Person dataset for extracting features."""
+
+    def build_data_pipline(self):
+        pipeline = Compose([
             Resize((256, 256)),
             CenterCrop((224, 224)),
             Normalize(
@@ -54,14 +97,20 @@ class PlaceDataset(Dataset):
                 to_rgb=True),
             ToTensor()
         ])
+        return pipeline
 
-    def __len__(self):
-        return len(self.img_list)
 
-    def __getitem__(self, idx):
-        return self.prepare_test_img(idx)
+class PlaceDataset(BaseDataset):
+    """Place dataset for extracting features."""
 
-    def prepare_test_img(self, idx):
-        filename = osp.join(self.img_prefix, self.img_list[idx])
-        img = mmcv.imread(filename)
-        return self.pipeline(img)
+    def build_data_pipline(self):
+        pipeline = Compose([
+            Resize((256, 256)),
+            CenterCrop((224, 224)),
+            Normalize(
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            ToTensor()
+        ])
+        return pipeline
