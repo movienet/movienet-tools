@@ -15,6 +15,6 @@ if __name__ == '__main__':
     img = mmcv.imread(img_path)
     result = detector.detect(img, show=True)
 
-    print('{} faces detected!'.format(result.shape[0]))
-    print('faces:')
+    print('{} persons detected!'.format(result.shape[0]))
+    print('persons:')
     print(result)
