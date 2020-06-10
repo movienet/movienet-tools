@@ -44,7 +44,7 @@ class RetinaNet(BaseDetector):
         outs = self.bbox_head(x)
         return outs
 
-    def simple_test(self, img, img_meta, rescale=False):
+    def simple_test(self, img, img_meta, rescale=True):
         x = self.extract_feat(img)
         outs = self.bbox_head(x)
         bbox_inputs = outs + (img_meta, self.test_cfg, rescale)

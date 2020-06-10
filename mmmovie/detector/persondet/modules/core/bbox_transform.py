@@ -1,4 +1,3 @@
-import mmcv
 import numpy as np
 import torch
 
@@ -85,7 +84,11 @@ def bbox_flip(bboxes, img_shape):
         flipped[:, 2::4] = img_shape[1] - bboxes[:, 0::4] - 1
         return flipped
     elif isinstance(bboxes, np.ndarray):
-        return mmcv.bbox_flip(bboxes, img_shape)
+        assert bboxes.shape[-1] % 4 == 0
+        flipped = bboxes.copy()
+        flipped[:, 0::4] = img_shape[1] - bboxes[:, 2::4] - 1
+        flipped[:, 2::4] = img_shape[1] - bboxes[:, 0::4] - 1
+        return flipped
 
 
 def bbox_mapping(bboxes, img_shape, scale_factor, flip):

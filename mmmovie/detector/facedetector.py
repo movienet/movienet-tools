@@ -41,7 +41,7 @@ class FaceDetector(object):
         faces = faces[keep_idx]
         landmarks = landmarks[keep_idx]
         if show:
-            img_show = self.draw_face(img, faces, landmarks)
+            img_show = self.draw_face(img.copy(), faces, landmarks)
             cv2.imshow('face', img_show)
             cv2.waitKey()
         return faces, landmarks
@@ -58,6 +58,9 @@ class FaceDetector(object):
                         img,
                         (int(landmarks[i, j, 0]), int(landmarks[i, j, 1])), 2,
                         (0, 255, 0), 2)
+            img = cv2.putText(img, 'prob:{:.2f}'.format(faces[i, -1]),
+                              (int(faces[i, 0]), int(faces[i, 1] - 10)),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         return img
 
     def crop_face(self,

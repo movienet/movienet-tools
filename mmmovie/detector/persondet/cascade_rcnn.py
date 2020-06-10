@@ -77,7 +77,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             x = self.neck(x)
         return x
 
-    def simple_test(self, img, img_meta, proposals=None, rescale=False):
+    def simple_test(self, img, img_meta, proposals=None, rescale=True):
         x = self.extract_feat(img)
         proposal_list = self.simple_test_rpn(
             x, img_meta,
@@ -188,8 +188,3 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                                   self.bbox_head[-1].num_classes)
 
         return bbox_result[0]
-
-    def show_result(self, data, result, **kwargs):
-        if isinstance(result, dict):
-            result = result['ensemble']
-        super(CascadeRCNN, self).show_result(data, result, **kwargs)
