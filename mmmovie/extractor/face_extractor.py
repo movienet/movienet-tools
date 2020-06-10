@@ -10,17 +10,17 @@ from mmcv.parallel import MMDistributedDataParallel, collate
 from mmcv.runner import get_dist_info
 from torch.utils.data import DataLoader, DistributedSampler
 
-from .src import PersonDataProcessor, PersonDataset, resnet50_person
+from .src import FaceDataProcessor, FaceDataset, IRv1_face
 
 
-class PersonExtractor(object):
+class FaceExtractor(object):
 
     def __init__(self, weight_path, gpu=0):
         weights = torch.load(weight_path, map_location='cpu')
-        self.model = resnet50_person(weights)
+        self.model = IRv1_face(weights)
         self.model.eval()
         self.model.cuda(gpu)
-        self.data_processor = PersonDataProcessor(gpu)
+        self.data_processor = FaceDataProcessor(gpu)
 
     def extract(self, img):
         if isinstance(img, str):
@@ -34,12 +34,12 @@ class PersonExtractor(object):
         return feature
 
 
-class DistPersonExtractor(object):
+class DistFaceExtractor(object):
 
     def __init__(self, weight_path):
         # build model
         weights = torch.load(weight_path, map_location='cpu')
-        self.model = resnet50_person(weights)
+        self.model = IRv1_face(weights)
         self.model = MMDistributedDataParallel(
             self.model.cuda(),
             device_ids=[torch.cuda.current_device()],
@@ -52,7 +52,7 @@ class DistPersonExtractor(object):
                       imgs_per_gpu=1,
                       workers_per_gpu=4):
         # build dataset
-        dataset = PersonDataset(imglist, img_prefix=img_prefix)
+        dataset = FaceDataset(imglist, img_prefix=img_prefix)
         # get dist info
         rank, world_size = get_dist_info()
         # build data loader

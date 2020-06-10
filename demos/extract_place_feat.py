@@ -11,8 +11,7 @@ if __name__ == '__main__':
     for i in range(1, 4):
         img_path = './tests/data/test{:02d}.jpg'.format(i)
         img = mmcv.imread(img_path)
-        output = extractor.extract(img)
-        feature = output.detach().cpu().numpy().squeeze()
+        feature = extractor.extract(img)
         feature /= np.linalg.norm(feature)
         features.append(feature)
 

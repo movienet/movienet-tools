@@ -47,7 +47,7 @@ if __name__ == '__main__':
     assert osp.isfile(args.listfile)
     assert osp.isdir(args.img_prefix)
     imglist = [x.strip() for x in open(args.listfile)]
-    results = extractor.batch_detect(
+    results = extractor.batch_extract(
         imglist,
         args.img_prefix,
         imgs_per_gpu=args.imgs_per_gpu,

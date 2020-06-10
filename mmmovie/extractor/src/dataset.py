@@ -57,6 +57,22 @@ class PersonDataProcessor(BaseDataProcessor):
         return pipeline
 
 
+class FaceDataProcessor(BaseDataProcessor):
+    """image preprocess pipeline for face feature extractor."""
+
+    def build_data_pipline(self, gpu):
+        pipeline = Compose([
+            Resize((160, 160)),
+            Normalize(
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
+                to_rgb=True),
+            ToTensor(),
+            OneImageCollate(gpu)
+        ])
+        return pipeline
+
+
 class BaseDataset(Dataset):
 
     def __init__(self, img_list, img_prefix=None):
@@ -110,6 +126,21 @@ class PlaceDataset(BaseDataset):
             Normalize(
                 mean=[123.675, 116.28, 103.53],
                 std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            ToTensor()
+        ])
+        return pipeline
+
+
+class FaceDataset(BaseDataset):
+    """Face dataset for extracting features."""
+
+    def build_data_pipline(self, gpu):
+        pipeline = Compose([
+            Resize((160, 160)),
+            Normalize(
+                mean=[127.5, 127.5, 127.5],
+                std=[128.0, 128.0, 128.0],
                 to_rgb=True),
             ToTensor()
         ])

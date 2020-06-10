@@ -30,7 +30,8 @@ class PlaceExtractor(object):
         data = self.data_processor(img)
         with torch.no_grad():
             result = self.model(data)
-        return result
+        feature = result.detach().cpu().numpy().squeeze()
+        return feature
 
 
 class DistPlaceExtractor(object):
@@ -45,11 +46,11 @@ class DistPlaceExtractor(object):
             broadcast_buffers=False)
         self.model.eval()
 
-    def batch_detect(self,
-                     imglist,
-                     img_prefix,
-                     imgs_per_gpu=1,
-                     workers_per_gpu=4):
+    def batch_extract(self,
+                      imglist,
+                      img_prefix,
+                      imgs_per_gpu=1,
+                      workers_per_gpu=4):
         # build dataset
         dataset = PlaceDataset(imglist, img_prefix=img_prefix)
         # get dist info
