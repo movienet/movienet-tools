@@ -1,11 +1,7 @@
 import logging
 from abc import ABCMeta, abstractmethod
 
-import mmcv
-import numpy as np
 import torch.nn as nn
-
-from .modules.core.misc import tensor2imgs
 
 
 class BaseDetector(nn.Module):
@@ -56,23 +52,3 @@ class BaseDetector(nn.Module):
 
     def forward(self, img, img_meta, **kwargs):
         return self.simple_test(img, img_meta, **kwargs)
-
-    def show_result(self, data, bboxes, dataset=None, score_thr=0.3):
-        img_tensor = data['img']
-        if isinstance(data['img_meta'], list):
-            img_metas = data['img_meta']
-        else:
-            img_metas = data['img_meta'].data[0]
-        imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
-        assert len(imgs) == len(img_metas)
-
-        for img, img_meta in zip(imgs, img_metas):
-            h, w, _ = img_meta['img_shape']
-            img_show = img[:h, :w, :]
-            labels = np.full(bboxes.shape[0], 0, dtype=np.int32)
-            mmcv.imshow_det_bboxes(
-                img_show,
-                bboxes,
-                labels,
-                class_names='person',
-                score_thr=score_thr)

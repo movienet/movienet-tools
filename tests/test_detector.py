@@ -11,11 +11,11 @@ class TestDetector(object):
 
     @classmethod
     def setup_class(cls):
-        cls.rcnn_bboxes = np.array([[363, 95, 670, 574], [922, 2, 1330, 577]],
-                                   np.int16)
+        cls.rcnn_bboxes = np.array(
+            [[524, 137, 965, 827], [1328, 2, 1916, 832]], np.int16)
         cls.rcnn_conf = np.array([0.994, 0.995], np.float32)
         cls.retina_bboxes = np.array(
-            [[368, 96, 652, 570], [919, 0, 1329, 576]], np.int16)
+            [[530, 138, 939, 821], [1324, 0, 1914, 830]], np.int16)
         cls.retina_conf = np.array([0.879, 0.866], np.float32)
         cls.mtcnn_bboxes = np.array([[658, 182, 731, 284]], np.int16)
         cls.mtcnn_landmarks = np.array(
@@ -30,7 +30,7 @@ class TestDetector(object):
         assert osp.isfile(weight)
         detector = PersonDetector('rcnn', cfg, weight)
         assert detector is not None
-        img_path = osp.join(osp.dirname(__file__), 'data/test01.jpg')
+        img_path = osp.join(osp.dirname(__file__), 'data/still02.jpg')
         assert osp.isfile(img_path)
         img = mmcv.imread(img_path)
         results = detector.detect(img)
@@ -47,7 +47,7 @@ class TestDetector(object):
         assert osp.isfile(weight)
         detector = PersonDetector('retina', cfg, weight)
         assert detector is not None
-        img_path = osp.join(osp.dirname(__file__), 'data/test01.jpg')
+        img_path = osp.join(osp.dirname(__file__), 'data/still02.jpg')
         assert osp.isfile(img_path)
         img = mmcv.imread(img_path)
         results = detector.detect(img)
@@ -64,7 +64,7 @@ class TestDetector(object):
         assert osp.isfile(weight)
         detector = FaceDetector(cfg, weight)
         assert detector is not None
-        img_path = osp.join(osp.dirname(__file__), 'data/test01.jpg')
+        img_path = osp.join(osp.dirname(__file__), 'data/still02.jpg')
         assert osp.isfile(img_path)
         img = mmcv.imread(img_path)
         faces, landmarks = detector.detect(img)

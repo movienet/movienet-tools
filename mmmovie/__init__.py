@@ -1,6 +1,6 @@
 from .crawler import DoubanCrawler, IMDBCrawler, TMDBCrawler
 from .detector import DistPersonDetector, FaceDetector, PersonDetector
-from .extractor import (DistPersonExtractor, DistPlaceExtractor,
+from .extractor import (DistPersonExtractor, DistPlaceExtractor, FaceExtractor,
                         FeatureExtractor, PersonExtractor, PlaceExtractor)
 from .metaio import MetaParser
 from .movie import (MovieReader, concat_movie, convert_movie,
@@ -17,5 +17,5 @@ __all__ = [
     'concat_movie', 'seconds_to_timecode', 'seconds_to_frames',
     'frames_to_seconds', 'timecode_to_seconds', 'PersonDetector',
     'DistPersonDetector', 'PlaceExtractor', 'DistPlaceExtractor',
-    'PersonExtractor', 'DistPersonExtractor', 'FaceDetector'
+    'PersonExtractor', 'DistPersonExtractor', 'FaceDetector', 'FaceExtractor'
 ]

@@ -262,21 +262,18 @@ class ResNet(nn.Module):
         return self._forward_impl(x)
 
 
-def _resnet(arch, block, layers, state_dict, progress, **kwargs):
+def _resnet(arch, block, layers, state_dict, **kwargs):
     model = ResNet(block, layers, **kwargs)
     model.load_state_dict(state_dict)
     return model
 
 
-def resnet50_place(state_dict, progress=True, **kwargs):
+def resnet50_place(state_dict, **kwargs):
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition"
         <https://arxiv.org/pdf/1512.03385.pdf>`_
 
     Args:
         state_dict: weights of the model
-        progress (bool): If True, displays a progress bar of the download to
-        stderr
     """
-    return _resnet('resnet50', Bottleneck, [3, 4, 6, 3], state_dict, progress,
-                   **kwargs)
+    return _resnet('resnet50', Bottleneck, [3, 4, 6, 3], state_dict, **kwargs)

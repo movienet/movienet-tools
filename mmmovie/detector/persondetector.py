@@ -4,7 +4,9 @@ import shutil
 import tempfile
 from functools import partial
 
+import cv2
 import mmcv
+import numpy as np
 import torch
 import torch.distributed as dist
 from mmcv.parallel import MMDistributedDataParallel, collate
@@ -56,11 +58,50 @@ class PersonDetector(object):
             img = mmcv.imread(filename)
         data = self.data_processor(img)
         with torch.no_grad():
-            result = self.model(rescale=False, **data)
-        result = result[result[:, -1] > conf_thr]
+            persons = self.model(rescale=True, **data)
+        persons = persons[persons[:, -1] > conf_thr]
         if show:
-            self.model.show_result(data, result)
-        return result
+            img_show = self.draw_person(img.copy(), persons)
+            cv2.imshow('person', img_show)
+            cv2.waitKey()
+        return persons
+
+    def draw_person(self, img, persons):
+        num_persons = persons.shape[0]
+        for i in range(num_persons):
+            img = cv2.rectangle(img, (int(persons[i, 0]), int(persons[i, 1])),
+                                (int(persons[i, 2]), int(persons[i, 3])),
+                                (0, 255, 0), 2)
+            img = cv2.putText(
+                img, 'prob:{:.2f}'.format(persons[i, -1]),
+                (int(persons[i, 0] + 10), int(persons[i, 1] + 30)),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+        return img
+
+    def crop_person(self,
+                    img,
+                    persons,
+                    save_dir=None,
+                    save_prefix=None,
+                    img_scale=(128, 256)):
+        num_persons = persons.shape[0]
+        h, w = img.shape[:2]
+        person_list = []
+        for i in range(num_persons):
+            x1, y1, x2, y2 = persons[i, :4].astype(np.int)
+            x1 = max(0, x1)
+            y1 = max(0, y1)
+            x2 = min(w, x2)
+            y2 = min(h, y2)
+            person_img = img[y1:y2, x1:x2]
+            if img_scale is not None:
+                person_img = cv2.resize(person_img, img_scale)
+            if save_dir is not None and save_prefix is not None:
+                save_path = osp.join(save_dir,
+                                     save_prefix + '_{:02d}.jpg'.format(i))
+                cv2.imwrite(save_path, person_img)
+            person_list.append(person_img)
+        return person_list
 
 
 class DistPersonDetector(object):
