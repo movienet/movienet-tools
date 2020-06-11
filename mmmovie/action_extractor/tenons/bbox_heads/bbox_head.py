@@ -4,14 +4,8 @@ import torch.nn.functional as F
 
 from mmaction.core.bbox2d import delta2bbox, bbox_target
 from mmaction.core.post_processing import multiclass_nms, singleclass_nms
-from mmaction.losses import (weighted_cross_entropy, weighted_smoothl1,
-                             multilabel_accuracy,
-                             weighted_binary_cross_entropy,
-                             weighted_multilabel_binary_cross_entropy)
-from ...registry import HEADS
 
 
-@HEADS.register_module
 class BBoxHead(nn.Module):
     """Simplest RoI head, with only two fc layers for classification and
     regression respectively"""
@@ -58,9 +52,11 @@ class BBoxHead(nn.Module):
                 self.temporal_pool = nn.MaxPool3d((roi_feat_size[0], 1, 1))
         if self.with_spatial_pool:
             if self.spatial_pool_type == 'avg':
-                self.spatial_pool = nn.AvgPool3d((1, roi_feat_size[1], roi_feat_size[2]))
+                self.spatial_pool = nn.AvgPool3d(
+                    (1, roi_feat_size[1], roi_feat_size[2]))
             else:
-                self.spatial_pool = nn.MaxPool3d((1, roi_feat_size[1], roi_feat_size[2]))
+                self.spatial_pool = nn.MaxPool3d(
+                    (1, roi_feat_size[1], roi_feat_size[2]))
         if not self.with_temporal_pool and not self.with_spatial_pool:
             in_channels *= (self.roi_feat_size * self.roi_feat_size)
         if self.with_cls:
@@ -106,54 +102,6 @@ class BBoxHead(nn.Module):
             target_stds=self.target_stds)
         return cls_reg_targets
 
-    def loss(self,
-             cls_score,
-             bbox_pred,
-             labels,
-             label_weights,
-             bbox_targets,
-             bbox_weights,
-             class_weights,
-             reduce=True):
-        losses = dict()
-        if cls_score is not None:
-            if not self.multilabel_classification:
-                assert len(labels[0]) == 1
-                losses['loss_cls'] = weighted_cross_entropy(
-                    cls_score, labels, label_weights, reduce=reduce)
-                losses['acc'] = accuracy(cls_score, labels)
-            else:
-                # cls_score = cls_score.sigmoid()
-                losses['loss_person_cls'] = weighted_binary_cross_entropy(
-                    cls_score[:, 0], labels[:, 0] >= 1, label_weights)
-                pos_inds = torch.nonzero(labels[:, 0] > 0).squeeze(1)
-                losses['loss_action_cls'] = weighted_multilabel_binary_cross_entropy(
-                    cls_score[pos_inds, 1:], labels[pos_inds, :], class_weights[pos_inds, 1:])
-                acc, recall_thr, prec_thr, recall_k, prec_k = multilabel_accuracy(
-                    cls_score, labels, topk=(3,5), thr=0.5)
-                losses['acc'] = acc
-                losses['recall@thr=0.5'] = recall_thr
-                losses['prec@thr=0.5'] = prec_thr
-                losses['recall@top3'] = recall_k[0]
-                losses['prec@top3'] = prec_k[0]
-                losses['recall@top5'] = recall_k[1]
-                losses['prec@top5'] = prec_k[1]
-        if bbox_pred is not None:
-            pos_inds = labels > 0
-            if self.reg_class_agnostic:
-                pos_inds = labels[:, 0] > 0
-                pos_bbox_pred = bbox_pred.view(bbox_pred.size(0), 4)[pos_inds]
-            else:
-                pos_inds = labels > 0
-                pos_bbox_pred = bbox_pred.view(bbox_pred.size(0), -1,
-                                               4)[pos_inds, labels[pos_inds]]
-            losses['loss_reg'] = weighted_smoothl1(
-                pos_bbox_pred,
-                bbox_targets[pos_inds],
-                bbox_weights[pos_inds],
-                avg_factor=bbox_targets.size(0))
-        return losses
-
     def get_det_bboxes(self,
                        rois,
                        cls_score,
@@ -166,7 +114,8 @@ class BBoxHead(nn.Module):
         if isinstance(cls_score, list):
             cls_score = sum(cls_score) / float(len(cls_score))
         if not self.multilabel_classification:
-            scores = F.softmax(cls_score, dim=1) if cls_score is not None else None
+            scores = F.softmax(
+                cls_score, dim=1) if cls_score is not None else None
         else:
             scores = cls_score.sigmoid() if cls_score is not None else None
 

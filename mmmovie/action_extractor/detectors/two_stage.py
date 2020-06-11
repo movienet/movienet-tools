@@ -7,6 +7,8 @@ from ..registry import DETECTORS
 from mmaction.core.bbox2d import (bbox2roi, bbox2result, build_assigner,
                                   build_sampler)
 
+from ..tenons.backbones import ResNet_I3D
+
 
 @DETECTORS.register_module
 class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
@@ -16,33 +18,18 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
                  bbox_roi_extractor,
                  bbox_head,
                  test_cfg,
-                 neck=None,
                  shared_head=None,
                  pretrained=None):
 
         super(FastRCNN, self).__init__()
-        self.backbone = builder.build_backbone(backbone)
-
-        if neck is not None:
-            self.neck = builder.build_neck(neck)
-
-        if shared_head is not None:
-            self.shared_head = builder.build_head(shared_head)
-
-        if rpn_head is not None:
-            self.rpn_head = builder.build_head(rpn_head)
+        self.backbone = ResNet_I3D(**backbone)
+        self.shared_head = ResI3DLayer(**shared_head)
 
         if bbox_head is not None:
             self.bbox_roi_extractor = builder.build_roi_extractor(
                 bbox_roi_extractor)
             self.bbox_head = builder.build_head(bbox_head)
 
-        if dropout_ratio > 0:
-            self.dropout = nn.Dropout(p=dropout_ratio)
-        else:
-            self.dropout = None
-
-        self.train_cfg = train_cfg
         self.test_cfg = test_cfg
 
         self.init_weights()
@@ -181,8 +168,8 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
                 proposal = proposal[0, ...]
                 if not self.test_cfg.train_detector:
                     select_inds = proposal[:, 4] >= min(
-                        self.test_cfg.person_det_score_thr, max(
-                            proposal[:, 4]))
+                        self.test_cfg.person_det_score_thr, max(proposal[:,
+                                                                         4]))
                     proposal = proposal[select_inds]
                 proposal_list.append(proposal)
 
@@ -221,8 +208,8 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
                 proposal = proposal[0, ...]
                 if not self.test_cfg.train_detector:
                     select_inds = proposal[:, 4] >= min(
-                        self.test_cfg.person_det_score_thr, max(
-                            proposal[:, 4]))
+                        self.test_cfg.person_det_score_thr, max(proposal[:,
+                                                                         4]))
                     proposal = proposal[select_inds]
                 proposal_list.append(proposal)
 
