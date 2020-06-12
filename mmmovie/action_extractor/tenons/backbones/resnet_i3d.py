@@ -11,9 +11,12 @@ from mmcv.runner import load_checkpoint
 from ..utils.nonlocal_block import build_nonlocal_block
 from ..spatial_temporal_modules.non_local import NonLocalModule
 
-from ...registry import BACKBONES
 
-def conv3x3x3(in_planes, out_planes, spatial_stride=1, temporal_stride=1, dilation=1):
+def conv3x3x3(in_planes,
+              out_planes,
+              spatial_stride=1,
+              temporal_stride=1,
+              dilation=1):
     "3x3x3 convolution with padding"
     return nn.Conv3d(
         in_planes,
@@ -25,12 +28,16 @@ def conv3x3x3(in_planes, out_planes, spatial_stride=1, temporal_stride=1, dilati
         bias=False)
 
 
-def conv1x3x3(in_planes, out_planes, spatial_stride=1, temporal_stride=1, dilation=1):
+def conv1x3x3(in_planes,
+              out_planes,
+              spatial_stride=1,
+              temporal_stride=1,
+              dilation=1):
     "1x3x3 convolution with padding"
     return nn.Conv3d(
         in_planes,
         out_planes,
-        kernel_size=(1,3,3),
+        kernel_size=(1, 3, 3),
         stride=(temporal_stride, spatial_stride, spatial_stride),
         padding=(0, dilation, dilation),
         dilation=dilation,
@@ -53,9 +60,11 @@ class BasicBlock(nn.Module):
                  with_cp=False):
         super(BasicBlock, self).__init__()
         if if_inflate:
-            self.conv1 = conv3x3x3(inplanes, planes, spatial_stride, temporal_stride, dilation)
+            self.conv1 = conv3x3x3(inplanes, planes, spatial_stride,
+                                   temporal_stride, dilation)
         else:
-            self.conv1 = conv1x3x3(inplanes, planes, spatial_stride, temporal_stride, dilation)
+            self.conv1 = conv1x3x3(inplanes, planes, spatial_stride,
+                                   temporal_stride, dilation)
         self.bn1 = nn.BatchNorm3d(planes)
         self.relu = nn.ReLU(inplace=True)
         if if_inflate:
@@ -124,37 +133,41 @@ class Bottleneck(nn.Module):
             self.conv1_stride_t = temporal_stride
             self.conv2_stride_t = 1
         if if_inflate:
-          if inflate_style == '3x1x1':
-              self.conv1 = nn.Conv3d(
-                  inplanes,
-                  planes,
-                  kernel_size=(3,1,1),
-                  stride=(self.conv1_stride_t, self.conv1_stride, self.conv1_stride),
-                  padding=(1,0,0),
-                  bias=False)
-              self.conv2 = nn.Conv3d(
-                  planes,
-                  planes,
-                  kernel_size=(1,3,3),
-                  stride=(self.conv2_stride_t, self.conv2_stride, self.conv2_stride),
-                  padding=(0, dilation, dilation),
-                  dilation=(1, dilation, dilation),
-                  bias=False)
-          else:
-              self.conv1 = nn.Conv3d(
-                  inplanes,
-                  planes,
-                  kernel_size=1,
-                  stride=(self.conv1_stride_t, self.conv1_stride, self.conv1_stride),
-                  bias=False)
-              self.conv2 = nn.Conv3d(
-                  planes,
-                  planes,
-                  kernel_size=3,
-                  stride=(self.conv2_stride_t, self.conv2_stride, self.conv2_stride),
-                  padding=(1, dilation, dilation),
-                  dilation=(1, dilation, dilation),
-                  bias=False)
+            if inflate_style == '3x1x1':
+                self.conv1 = nn.Conv3d(
+                    inplanes,
+                    planes,
+                    kernel_size=(3, 1, 1),
+                    stride=(self.conv1_stride_t, self.conv1_stride,
+                            self.conv1_stride),
+                    padding=(1, 0, 0),
+                    bias=False)
+                self.conv2 = nn.Conv3d(
+                    planes,
+                    planes,
+                    kernel_size=(1, 3, 3),
+                    stride=(self.conv2_stride_t, self.conv2_stride,
+                            self.conv2_stride),
+                    padding=(0, dilation, dilation),
+                    dilation=(1, dilation, dilation),
+                    bias=False)
+            else:
+                self.conv1 = nn.Conv3d(
+                    inplanes,
+                    planes,
+                    kernel_size=1,
+                    stride=(self.conv1_stride_t, self.conv1_stride,
+                            self.conv1_stride),
+                    bias=False)
+                self.conv2 = nn.Conv3d(
+                    planes,
+                    planes,
+                    kernel_size=3,
+                    stride=(self.conv2_stride_t, self.conv2_stride,
+                            self.conv2_stride),
+                    padding=(1, dilation, dilation),
+                    dilation=(1, dilation, dilation),
+                    bias=False)
         else:
             self.conv1 = nn.Conv3d(
                 inplanes,
@@ -165,7 +178,7 @@ class Bottleneck(nn.Module):
             self.conv2 = nn.Conv3d(
                 planes,
                 planes,
-                kernel_size=(1,3,3),
+                kernel_size=(1, 3, 3),
                 stride=(1, self.conv2_stride, self.conv2_stride),
                 padding=(0, dilation, dilation),
                 dilation=(1, dilation, dilation),
@@ -239,8 +252,10 @@ def make_res_layer(block,
                    nonlocal_freq=1,
                    nonlocal_cfg=None,
                    with_cp=False):
-    inflate_freq = inflate_freq if not isinstance(inflate_freq, int) else (inflate_freq, ) * blocks
-    nonlocal_freq = nonlocal_freq if not isinstance(nonlocal_freq, int) else (nonlocal_freq, ) * blocks
+    inflate_freq = inflate_freq if not isinstance(
+        inflate_freq, int) else (inflate_freq, ) * blocks
+    nonlocal_freq = nonlocal_freq if not isinstance(
+        nonlocal_freq, int) else (nonlocal_freq, ) * blocks
     assert len(inflate_freq) == blocks
     assert len(nonlocal_freq) == blocks
     downsample = None
@@ -265,29 +280,30 @@ def make_res_layer(block,
             dilation,
             downsample,
             style=style,
-            if_inflate= (inflate_freq[0] == 1),
+            if_inflate=(inflate_freq[0] == 1),
             inflate_style=inflate_style,
-            if_nonlocal= (nonlocal_freq[0] == 1),
+            if_nonlocal=(nonlocal_freq[0] == 1),
             nonlocal_cfg=nonlocal_cfg,
             with_cp=with_cp))
     inplanes = planes * block.expansion
     for i in range(1, blocks):
         layers.append(
-            block(inplanes,
+            block(
+                inplanes,
                 planes,
-                1, 1,
+                1,
+                1,
                 dilation,
                 style=style,
-                if_inflate= (inflate_freq[i] == 1),
+                if_inflate=(inflate_freq[i] == 1),
                 inflate_style=inflate_style,
-                if_nonlocal= (nonlocal_freq[i] == 1),
+                if_nonlocal=(nonlocal_freq[i] == 1),
                 nonlocal_cfg=nonlocal_cfg,
                 with_cp=with_cp))
 
     return nn.Sequential(*layers)
 
 
-@BACKBONES.register_module
 class ResNet_I3D(nn.Module):
     """ResNet_I3D backbone.
 
@@ -317,32 +333,33 @@ class ResNet_I3D(nn.Module):
         152: (Bottleneck, (3, 8, 36, 3))
     }
 
-    def __init__(self,
-                 depth,
-                 pretrained=None,
-                 pretrained2d=True,
-                 num_stages=4,
-                 spatial_strides=(1, 2, 2, 2),
-                 temporal_strides=(1, 1, 1, 1),
-                 dilations=(1, 1, 1, 1),
-                 out_indices=(0, 1, 2, 3),
-                 conv1_kernel_t=5,
-                 conv1_stride_t=2,
-                 pool1_kernel_t=1,
-                 pool1_stride_t=2,
-                 style='pytorch',
-                 frozen_stages=-1,
-                 inflate_freq=(1, 1, 1, 1),    # For C2D baseline, this is set to -1.
-                 inflate_stride=(1, 1, 1, 1),
-                 inflate_style='3x1x1',
-                 nonlocal_stages=(-1, ),
-                 nonlocal_freq=(0, 1, 1, 0),
-                 nonlocal_cfg=None,
-                 no_pool2=False,
-                 bn_eval=True,
-                 bn_frozen=False,
-                 partial_bn=False,
-                 with_cp=False):
+    def __init__(
+            self,
+            depth,
+            pretrained=None,
+            pretrained2d=True,
+            num_stages=4,
+            spatial_strides=(1, 2, 2, 2),
+            temporal_strides=(1, 1, 1, 1),
+            dilations=(1, 1, 1, 1),
+            out_indices=(0, 1, 2, 3),
+            conv1_kernel_t=5,
+            conv1_stride_t=2,
+            pool1_kernel_t=1,
+            pool1_stride_t=2,
+            style='pytorch',
+            frozen_stages=-1,
+            inflate_freq=(1, 1, 1, 1),  # For C2D baseline, this is set to -1.
+            inflate_stride=(1, 1, 1, 1),
+            inflate_style='3x1x1',
+            nonlocal_stages=(-1, ),
+            nonlocal_freq=(0, 1, 1, 0),
+            nonlocal_cfg=None,
+            no_pool2=False,
+            bn_eval=True,
+            bn_frozen=False,
+            partial_bn=False,
+            with_cp=False):
         super(ResNet_I3D, self).__init__()
         if depth not in self.arch_settings:
             raise KeyError('invalid depth {} for resnet'.format(depth))
@@ -354,15 +371,18 @@ class ResNet_I3D(nn.Module):
         self.spatial_strides = spatial_strides
         self.temporal_strides = temporal_strides
         self.dilations = dilations
-        assert len(spatial_strides) == len(temporal_strides) == len(dilations) == num_stages
+        assert len(spatial_strides) == len(temporal_strides) == len(
+            dilations) == num_stages
         self.out_indices = out_indices
         assert max(out_indices) < num_stages
         self.style = style
         self.frozen_stages = frozen_stages
-        self.inflate_freqs = inflate_freq if not isinstance(inflate_freq, int) else (inflate_freq, ) * num_stages
+        self.inflate_freqs = inflate_freq if not isinstance(
+            inflate_freq, int) else (inflate_freq, ) * num_stages
         self.inflate_style = inflate_style
         self.nonlocal_stages = nonlocal_stages
-        self.nonlocal_freqs = nonlocal_freq if not isinstance(nonlocal_freq, int) else (nonlocal_freq, ) * num_stages
+        self.nonlocal_freqs = nonlocal_freq if not isinstance(
+            nonlocal_freq, int) else (nonlocal_freq, ) * num_stages
         self.nonlocal_cfg = nonlocal_cfg
         self.bn_eval = bn_eval
         self.bn_frozen = bn_frozen
@@ -373,14 +393,22 @@ class ResNet_I3D(nn.Module):
         self.stage_blocks = stage_blocks[:num_stages]
         self.inplanes = 64
 
-
         self.conv1 = nn.Conv3d(
-            3, 64, kernel_size=(conv1_kernel_t,7,7), stride=(conv1_stride_t,2,2), padding=((conv1_kernel_t-1)//2,3,3), bias=False)
+            3,
+            64,
+            kernel_size=(conv1_kernel_t, 7, 7),
+            stride=(conv1_stride_t, 2, 2),
+            padding=((conv1_kernel_t - 1) // 2, 3, 3),
+            bias=False)
         self.bn1 = nn.BatchNorm3d(64)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool3d(kernel_size=(pool1_kernel_t,3,3), stride=(pool1_stride_t,2,2), padding=(pool1_kernel_t//2,1,1))
-	 #TODO: Check whether pad=0 differs a lot
-        self.pool2 = nn.MaxPool3d(kernel_size=(2,1,1), stride=(2,1,1), padding=(0,0,0))
+        self.maxpool = nn.MaxPool3d(
+            kernel_size=(pool1_kernel_t, 3, 3),
+            stride=(pool1_stride_t, 2, 2),
+            padding=(pool1_kernel_t // 2, 1, 1))
+        #TODO: Check whether pad=0 differs a lot
+        self.pool2 = nn.MaxPool3d(
+            kernel_size=(2, 1, 1), stride=(2, 1, 1), padding=(0, 0, 0))
         self.no_pool2 = no_pool2
 
         self.res_layers = []
@@ -401,7 +429,8 @@ class ResNet_I3D(nn.Module):
                 inflate_freq=self.inflate_freqs[i],
                 inflate_style=self.inflate_style,
                 nonlocal_freq=self.nonlocal_freqs[i],
-                nonlocal_cfg=self.nonlocal_cfg if i in self.nonlocal_stages else None,
+                nonlocal_cfg=self.nonlocal_cfg
+                if i in self.nonlocal_stages else None,
                 with_cp=with_cp)
             self.inplanes = planes * self.block.expansion
             layer_name = 'layer{}'.format(i + 1)
@@ -416,24 +445,42 @@ class ResNet_I3D(nn.Module):
             logger = logging.getLogger()
             if self.pretrained2d:
                 resnet2d = ResNet(self.depth)
-                load_checkpoint(resnet2d, self.pretrained, strict=False, logger=logger)
+                load_checkpoint(
+                    resnet2d, self.pretrained, strict=False, logger=logger)
                 for name, module in self.named_modules():
                     if isinstance(module, NonLocalModule):
                         module.init_weights()
-                    elif isinstance(module, nn.Conv3d) and rhasattr(resnet2d, name):
-                        new_weight = rgetattr(resnet2d, name).weight.data.unsqueeze(2).expand_as(module.weight) / module.weight.data.shape[2]
+                    elif isinstance(module, nn.Conv3d) and rhasattr(
+                            resnet2d, name):
+                        new_weight = rgetattr(
+                            resnet2d, name).weight.data.unsqueeze(2).expand_as(
+                                module.weight) / module.weight.data.shape[2]
                         module.weight.data.copy_(new_weight)
-                        logging.info("{}.weight loaded from weights file into {}".format(name, new_weight.shape))
+                        logging.info(
+                            "{}.weight loaded from weights file into {}".
+                            format(name, new_weight.shape))
                         if hasattr(module, 'bias') and module.bias is not None:
                             new_bias = rgetattr(resnet2d, name).bias.data
                             module.bias.data.copy_(new_bias)
-                            logging.info("{}.bias loaded from weights file into {}".format(name, new_bias.shape))
-                    elif isinstance(module, nn.BatchNorm3d) and rhasattr(resnet2d, name):
-                          for attr in ['weight', 'bias', 'running_mean', 'running_var']:
-                              logging.info("{}.{} loaded from weights file into {}".format(name, attr, getattr(rgetattr(resnet2d, name), attr).shape))
-                              setattr(module, attr, getattr(rgetattr(resnet2d, name), attr))
+                            logging.info(
+                                "{}.bias loaded from weights file into {}".
+                                format(name, new_bias.shape))
+                    elif isinstance(module, nn.BatchNorm3d) and rhasattr(
+                            resnet2d, name):
+                        for attr in [
+                                'weight', 'bias', 'running_mean', 'running_var'
+                        ]:
+                            logging.info(
+                                "{}.{} loaded from weights file into {}".
+                                format(
+                                    name, attr,
+                                    getattr(rgetattr(resnet2d, name),
+                                            attr).shape))
+                            setattr(module, attr,
+                                    getattr(rgetattr(resnet2d, name), attr))
             else:
-                load_checkpoint(self, self.pretrained, strict=False, logger=logger)
+                load_checkpoint(
+                    self, self.pretrained, strict=False, logger=logger)
         elif self.pretrained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv3d):

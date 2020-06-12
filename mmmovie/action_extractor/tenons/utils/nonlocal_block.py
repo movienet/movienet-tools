@@ -1,4 +1,4 @@
-from ..spatial_temporal_modules.non_local import NonLocalModule
+from ..spatial_temporal_modules import NonLocalModule
 
 
 def build_nonlocal_block(cfg):
