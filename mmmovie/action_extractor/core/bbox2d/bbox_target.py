@@ -1,7 +1,7 @@
 import torch
 
 from .transforms import bbox2delta
-from mmaction.utils.misc import multi_apply
+from ..utils.misc import multi_apply
 
 
 def bbox_target(pos_bboxes_list,
@@ -13,17 +13,17 @@ def bbox_target(pos_bboxes_list,
                 target_means=[.0, .0, .0, .0],
                 target_stds=[1.0, 1.0, 1.0, 1.0],
                 concat=True):
-    (labels, label_weights, bbox_targets,
-     bbox_weights, class_weights) = multi_apply(
-        bbox_target_single,
-        pos_bboxes_list,
-        neg_bboxes_list,
-        pos_gt_bboxes_list,
-        pos_gt_labels_list,
-        cfg=cfg,
-        reg_classes=reg_classes,
-        target_means=target_means,
-        target_stds=target_stds)
+    (labels, label_weights, bbox_targets, bbox_weights,
+     class_weights) = multi_apply(
+         bbox_target_single,
+         pos_bboxes_list,
+         neg_bboxes_list,
+         pos_gt_bboxes_list,
+         pos_gt_labels_list,
+         cfg=cfg,
+         reg_classes=reg_classes,
+         target_means=target_means,
+         target_stds=target_stds)
 
     if concat:
         labels = torch.cat(labels, 0)
@@ -48,14 +48,14 @@ def bbox_target_single(pos_bboxes,
     if len(pos_gt_labels[0]) == 1:
         labels = pos_bboxes.new_zeros(num_samples, dtype=torch.long)
     else:
-        labels = pos_bboxes.new_zeros(
-            (num_samples, len(pos_gt_labels[0])), dtype=torch.long)
+        labels = pos_bboxes.new_zeros((num_samples, len(pos_gt_labels[0])),
+                                      dtype=torch.long)
     label_weights = pos_bboxes.new_zeros(num_samples)
     if len(pos_gt_labels[0]) == 1:
         class_weights = pos_bboxes.new_zeros(num_samples)
     else:
-        class_weights = pos_bboxes.new_zeros(
-            num_samples, len(pos_gt_labels[0]))
+        class_weights = pos_bboxes.new_zeros(num_samples,
+                                             len(pos_gt_labels[0]))
     bbox_targets = pos_bboxes.new_zeros(num_samples, 4)
     bbox_weights = pos_bboxes.new_zeros(num_samples, 4)
     if num_pos > 0:
@@ -77,10 +77,10 @@ def bbox_target_single(pos_bboxes,
 
 
 def expand_target(bbox_targets, bbox_weights, labels, num_classes):
-    bbox_targets_expand = bbox_targets.new_zeros((bbox_targets.size(0),
-                                                  4 * num_classes))
-    bbox_weights_expand = bbox_weights.new_zeros((bbox_weights.size(0),
-                                                  4 * num_classes))
+    bbox_targets_expand = bbox_targets.new_zeros(
+        (bbox_targets.size(0), 4 * num_classes))
+    bbox_weights_expand = bbox_weights.new_zeros(
+        (bbox_weights.size(0), 4 * num_classes))
     for i in torch.nonzero(labels > 0).squeeze(-1):
         start, end = labels[i] * 4, (labels[i] + 1) * 4
         bbox_targets_expand[i, start:end] = bbox_targets[i, :]

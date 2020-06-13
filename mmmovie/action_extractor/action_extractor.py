@@ -1,5 +1,5 @@
 import mmcv
-from detecotrs import FastRCNN
+from .detectors import FastRCNN
 import torch
 from .src import ActionDataPreprocessor
 import numpy as np

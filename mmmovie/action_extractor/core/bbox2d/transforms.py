@@ -161,7 +161,9 @@ def bbox2result(bboxes, labels, num_classes, thr=0.01):
 
             result = []
             for i in range(num_classes - 1):
-                where = scores[:, i+1] > thr[i+1]
-                result.append(np.concatenate(
-                    (bboxes[where, :4], scores[where, i+1:i+2]), axis=1))
+                where = scores[:, i + 1] > thr[i + 1]
+                result.append(
+                    np.concatenate(
+                        (bboxes[where, :4], scores[where, i + 1:i + 2]),
+                        axis=1))
             return result

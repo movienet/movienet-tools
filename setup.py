@@ -172,6 +172,26 @@ if __name__ == '__main__':
             make_cuda_ext(
                 name='roi_pool_cuda',
                 module='mmmovie.detector.persondet.modules.core.ops.roi_pool',
+                sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu']),
+            make_cython_ext(
+                name='soft_nms_cpu',
+                module='mmmovie.action_extractor.core.ops.nms',
+                sources=['src/soft_nms_cpu.pyx']),
+            make_cuda_ext(
+                name='nms_cpu',
+                module='mmmovie.action_extractor.core.ops.nms',
+                sources=['src/nms_cpu.cpp']),
+            make_cuda_ext(
+                name='nms_cuda',
+                module='mmmovie.action_extractor.core.ops.nms',
+                sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
+            make_cuda_ext(
+                name='roi_align_cuda',
+                module='mmmovie.action_extractor.core.ops.roi_align',
+                sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
+            make_cuda_ext(
+                name='roi_pool_cuda',
+                module='mmmovie.action_extractor.core.ops.roi_pool',
                 sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu'])
         ],
         cmdclass={'build_ext': BuildExtension},
