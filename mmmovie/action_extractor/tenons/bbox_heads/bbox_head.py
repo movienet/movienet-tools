@@ -82,7 +82,7 @@ class BBoxHead(nn.Module):
         x = x.view(x.size(0), -1)
         cls_score = self.fc_cls(x) if self.with_cls else None
         bbox_pred = self.fc_reg(x) if self.with_reg else None
-        return cls_score, bbox_pred
+        return cls_score, bbox_pred, x
 
     def get_target(self, sampling_results, gt_bboxes, gt_labels,
                    rcnn_train_cfg):
