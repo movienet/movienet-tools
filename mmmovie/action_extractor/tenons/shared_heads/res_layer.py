@@ -6,11 +6,9 @@ from mmcv.runner import load_checkpoint
 
 from ..backbones import ResNet
 from ..backbones.resnet import make_res_layer
-from ...registry import HEADS
 from ..spatial_temporal_modules.non_local import NonLocalModule
 
 
-@HEADS.register_module
 class ResLayer(nn.Module):
 
     def __init__(self,

@@ -1,25 +1,19 @@
 import torch
+import torch.nn as nn
 from torch.autograd import Function
+from torch.autograd.function import once_differentiable
+from torch.nn.modules.utils import _pair
 
-from .. import roi_pool_cuda
+from . import roi_pool_cuda
 
 
 class RoIPoolFunction(Function):
 
     @staticmethod
     def forward(ctx, features, rois, out_size, spatial_scale):
-        if isinstance(out_size, int):
-            out_h = out_size
-            out_w = out_size
-        elif isinstance(out_size, tuple):
-            assert len(out_size) == 2
-            assert isinstance(out_size[0], int)
-            assert isinstance(out_size[1], int)
-            out_h, out_w = out_size
-        else:
-            raise TypeError(
-                '"out_size" must be an integer or tuple of integers')
         assert features.is_cuda
+        out_h, out_w = _pair(out_size)
+        assert isinstance(out_h, int) and isinstance(out_w, int)
         ctx.save_for_backward(rois)
         num_channels = features.size(1)
         num_rois = rois.size(0)
@@ -35,6 +29,7 @@ class RoIPoolFunction(Function):
         return output
 
     @staticmethod
+    @once_differentiable
     def backward(ctx, grad_output):
         assert grad_output.is_cuda
         spatial_scale = ctx.spatial_scale
@@ -53,3 +48,28 @@ class RoIPoolFunction(Function):
 
 
 roi_pool = RoIPoolFunction.apply
+
+
+class RoIPool(nn.Module):
+
+    def __init__(self, out_size, spatial_scale, use_torchvision=False):
+        super(RoIPool, self).__init__()
+
+        self.out_size = _pair(out_size)
+        self.spatial_scale = float(spatial_scale)
+        self.use_torchvision = use_torchvision
+
+    def forward(self, features, rois):
+        if self.use_torchvision:
+            from torchvision.ops import roi_pool as tv_roi_pool
+            return tv_roi_pool(features, rois, self.out_size,
+                               self.spatial_scale)
+        else:
+            return roi_pool(features, rois, self.out_size, self.spatial_scale)
+
+    def __repr__(self):
+        format_str = self.__class__.__name__
+        format_str += '(out_size={}, spatial_scale={}'.format(
+            self.out_size, self.spatial_scale)
+        format_str += ', use_torchvision={})'.format(self.use_torchvision)
+        return format_str

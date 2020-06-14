@@ -2,7 +2,7 @@ import torch.nn as nn
 
 from .base import BaseDetector
 from .test_mixins import RPNTestMixin, BBoxTestMixin
-from ..core.bbox2d import bbox2result
+from ..core.bbox2d.transforms import bbox2result
 
 from ..tenons.backbones import ResNet_I3D
 from ..tenons.shared_heads import ResI3DLayer
@@ -37,26 +37,26 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
                 x = (x, )
         return x
 
-    def simple_test(self, img_meta, proposals=None, rescale=False, **kwargs):
+    def simple_test(self,
+                    img_meta,
+                    proposals=None,
+                    rescale=False,
+                    num_modalities=1,
+                    **kwargs):
         """Test without augmentation."""
         assert self.with_bbox, "Bbox head must be implemented."
 
         img_group = kwargs['img_group_0'][0]
         x = self.extract_feat(img_group)
 
-        if proposals is None:
-            proposal_list = self.simple_test_rpn(x, img_meta,
-                                                 self.test_cfg.rpn)
-        else:
-            proposal_list = []
-            for proposal in proposals:
-                proposal = proposal[0, ...]
-                if not self.test_cfg.train_detector:
-                    select_inds = proposal[:, 4] >= min(
-                        self.test_cfg.person_det_score_thr, max(
-                            proposal[:, 4]))
-                    proposal = proposal[select_inds]
-                proposal_list.append(proposal)
+        proposal_list = []
+        for proposal in proposals:
+            proposal = proposal[0, ...]
+            # if not self.test_cfg.train_detector:
+            #     select_inds = proposal[:, 4] >= min(
+            #         self.test_cfg.person_det_score_thr, max(proposal[:, 4]))
+            #     proposal = proposal[select_inds]
+            proposal_list.append(proposal)
 
         img_meta = img_meta[0]
 
@@ -71,7 +71,12 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
 
         return det_bboxes, det_labels, feature
 
-    def aug_test(self, img_metas, proposals=None, rescale=False, **kwargs):
+    def aug_test(self,
+                 img_metas,
+                 proposals=None,
+                 rescale=False,
+                 num_modalities=1,
+                 **kwargs):
         """Test with augmentations.
 
         If rescale is False, then returned bboxes will fit the scale
@@ -86,11 +91,11 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
             proposal_list = []
             for proposal in proposals:
                 proposal = proposal[0, ...]
-                if not self.test_cfg.train_detector:
-                    select_inds = proposal[:, 4] >= min(
-                        self.test_cfg.person_det_score_thr, max(
-                            proposal[:, 4]))
-                    proposal = proposal[select_inds]
+                # if not self.test_cfg.train_detector:
+                #     select_inds = proposal[:, 4] >= min(
+                #         self.test_cfg.person_det_score_thr, max(
+                #             proposal[:, 4]))
+                #     proposal = proposal[select_inds]
                 proposal_list.append(proposal)
 
         det_bboxes, det_labels = self.aug_test_bboxes(
@@ -102,10 +107,13 @@ class FastRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin):
         else:
             _det_bboxes = det_bboxes.clone()
             _det_bboxes[:, :4] *= img_metas[0][0]['scale_factor']
-        bbox_results = bbox2result(
-            _det_bboxes,
-            det_labels,
-            self.bbox_head.num_classes,
-            thr=self.test_cfg.rcnn.action_thr)
+        # bbox_results = bbox2result(
+        #     _det_bboxes,
+        #     det_labels,
+        #     self.bbox_head.num_classes,
+        #     thr=self.test_cfg.rcnn.action_thr)
 
-        return bbox_results
+        # return bbox_results
+        det_labels = det_labels[:, 1:]
+
+        return det_bboxes, det_labels, feature

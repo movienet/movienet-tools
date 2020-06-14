@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from ...core.bbox2d import delta2bbox, bbox_target
+from ...core.bbox2d.transforms import delta2bbox
+from ...core.bbox2d.bbox_target import bbox_target
 from ...core.post_processing import multiclass_nms, singleclass_nms
 
 

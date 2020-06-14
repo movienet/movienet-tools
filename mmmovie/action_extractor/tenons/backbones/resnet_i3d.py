@@ -3,7 +3,7 @@ import logging
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 
-from ....utils.misc import rgetattr, rhasattr
+from ...core.utils.misc import rgetattr, rhasattr
 from .resnet import ResNet
 from mmcv.cnn import constant_init, kaiming_init
 from mmcv.runner import load_checkpoint

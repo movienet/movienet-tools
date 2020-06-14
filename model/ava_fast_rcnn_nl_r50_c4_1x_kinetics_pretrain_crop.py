@@ -22,7 +22,7 @@ backbone = dict(
     bn_eval=False,
     partial_bn=False,
     bn_frozen=True,
-    style='pytorch'),
+    style='pytorch')
 shared_head = dict(
     pretrained=None,
     pretrained2d=False,
@@ -35,13 +35,13 @@ shared_head = dict(
     inflate_freq=(0, 1, 0),
     inflate_style='3x1x1',
     bn_eval=False,
-    bn_frozen=True),
+    bn_frozen=True)
 bbox_roi_extractor = dict(
     roi_layer=dict(type='RoIAlign', out_size=16, sample_num=2),
     out_channels=1024,
     featmap_strides=[16],
-    with_temporal_pool=True),
-dropout_ratio = 0.3,
+    with_temporal_pool=True)
+# dropout_ratio = 0.3,
 bbox_head = dict(
     with_reg=False,
     with_temporal_pool=False,
@@ -55,11 +55,10 @@ bbox_head = dict(
     multilabel_classification=True,
     reg_class_agnostic=True,
     nms_class_agnostic=True)
-test_cfg = dict(
-    train_detector=False,
-    person_det_score_thr=0.85,
-    rcnn=dict(
-        score_thr=0.00,
-        nms=dict(type='nms', iou_thr=1.0),
-        max_per_img=100,
-        action_thr=0.00))
+test_cfg = dict(train_detector=False, rcnn=None)
+# person_det_score_thr=0.85,
+# rcnn=dict(
+#     score_thr=0.00,
+#     nms=dict(type='nms', iou_thr=1.0),
+#     max_per_img=100,
+#     action_thr=0.00))

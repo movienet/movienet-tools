@@ -1596,6 +1596,9 @@ typedef struct {
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
 
 /* CIntToPy.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value);
+
+/* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
 
 /* RealImag.proto */
@@ -2117,7 +2120,7 @@ static PyObject *__pyx_pw_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
 
 static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms_12soft_nms_cpu_soft_nms_cpu(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_boxes_in, float __pyx_v_iou_thr, unsigned int __pyx_v_method, float __pyx_v_sigma, float __pyx_v_min_score) {
   PyObject *__pyx_v_boxes = NULL;
-  int __pyx_v_N;
+  unsigned int __pyx_v_N;
   float __pyx_v_iw;
   float __pyx_v_ih;
   float __pyx_v_ua;
@@ -2147,14 +2150,15 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
-  int __pyx_t_4;
+  unsigned int __pyx_t_4;
   PyObject *__pyx_t_5 = NULL;
   Py_ssize_t __pyx_t_6;
   PyObject *(*__pyx_t_7)(PyObject *);
   float __pyx_t_8;
   int __pyx_t_9;
-  PyObject *__pyx_t_10 = NULL;
-  long __pyx_t_11;
+  int __pyx_t_10;
+  PyObject *__pyx_t_11 = NULL;
+  long __pyx_t_12;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -2173,7 +2177,7 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *     float min_score=0.001,
  * ):
  *     boxes = boxes_in.copy()             # <<<<<<<<<<<<<<
- *     cdef int N = boxes.shape[0]
+ *     cdef unsigned N = boxes.shape[0]
  *     cdef float iw, ih, box_area
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_boxes_in), __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
@@ -2199,7 +2203,7 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
   /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":30
  * ):
  *     boxes = boxes_in.copy()
- *     cdef int N = boxes.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef unsigned N = boxes.shape[0]             # <<<<<<<<<<<<<<
  *     cdef float iw, ih, box_area
  *     cdef float ua
  */
@@ -2208,7 +2212,7 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
   __pyx_t_2 = __Pyx_GetItemInt(__pyx_t_1, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 30, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_As_unsigned_int(__pyx_t_2); if (unlikely((__pyx_t_4 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_N = __pyx_t_4;
 
@@ -2251,7 +2255,7 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_arange); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_N); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_unsigned_int(__pyx_v_N); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 37, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -2279,7 +2283,7 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *         maxscore = boxes[i, 4]
  *         maxpos = i
  */
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_N); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_unsigned_int(__pyx_v_N); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -2356,8 +2360,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  * 
  *         tx1 = boxes[i, 0]
  */
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_v_i); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L1_error)
-    __pyx_v_maxpos = __pyx_t_4;
+    __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_v_i); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 41, __pyx_L1_error)
+    __pyx_v_maxpos = __pyx_t_9;
 
     /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":43
  *         maxpos = i
@@ -2490,9 +2494,9 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  */
     __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_v_pos = __pyx_t_4;
+    __pyx_v_pos = __pyx_t_9;
 
     /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":52
  *         pos = i + 1
@@ -2502,8 +2506,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *                 maxscore = boxes[pos, 4]
  */
     while (1) {
-      __pyx_t_9 = ((__pyx_v_pos < __pyx_v_N) != 0);
-      if (!__pyx_t_9) break;
+      __pyx_t_10 = ((__pyx_v_pos < __pyx_v_N) != 0);
+      if (!__pyx_t_10) break;
 
       /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":53
  *         # get max box
@@ -2530,9 +2534,9 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
       __pyx_t_5 = PyObject_RichCompare(__pyx_t_3, __pyx_t_1, Py_LT); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 53, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 53, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 53, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (__pyx_t_9) {
+      if (__pyx_t_10) {
 
         /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":54
  *         while pos < N:
@@ -3001,9 +3005,9 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  */
     __pyx_t_3 = __Pyx_PyInt_AddObjC(__pyx_v_i, __pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 80, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_9 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_v_pos = __pyx_t_4;
+    __pyx_v_pos = __pyx_t_9;
 
     /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":83
  *         # NMS iterations, note that N changes if detection boxes fall below
@@ -3013,8 +3017,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *             y1 = boxes[pos, 1]
  */
     while (1) {
-      __pyx_t_9 = ((__pyx_v_pos < __pyx_v_N) != 0);
-      if (!__pyx_t_9) break;
+      __pyx_t_10 = ((__pyx_v_pos < __pyx_v_N) != 0);
+      if (!__pyx_t_10) break;
 
       /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":84
  *         # threshold
@@ -3160,8 +3164,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *                 ih = (min(ty2, y2) - max(ty1, y1) + 1)
  *                 if ih > 0:
  */
-      __pyx_t_9 = ((__pyx_v_iw > 0.0) != 0);
-      if (__pyx_t_9) {
+      __pyx_t_10 = ((__pyx_v_iw > 0.0) != 0);
+      if (__pyx_t_10) {
 
         /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":93
  *             iw = (min(tx2, x2) - max(tx1, x1) + 1)
@@ -3179,8 +3183,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *                     ua = float((tx2 - tx1 + 1) * (ty2 - ty1 + 1) + area - iw * ih)
  *                     ov = iw * ih / ua  # iou between max box and detection box
  */
-        __pyx_t_9 = ((__pyx_v_ih > 0.0) != 0);
-        if (__pyx_t_9) {
+        __pyx_t_10 = ((__pyx_v_ih > 0.0) != 0);
+        if (__pyx_t_10) {
 
           /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":95
  *                 ih = (min(ty2, y2) - max(ty1, y1) + 1)
@@ -3222,8 +3226,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *                             weight = 1 - ov
  *                         else:
  */
-            __pyx_t_9 = ((__pyx_v_ov > __pyx_v_iou_thr) != 0);
-            if (__pyx_t_9) {
+            __pyx_t_10 = ((__pyx_v_ov > __pyx_v_iou_thr) != 0);
+            if (__pyx_t_10) {
 
               /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":100
  *                     if method == 1:  # linear
@@ -3285,18 +3289,18 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
             }
             __pyx_t_5 = PyFloat_FromDouble((__pyx_t_8 / __pyx_v_sigma)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 104, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
-            __pyx_t_10 = NULL;
+            __pyx_t_11 = NULL;
             if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
-              __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_1);
-              if (likely(__pyx_t_10)) {
+              __pyx_t_11 = PyMethod_GET_SELF(__pyx_t_1);
+              if (likely(__pyx_t_11)) {
                 PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_1);
-                __Pyx_INCREF(__pyx_t_10);
+                __Pyx_INCREF(__pyx_t_11);
                 __Pyx_INCREF(function);
                 __Pyx_DECREF_SET(__pyx_t_1, function);
               }
             }
-            __pyx_t_3 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_10, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_5);
-            __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+            __pyx_t_3 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_11, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_5);
+            __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
             if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 104, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
@@ -3322,8 +3326,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *                             weight = 0
  *                         else:
  */
-            __pyx_t_9 = ((__pyx_v_ov > __pyx_v_iou_thr) != 0);
-            if (__pyx_t_9) {
+            __pyx_t_10 = ((__pyx_v_ov > __pyx_v_iou_thr) != 0);
+            if (__pyx_t_10) {
 
               /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":107
  *                     else:  # original NMS
@@ -3423,9 +3427,9 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
           __pyx_t_1 = PyObject_RichCompare(__pyx_t_5, __pyx_t_3, Py_LT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          __pyx_t_9 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 115, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_10 < 0)) __PYX_ERR(0, 115, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (__pyx_t_9) {
+          if (__pyx_t_10) {
 
             /* "mmmovie/detector/persondet/modules/core/ops/nms/src/soft_nms_cpu.pyx":116
  *                     # swapping with last box update N
@@ -3604,8 +3608,8 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
  *                         N = N - 1
  *                         pos = pos - 1
  */
-            __pyx_t_11 = (__pyx_v_N - 1);
-            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_inds, __pyx_t_11, long, 1, __Pyx_PyInt_From_long, 0, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
+            __pyx_t_12 = (__pyx_v_N - 1);
+            __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_inds, __pyx_t_12, long, 1, __Pyx_PyInt_From_long, 0, 1, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 121, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
             if (unlikely(__Pyx_SetItemInt(__pyx_v_inds, __pyx_v_pos, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 0) < 0)) __PYX_ERR(0, 121, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3711,7 +3715,7 @@ static PyObject *__pyx_pf_7mmmovie_8detector_9persondet_7modules_4core_3ops_3nms
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_5);
-  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_11);
   { PyObject *__pyx_type, *__pyx_value, *__pyx_tb;
     __Pyx_PyThreadState_declare
     __Pyx_PyThreadState_assign
@@ -9057,6 +9061,37 @@ static void __Pyx_ReleaseBuffer(Py_buffer *view) {
         int one = 1; int little = (int)*(unsigned char *)&one;
         unsigned char *bytes = (unsigned char *)&value;
         return _PyLong_FromByteArray(bytes, sizeof(long),
+                                     little, !is_unsigned);
+    }
+}
+
+/* CIntToPy */
+  static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value) {
+    const unsigned int neg_one = (unsigned int) ((unsigned int) 0 - (unsigned int) 1), const_zero = (unsigned int) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(unsigned int) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(unsigned int) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(unsigned int) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
+#endif
+        }
+    } else {
+        if (sizeof(unsigned int) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+#ifdef HAVE_LONG_LONG
+        } else if (sizeof(unsigned int) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
+#endif
+        }
+    }
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(unsigned int),
                                      little, !is_unsigned);
     }
 }

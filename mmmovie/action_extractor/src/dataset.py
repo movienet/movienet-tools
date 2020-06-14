@@ -31,6 +31,7 @@ class ActionDataPreprocessor(object):
                 to_rgb=True,
                 size_divisor=32,
                 scale=(800, 256)),
+            BboxTransform(),
             Collect(
                 keys=["img_group_0", "proposals"],
                 meta_keys=[

@@ -2177,7 +2177,7 @@ static PyObject *__pyx_pf_7mmmovie_16action_extractor_4core_3ops_3nms_12soft_nms
  *     float min_score=0.001,
  * ):
  *     boxes = boxes_in.copy()             # <<<<<<<<<<<<<<
- *     cdef unsigned int N = boxes.shape[0]
+ *     cdef unsigned N = boxes.shape[0]
  *     cdef float iw, ih, box_area
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_boxes_in), __pyx_n_s_copy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 29, __pyx_L1_error)
@@ -2203,7 +2203,7 @@ static PyObject *__pyx_pf_7mmmovie_16action_extractor_4core_3ops_3nms_12soft_nms
   /* "mmmovie/action_extractor/core/ops/nms/src/soft_nms_cpu.pyx":30
  * ):
  *     boxes = boxes_in.copy()
- *     cdef unsigned int N = boxes.shape[0]             # <<<<<<<<<<<<<<
+ *     cdef unsigned N = boxes.shape[0]             # <<<<<<<<<<<<<<
  *     cdef float iw, ih, box_area
  *     cdef float ua
  */

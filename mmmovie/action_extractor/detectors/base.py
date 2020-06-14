@@ -36,15 +36,15 @@ class BaseDetector(nn.Module):
             yield self.extract_feat(img_group)
 
     @abstractmethod
-    def forward_train(self, num_modalities, img_metas, **kwargs):
+    def forward_train(self, img_metas, **kwargs):
         pass
 
     @abstractmethod
-    def simple_test(self, num_modalities, img_metas, **kwargs):
+    def simple_test(self, img_metas, **kwargs):
         pass
 
     @abstractmethod
-    def aug_test(self, num_modalities, img_metas, **kwargs):
+    def aug_test(self, img_metas, **kwargs):
         pass
 
     def init_weights(self, pretrained=None):
@@ -52,7 +52,7 @@ class BaseDetector(nn.Module):
             logger = logging.getLogger()
             logger.info('load model from: {}'.format(pretrained))
 
-    def forward_test(self, num_modalities, img_metas, **kwargs):
+    def forward_test(self, img_metas, **kwargs):
         if not isinstance(img_metas, list):
             raise TypeError('{} must be a list, but got {}'.format(
                 img_metas, type(img_metas)))
@@ -67,13 +67,9 @@ class BaseDetector(nn.Module):
         assert videos_per_gpu == 1
 
         if num_augs == 1:
-            return self.simple_test(num_modalities, img_metas, **kwargs)
+            return self.simple_test(img_metas, **kwargs)
         else:
-            return self.aug_test(num_modalities, img_metas, **kwargs)
+            return self.aug_test(img_metas, **kwargs)
 
-    def forward(self, num_modalities, img_meta, return_loss=True, **kwargs):
-        num_modalities = int(num_modalities[0])
-        if return_loss:
-            return self.forward_train(num_modalities, img_meta, **kwargs)
-        else:
-            return self.forward_test(num_modalities, img_meta, **kwargs)
+    def forward(self, img_meta, return_loss=True, **kwargs):
+        return self.forward_test(img_meta, **kwargs)

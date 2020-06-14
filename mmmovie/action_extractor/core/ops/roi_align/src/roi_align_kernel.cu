@@ -1,5 +1,6 @@
 #include <ATen/ATen.h>
 #include <THC/THCAtomics.cuh>
+#include <ATen/DeviceGuard.h>
 
 #define CUDA_1D_KERNEL_LOOP(i, n)                            \
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < n; \
@@ -130,8 +131,12 @@ int ROIAlignForwardLaucher(const at::Tensor features, const at::Tensor rois,
                            const int pooled_height, const int pooled_width,
                            at::Tensor output) {
   const int output_size = num_rois * pooled_height * pooled_width * channels;
+
+  // Ensure CUDA uses the input tensor device.
+  at::DeviceGuard guard(features.device());
+
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
-      features.type(), "ROIAlignLaucherForward", ([&] {
+      features.scalar_type(), "ROIAlignLaucherForward", ([&] {
         const scalar_t *bottom_data = features.data<scalar_t>();
         const scalar_t *rois_data = rois.data<scalar_t>();
         scalar_t *top_data = output.data<scalar_t>();
@@ -274,7 +279,7 @@ int ROIAlignBackwardLaucher(const at::Tensor top_grad, const at::Tensor rois,
   const int output_size = num_rois * pooled_height * pooled_width * channels;
 
   AT_DISPATCH_FLOATING_TYPES_AND_HALF(
-      top_grad.type(), "ROIAlignLaucherBackward", ([&] {
+      top_grad.scalar_type(), "ROIAlignLaucherBackward", ([&] {
         const scalar_t *top_diff = top_grad.data<scalar_t>();
         const scalar_t *rois_data = rois.data<scalar_t>();
         scalar_t *bottom_diff = bottom_grad.data<scalar_t>();

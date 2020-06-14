@@ -2,8 +2,8 @@ import torch
 
 import numpy as np
 
-from mmaction.ops import nms
-from ..bbox2d import bbox_mapping_back
+from ..ops import nms
+from ..bbox2d.transforms import bbox_mapping_back
 
 
 def merge_aug_proposals(aug_proposals, img_metas, rpn_test_cfg):

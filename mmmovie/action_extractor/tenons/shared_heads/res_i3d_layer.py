@@ -6,10 +6,8 @@ from mmcv.runner import load_checkpoint
 
 from ..backbones import ResNet_I3D
 from ..backbones.resnet_i3d import make_res_layer
-from ...registry import HEADS
 
 
-@HEADS.register_module
 class ResI3DLayer(nn.Module):
 
     def __init__(self,
@@ -39,7 +37,8 @@ class ResI3DLayer(nn.Module):
         planes = 64 * 2**stage
         inplanes = 64 * 2**(stage - 1) * block.expansion
 
-        self.inflate_freq = inflate_freq if not isinstance(inflate_freq, int) else (inflate_freq, ) * stage
+        self.inflate_freq = inflate_freq if not isinstance(
+            inflate_freq, int) else (inflate_freq, ) * stage
 
         res_layer = make_res_layer(
             block,
@@ -60,24 +59,42 @@ class ResI3DLayer(nn.Module):
             logger = logging.getLogger()
             if self.pretrained2d:
                 resnet2d = ResNet(self.depth)
-                load_checkpoint(resnet2d, self.pretrained, strict=False, logger=logger)
+                load_checkpoint(
+                    resnet2d, self.pretrained, strict=False, logger=logger)
                 for name, module in self.named_modules():
                     if isinstance(module, NonLocalModule):
                         module.init_weights()
-                    elif isinstance(module, nn.Conv3d) and rhasattr(resnet2d, name):
-                        new_weight = rgetattr(resnet2d, name).weight.data.unsqueeze(2).expand_as(module.weight) / module.weight.data.shape[2]
+                    elif isinstance(module, nn.Conv3d) and rhasattr(
+                            resnet2d, name):
+                        new_weight = rgetattr(
+                            resnet2d, name).weight.data.unsqueeze(2).expand_as(
+                                module.weight) / module.weight.data.shape[2]
                         module.weight.data.copy_(new_weight)
-                        logging.info("{}.weight loaded from weights file into {}".format(name, new_weight.shape))
+                        logging.info(
+                            "{}.weight loaded from weights file into {}".
+                            format(name, new_weight.shape))
                         if hasattr(module, 'bias') and module.bias is not None:
                             new_bias = rgetattr(resnet2d, name).bias.data
                             module.bias.data.copy_(new_bias)
-                            logging.info("{}.bias loaded from weights file into {}".format(name, new_bias.shape))
-                    elif isinstance(module, nn.BatchNorm3d) and rhasattr(resnet2d, name):
-                        for attr in ['weight', 'bias', 'running_mean', 'running_var']:
-                            logging.info("{}.{} loaded from weights file into {}".format(name, attr, getattr(rgetattr(resnet2d, name), attr).shape))
-                            setattr(module, attr, getattr(rgetattr(resnet2d, name), attr))
+                            logging.info(
+                                "{}.bias loaded from weights file into {}".
+                                format(name, new_bias.shape))
+                    elif isinstance(module, nn.BatchNorm3d) and rhasattr(
+                            resnet2d, name):
+                        for attr in [
+                                'weight', 'bias', 'running_mean', 'running_var'
+                        ]:
+                            logging.info(
+                                "{}.{} loaded from weights file into {}".
+                                format(
+                                    name, attr,
+                                    getattr(rgetattr(resnet2d, name),
+                                            attr).shape))
+                            setattr(module, attr,
+                                    getattr(rgetattr(resnet2d, name), attr))
             else:
-                load_checkpoint(self, self.pretrained, strict=False, logger=logger)
+                load_checkpoint(
+                    self, self.pretrained, strict=False, logger=logger)
         elif self.pretrained is None:
             for m in self.modules():
                 if isinstance(m, nn.Conv2d):

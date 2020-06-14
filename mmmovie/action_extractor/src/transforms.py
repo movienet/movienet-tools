@@ -1,3 +1,10 @@
+import torch
+import numpy as np
+import mmcv
+from collections import Sequence
+from ..core.bbox2d.transforms import bbox_flip
+
+
 def to_tensor(data):
     """Convert objects of various python types to :obj:`torch.Tensor`.
 
@@ -32,21 +39,23 @@ class BboxTransform(object):
     def _preprocess_bboxes(self, proposal, height, width):
         proposal = proposal.astype(np.float32)
         if proposal.shape[1] == 5:
-            proposal = proposal * np.array([width, height, width, height, 1.0])
+            proposal = proposal * np.array([width, height, width, height, 1.0],
+                                           dtype=np.float32)
             score = proposal[:, 4, None]
             proposal = proposal[:, :4]
         else:
-            proposal = proposal * np.array([width, height, width, height])
+            proposal = proposal * np.array([width, height, width, height],
+                                           dtype=np.float32)
             score = None
         return proposal, score
 
-    def __call__(self, ):
-        height, width, _ = resutls["ori_shape"]
+    def __call__(self, results):
+        height, width, _ = results["ori_shape"]
         bboxes, score = self._preprocess_bboxes(results["bboxes"], height,
                                                 width)
         gt_bboxes = bboxes * results["scale_factor"]
 
-        img_shape = results['image_shape']
+        img_shape = results['img_shape']
         if results["flip"]:
             gt_bboxes = bbox_flip(gt_bboxes, img_shape)
         gt_bboxes[:, 0::2] = np.clip(gt_bboxes[:, 0::2], 0, img_shape[1] - 1)
@@ -58,7 +67,8 @@ class BboxTransform(object):
             padded_bboxes = np.zeros((self.max_num_gts, 4), dtype=np.float32)
             padded_bboxes[:num_gts, :] = gt_bboxes
             rst = padded_bboxes
-        proposal = np.hstack([rst, score] if score is not None else rst)
+        proposal = np.hstack([rst, score]) if score is not None else rst
+
         results["proposals"] = [to_tensor(proposal)]
         return results
 
@@ -95,7 +105,7 @@ class Images2FixedLengthGroup(object):
         p = indice
         for i, ind in enumerate(
                 range(0, (self.scope_length + 1) // 2, self.step)):
-            sampled_idxes.extend(p + self.skip_offset)
+            sampled_idxes.append(p + self.skip_offset)
             if p + self.step < nimg:
                 p += self.step
         return sampled_idxes
@@ -106,7 +116,7 @@ class Images2FixedLengthGroup(object):
         sampled_idxes = self._get_sample_index(indice, nimg)
         imgs = results['imgs']
         img_group = [imgs[p] for p in sampled_idxes]
-        results['img_group_0'] = [to_tensor(img_group)]
+        results['img_group'] = img_group  # [to_tensor(img_group)]
         return results
 
     def __repr__(self):
@@ -133,7 +143,7 @@ class ImageGroupTransform(object):
                  std=(1, 1, 1),
                  to_rgb=True,
                  size_divisor=None,
-                 scale):
+                 scale=None):
         self.mean = np.array(mean, dtype=np.float32)
         self.std = np.array(std, dtype=np.float32)
         self.to_rgb = to_rgb
@@ -194,9 +204,8 @@ class ImageGroupTransform(object):
         #     img_group, crop_quadruple = self.op_crop(
         #         img_group, is_flow=is_flow)
         # else:
-        # crop_quadruple = None
-
-        # img_shape = img_group[0].shape
+        crop_quadruple = None
+        img_shape = img_group[0].shape
         # # 3. flip
         # if flip:
         #     img_group = [mmcv.imflip(img) for img in img_group]
@@ -231,10 +240,13 @@ class ImageGroupTransform(object):
 
         # Stack into numpy.array
         img_group = np.stack(img_group, axis=0)
-        results['img_group'] = img_group
+        img_group = to_tensor(img_group)
+        img_group = np.transpose(img_group, (1, 0, 2, 3))
+
+        results['img_group_0'] = [img_group]  #img_group
         results['img_shape'] = img_shape
         results['pad_shape'] = pad_shape
         results['scale_factor'] = scale_factor
-        results['crop_quadruple'] = None
+        results['crop_quadruple'] = crop_quadruple
         results['flip'] = False
-        return img_group, img_shape, pad_shape, scale_factor, crop_quadruple
+        return results

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from ...registry import HEADS
 
+
 @HEADS.register_module
 class ClsHead(nn.Module):
     """Simplest classification head"""
@@ -14,7 +15,7 @@ class ClsHead(nn.Module):
                  dropout_ratio=0.8,
                  in_channels=2048,
                  num_classes=101,
-		 init_std=0.01,
+                 init_std=0.01,
                  fcn_testing=False):
 
         super(ClsHead, self).__init__()
@@ -34,7 +35,9 @@ class ClsHead(nn.Module):
         else:
             self.dropout = None
         if self.with_avg_pool:
-            self.avg_pool = nn.AvgPool3d((temporal_feature_size, spatial_feature_size, spatial_feature_size))
+            self.avg_pool = nn.AvgPool3d(
+                (temporal_feature_size, spatial_feature_size,
+                 spatial_feature_size))
 
         self.fc_cls = nn.Linear(in_channels, num_classes)
         self.new_cls = None
@@ -65,15 +68,19 @@ class ClsHead(nn.Module):
             if self.with_avg_pool:
                 x = self.avg_pool(x)
             if self.new_cls is None:
-                self.new_cls = nn.Conv3d(self.in_channels, self.num_classes, 1,1,0).cuda()
-                self.new_cls.load_state_dict({'weight': self.fc_cls.weight.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1),
-                                              'bias': self.fc_cls.bias})
+                self.new_cls = nn.Conv3d(self.in_channels, self.num_classes, 1,
+                                         1, 0).cuda()
+                self.new_cls.load_state_dict({
+                    'weight':
+                    self.fc_cls.weight.unsqueeze(-1).unsqueeze(-1).unsqueeze(
+                        -1),
+                    'bias':
+                    self.fc_cls.bias
+                })
             class_map = self.new_cls(x)
             return class_map
 
-    def loss(self,
-             cls_score,
-             labels):
+    def loss(self, cls_score, labels):
         losses = dict()
         losses['loss_cls'] = F.cross_entropy(cls_score, labels)
 

@@ -1,11 +1,9 @@
 import torch
 import torch.nn as nn
 
-from mmaction import ops
+from ...core import ops
 
-from ...registry import ROI_EXTRACTORS
 
-@ROI_EXTRACTORS.register_module
 class SingleRoIStraight3DExtractor(nn.Module):
     """Extract RoI features from a single level feature map.
 

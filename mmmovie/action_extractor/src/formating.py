@@ -41,7 +41,16 @@ class OneSampleCollate(object):
                     _meta.data for _meta in results['img_meta']
                 ]]
             else:
-                data[key] = results[key].unsqueeze(dim=0).cuda(self.device)
+                rst = results[key]
+                if isinstance(rst, list):
+                    data[key] = [
+                        r.unsqueeze(dim=0).cuda(self.device) for r in rst
+                    ]
+                elif isinstance(rst, torch.Tensor):
+                    data[key] = rst.unsqueeze(dim=0).cuda(self.device)
+                else:
+                    raise TypeError(
+                        f"results[{key}] must be torch.Tensor or list")
         return data
 
     def __repr__(self):
