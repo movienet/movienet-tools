@@ -1,34 +1,25 @@
 # mmmovie
+
 some basic tools for movie analysis
 
 ## Install
-> python > 3.6
-> python setup.py develop
 
-silly
->librosa requires numba <= 0.48.0
+1. install requirements
 
-## Test warings
-Silly librosa  The 'cachedir' attribute has been deprecated in version 0.12 and will be removed in version 0.14.
+    ```pip install -r requirements.txt```
 
-## Write test code
-```
-python -m pytest
-pytest -c /dev/null tests/test_extractor.py
-```
+2. install pytorch
 
-## Code rule
-Some abbrevation rule, and you may negoitate with us.
+    ```conda install pytorch torchvision cudatoolkit=10.2 -c pytorch```
 
-```
-*mmcv*
-src = source
-dst = destination
-img = image
-```
+3. build mmmovie
 
-```
-*follow qq*
-st = start
-ed = end
-```
+    ```python setup.py develop```
+
+4. dowload model weights
+
+    ```python tools/dowload_models.py```
+
+5. run a demo to see if you install it correctly
+
+    ```python demo/face_demo.py```
