@@ -22,4 +22,4 @@ some basic tools for movie analysis
 
 5. run a demo to see if you install it correctly
 
-    ```python demo/face_demo.py```
+    ```python demos/face_demo.py```
