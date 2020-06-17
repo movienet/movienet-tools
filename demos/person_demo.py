@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     img_path = './tests/data/still01.jpg'
     img = cv2.imread(img_path)
-    persons = detector.detect(img, show=True, conf_thr=0.5)
+    persons = detector.detect(img, show=True, conf_thr=0.9)
     assert persons.shape[0] == 2
     person_imgs = detector.crop_person(img, persons)
 
