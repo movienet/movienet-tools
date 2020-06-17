@@ -18,7 +18,7 @@ some basic tools for movie analysis
 
 4. dowload model weights
 
-    ```python tools/dowload_models.py```
+    ```python tools/download_models.py```
 
 5. run a demo to see if you install it correctly
 
