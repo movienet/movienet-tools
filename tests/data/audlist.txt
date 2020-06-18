@@ -1,0 +1,3 @@
+shot_0000.wav
+shot_0001.wav
+shot_0002.wav

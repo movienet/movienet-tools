@@ -2,24 +2,15 @@
 
 some basic tools for movie analysis
 
-## Install
+## Features
+- Basic video processing tools.
+- Holistic semantic video feature extractors.
+- All-in-one movie info web crawler.
 
-1. install requirements
+## Installation
+Please refer to [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation. Pretrained models and dataset are also explanined here.
 
-    ```pip install -r requirements.txt```
+## Get Started
+🥳Please see [GETTING_STARTED.md](docs/GETTING_STARTED.md) for the basic usage.
 
-2. install pytorch
 
-    ```conda install pytorch torchvision cudatoolkit=10.2 -c pytorch```
-
-3. build mmmovie
-
-    ```python setup.py develop```
-
-4. dowload model weights
-
-    ```python tools/download_models.py```
-
-5. run a demo to see if you install it correctly
-
-    ```python demos/face_demo.py```
