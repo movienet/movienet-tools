@@ -13,7 +13,7 @@ backbone = dict(
     inflate_style='3x1x1',
     nonlocal_stages=(1, 2),
     # nonlocal_freq=((0,0,0), (0,1,0,1), (0,1,0,1,0,1)),
-    nonlocal_cfg=dict(nonlocal_type="gaussian"),
+    nonlocal_cfg=dict(nonlocal_type='gaussian'),
     nonlocal_freq=((0, 0, 0), (0, 1, 0, 1), (0, 1, 0, 1, 0, 1), (0, 0, 0)),
     conv1_kernel_t=5,
     conv1_stride_t=1,

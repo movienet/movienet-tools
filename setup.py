@@ -4,9 +4,12 @@ import subprocess
 import time
 from setuptools import Extension, dist, find_packages, setup
 
+import Cython.Compiler.Options
 import numpy as np  # noqa: E402
 from Cython.Build import cythonize  # noqa: E402
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+
+Cython.Compiler.Options.docstrings = False
 
 dist.Distribution().fetch_build_eggs(['Cython', 'numpy>=1.11.1'])
 

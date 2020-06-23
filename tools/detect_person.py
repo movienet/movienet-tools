@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--img_prefix', type=str, default=None, help='prefix of the images')
     parser.add_argument(
-        '--save_path', type=str, default=None, help='prefix of the images')
+        '--save_path', type=str, default=None, help='path to save result')
     parser.add_argument(
         '--imgs_per_gpu',
         type=int,

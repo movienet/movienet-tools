@@ -1,6 +1,5 @@
 # Test data
-tests/data/aud_wav
-tests/data/aud_feat
+tests/data/aud_stft
 tests/data/place_feat_raw
 tests/data/place_feat
 
