@@ -45,7 +45,7 @@ class DataProcessor(object):
 class CustomDataset(Dataset):
     """Custom dataset for detection."""
 
-    def __init__(self, img_list, img_scale=(1333, 800), img_prefix=None):
+    def __init__(self, img_list, img_scale=(1333, 800), img_prefix=''):
         if isinstance(img_list, list):
             self.img_list = img_list
         elif isinstance(img_list, str):
