@@ -30,7 +30,7 @@ class VideoFileBackend(object):
     def __init__(self,
                  file_generator_type,
                  data_root,
-                 tmpl='shot_{:04d}/img_{:06d}.jpg',
+                 tmpl='shot_{:04d}/{:06d}.jpg',
                  shot_file=None):
         if file_generator_type == 'simple':
             self.file_generator = SimpleFileGenerator(data_root, tmpl)

@@ -5,7 +5,8 @@ import torch.nn as nn
 from .base import BaseDetector
 from .modules.convfc_bbox_head import SharedFCBBoxHead
 from .modules.core.bbox_nms import multiclass_nms
-from .modules.core.bbox_transform import bbox2result, bbox2roi, bbox_mapping
+from .modules.core.bbox_transform import (bbox2result, bbox2roi, bbox_mapping,
+                                          bbox2result_pth)
 from .modules.core.merge_augs import merge_aug_bboxes
 from .modules.fpn import FPN
 from .modules.resnext import ResNeXt
@@ -77,7 +78,12 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             x = self.neck(x)
         return x
 
-    def simple_test(self, img, img_meta, proposals=None, rescale=True):
+    def simple_test(self,
+                    img,
+                    img_meta,
+                    proposals=None,
+                    rescale=True,
+                    return_numpy=True):
         x = self.extract_feat(img)
         proposal_list = self.simple_test_rpn(
             x, img_meta,
@@ -87,7 +93,7 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
         scale_factor = img_meta[0]['scale_factor']
 
         # "ms" in variable names means multi-stage
-        ms_bbox_result = {}
+        # ms_bbox_result = {}
         ms_scores = []
         rcnn_test_cfg = self.test_cfg['rcnn']
 
@@ -116,11 +122,17 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             scale_factor,
             rescale=rescale,
             cfg=rcnn_test_cfg)
-        bbox_result = bbox2result(det_bboxes, det_labels,
-                                  self.bbox_head[-1].num_classes)
-        ms_bbox_result['ensemble'] = bbox_result
-        results = ms_bbox_result['ensemble']
-        return results[0]
+        if return_numpy:
+            bbox_result = bbox2result(det_bboxes, det_labels,
+                                      self.bbox_head[-1].num_classes)
+            # ms_bbox_result['ensemble'] = bbox_result
+            # results = ms_bbox_result['ensemble']
+            # return results[0]
+            return bbox_result[0]
+        else:
+            bbox_result = bbox2result_pth(det_bboxes, det_labels,
+                                          self.bbox_head[-1].num_classes)
+            return bbox_result
 
     def aug_test(self, imgs, img_metas, proposals=None, rescale=False):
         """Test with augmentations.

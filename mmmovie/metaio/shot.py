@@ -67,6 +67,10 @@ class ShotList(object):
         self.fps = fps
         self.shots = [Shot(idx, s, fps) for idx, s in enumerate(shot_list)]
 
+    def __iter__(self):
+        for s in self.shots:
+            yield s
+
     def __getitem__(self, idx):
         return self.shots[idx]
 
@@ -74,6 +78,6 @@ class ShotList(object):
         return len(self.shots)
 
     def frame_idx_to_shot_idx(self, frame_idx):
-        starts = [s.start_frame for s in self.shot_list]
+        starts = [s.start_frame for s in self.shots]
         shot_id, frame_id = num_to_interval(starts, frame_idx)
         return shot_id, frame_id

@@ -20,24 +20,26 @@ def main(args):
             args.temp_dir = tempfile.mkdtemp()
         args.tracklet_dir = args.temp_dir
         mmcv.mkdir_or_exist(args.temp_dir)
-        detector = ParallelPersonDetector(args.arch, args.detector_cfg,
-                                          args.detector_weight)
+        detector = ParallelPersonDetector(
+            args.arch,
+            args.detector_cfg,
+            args.detector_weight,
+            gpu_ids=list(range(args.ngpu)))
         for movie_id in movie_ids:
-            shot_file = osp.join(args.movienet_root, 'shot_file',
-                                 f"{movie_id}.txt")
+            shot_file = osp.join(args.movienet_root, 'shot', f"{movie_id}.txt")
             video = VideoFileBackend(
                 'twolevel',
                 osp.join(args.movienet_root, 'frame', movie_id),
                 shot_file=shot_file)
-            tracklets = manager.run_detect(detector, video, shot_file)
+            tracklets = manager.run_detect(
+                detector, video, shot_file, imgs_per_gpu=args.imgs_per_gpu)
             tracklet_file = osp.join(args.temp_dir, f"{movie_id}.pkl")
             mmcv.dump(tracklets, tracklet_file)
 
     extractor = ParallelActionExtractor(args.extractor_cfg,
                                         args.extractor_weight)
     for movie_id in movie_ids:
-        shot_file = osp.join(args.movienet_root, 'shot_file',
-                             f"{movie_id}.txt")
+        shot_file = osp.join(args.movienet_root, 'shot', f"{movie_id}.txt")
         video = VideoFileBackend(
             'twolevel',
             osp.join(args.movienet_root, 'frame', movie_id),
@@ -85,6 +87,8 @@ if __name__ == '__main__':
         help='the weight of the model')
     parser.add_argument('--tracklet_dir', default=None, type=str)
     parser.add_argument('--temp_dir', default=None, type=str)
+    parser.add_argument('--ngpu', type=int, default=1)
+
     parser.add_argument('--detect', action='store_true')
 
     args = parser.parse_args()

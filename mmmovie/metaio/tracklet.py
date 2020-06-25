@@ -7,11 +7,11 @@ class ShotLevelTrackletSet(object):
         self.bboxes = bbox_lst
         self.frame_ids = frame_id_lst
         self.id_prefix = id_prefix
+        self.thr = thr  # tracklet overlap threshold
         self._clean_bboxes()
         self.set = self._match()
         (self.frame_based_indexing,
          self.id_based_indexing) = self._build_indexing()
-        self.thr = thr  # tracklet overlap threshold
 
     def _clean_bboxes(self):
         assert len(self.bboxes) == len(self.frame_ids)

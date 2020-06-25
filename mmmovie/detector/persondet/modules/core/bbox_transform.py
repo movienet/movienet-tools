@@ -154,6 +154,28 @@ def bbox2result(bboxes, labels, num_classes):
             np.zeros((0, 5), dtype=np.float32) for i in range(num_classes - 1)
         ]
     else:
-        bboxes = bboxes.cpu().numpy()
-        labels = labels.cpu().numpy()
+        bboxes = bboxes.detach().cpu().numpy()
+        labels = labels.detach().cpu().numpy()
         return [bboxes[labels == i, :] for i in range(num_classes - 1)]
+
+
+def bbox2result_pth(bboxes, labels, num_classes):
+    """Convert detection results to a list of numpy arrays.
+
+    Args:
+        bboxes (Tensor): shape (n, 5)
+        labels (Tensor): shape (n, )
+        num_classes (int): class number, including background class
+
+    Returns:
+        list(ndarray): bbox results of each class
+    """
+    assert num_classes == 2
+    if bboxes.shape[0] == 0:
+        return dict(
+            bbox=bboxes.new_zeros((0, 5)), nbox=bboxes.new_tensor([0]).long())
+    else:
+        # bboxes = bboxes.detach().cpu().numpy()
+        # labels = labels.detach().cpu().numpy()
+        bbox = bboxes[labels == 0, :]
+        return dict(bbox=bbox, nbox=bbox.new_tensor([len(bbox)]).long())

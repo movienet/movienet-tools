@@ -89,23 +89,25 @@ class ActionDataset(object):
         def _allocate(_shot):
             _nframe = _shot.nframe
             if _nframe <= self.seq_len:
-                return [[_shot.start, _shot.end]], [_shot.start + _nframe // 2]
+                return [[_shot.start_frame,
+                         _shot.end_frame]], [_shot.start_frame + _nframe // 2]
             else:
                 ret_range, ret_center = [], []
                 ngroup = math.ceil(_nframe / self.seq_len)
                 overlap = math.floor(
                     (self.seq_len * ngroup - _nframe) / (ngroup - 1))
-                for i in range(_shot.start, _shot.start + _nframe,
+                for i in range(_shot.start_frame, _shot.start_frame + _nframe,
                                self.seq_len):
                     _st = max(0, i - overlap)
-                    _ed = min(_st + self.seq_len, _shot.end)
+                    _ed = min(_st + self.seq_len, _shot.end_frame)
                     _st = _ed - self.seq_len
                     ret_range.append([_st, _ed])
                     ret_center.append(_st + self.seq_len // 2)
                 return ret_range, ret_center
 
         (bbox_stream, bbox_tracklet_ids, shot_group_slice, sequence_centers,
-         seq_stream) = [], [], [], []
+         seq_stream) = [], [], [], [], []
+
         for shot in self.shot_list:
             range_lst, center_lst = _allocate(shot)
             if self.tracklet_list:

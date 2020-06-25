@@ -7,10 +7,12 @@ class ActionExtractManager(object):
     def __init__(self):
         pass
 
-    def run_detect(self, detector, video, shot_file):
+    def run_detect(self, detector, video, shot_file, imgs_per_gpu=1):
         dataset = ActionDataset(video, tracklet_file=None, shot_file=shot_file)
         img_list = dataset.get_det_infos()
-        result = detector.batch_detect(img_list, '')
+        result = detector.batch_detect(img_list, '', imgs_per_gpu=imgs_per_gpu)
+        from IPython import embed
+        embed()
         tracklets = self._bbox_result_to_tracklets(result,
                                                    dataset.shot_group_slice,
                                                    dataset.sequence_centers)
