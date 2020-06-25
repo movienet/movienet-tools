@@ -125,6 +125,24 @@ class Images2FixedLengthGroup(object):
             self.scope_length, self.step, self.skip_offset)
 
 
+class LoadImages(object):
+
+    def __init__(self, record_ori_shape=True):
+        self.record_ori_shape = record_ori_shape
+
+    def __call__(self, results):
+        img_group = results['img_group']
+        img_group = [mmcv.load(img_fn) for img_fn in img_group]
+        results['img_group'] = img_group
+        if self.record_ori_shape:
+            results['ori_shape'] = img_group[0].shape
+        return results
+
+    def __repr__(self):
+        repr_str = self.__class__.__name__
+        repr_str += f"(record_ori_shape={self.record_ori_shape})"
+
+
 class ImageGroupTransform(object):
     """Preprocess a group of images.
     1. rescale the images to expected size

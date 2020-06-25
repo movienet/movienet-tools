@@ -27,11 +27,7 @@ class ShotLevelTrackletSet(object):
     def _match(self):
         if len(self.bboxes) == 0:
             return []
-        # if len(self.bboxes) == 1:
-        #     return [(self.frame_ids[0], self.bboxes[0], [
-        #         '_'.join(self.id_prefix, j)
-        #         for j in range(len(self.bboxes[0]))
-        #     ])]
+
         tset = []  # tracklet set
         id_strings = [
             f"{self.id_prefix}_{j}" for j in range(len(self.bboxes[0]))

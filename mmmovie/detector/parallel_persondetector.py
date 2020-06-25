@@ -88,6 +88,5 @@ class ParallelPersonDetector(object):
             results.append(result)
             for _ in range(self.ngpu):
                 prog_bar.update()
-        # collect results from all ranks
-        # results = self.collect_results(results, len(dataset))
+
         return results

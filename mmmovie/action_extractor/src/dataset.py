@@ -1,7 +1,7 @@
 import mmcv
 from torchvision.transforms import Compose
 from .transforms import (Images2FixedLengthGroup, ImageGroupTransform,
-                         BboxTransform)
+                         BboxTransform, LoadImages)
 from .formating import Collect, OneSampleCollate
 from mmmovie.metaio import ShotList, ShotLevelTrackletSet
 import math
@@ -20,9 +20,6 @@ class ActionDataPreprocessor(object):
             ori_shape=(imgs[0].shape[0], imgs[0].shape[1], 3))
         # results = self.pre_pipeline(results)
         return self.pipeline(results)
-
-    # def pre_pipeline(self, results):
-    #     result = 0
 
     def build_data_pipline(self, gpu):
         pipeline = Compose([
@@ -69,6 +66,7 @@ class ActionDataset(object):
     def build_data_pipline(self):
         pipeline = Compose([
             Images2FixedLengthGroup(32, 2, 0),
+            LoadImages(record_ori_shape=True),
             ImageGroupTransform(
                 mean=[123.675, 116.28, 103.53],
                 std=[58.395, 57.12, 57.375],
@@ -144,7 +142,9 @@ class ActionDataset(object):
                 sequence_centers, seq_stream)
 
     def __getitem__(self, idx):
-        pass
+        imgs = self.seq_stream[idx]
+        results = dict(imgs=imgs, bboxes=self.bbox_stream[idx], nimg=len(imgs))
+        return self.pipeline(results)
 
     def get_det_infos(self):
         return [self.video[i] for i in self.sequence_centers]
