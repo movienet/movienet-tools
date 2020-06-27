@@ -63,6 +63,9 @@ class ActionDataset(object):
          self.sequence_centers, self.seq_stream) = self._init_stream()
         self.pipeline = self.build_data_pipline()
 
+    def __len__(self):
+        return len(self.seq_stream)
+
     def build_data_pipline(self):
         pipeline = Compose([
             Images2FixedLengthGroup(32, 2, 0),
@@ -89,8 +92,8 @@ class ActionDataset(object):
         def _allocate(_shot):
             _nframe = _shot.nframe
             if _nframe <= self.seq_len:
-                return [[_shot.start_frame,
-                         _shot.end_frame]], [_shot.start_frame + _nframe // 2]
+                return [[_shot.start_frame, _shot.end_frame + 1]
+                        ], [_shot.start_frame + _nframe // 2]
             else:
                 ret_range, ret_center = [], []
                 ngroup = math.ceil(_nframe / self.seq_len)
@@ -111,10 +114,11 @@ class ActionDataset(object):
         (bbox_stream, bbox_tracklet_ids, shot_group_slice, sequence_centers,
          seq_stream) = [], [], [], [], []
 
-        for shot in self.shot_list:
+        for shot_id, shot in enumerate(self.shot_list):
             range_lst, center_lst = _allocate(shot)
             if self.tracklet_list:
                 bboxes = self.tracklet_list[shot.index].get_bboxes(center_lst)
+
                 tracklet_ids = self.tracklet_list[shot.index].get_tids(
                     center_lst)
                 center_lst = [
@@ -148,6 +152,7 @@ class ActionDataset(object):
 
     def __getitem__(self, idx):
         imgs = self.seq_stream[idx]
+        imgs = [self.video[i] for i in range(imgs[0], imgs[1])]
         results = dict(imgs=imgs, bboxes=self.bbox_stream[idx], nimg=len(imgs))
         return self.pipeline(results)
 

@@ -112,7 +112,9 @@ class Images2FixedLengthGroup(object):
 
     def __call__(self, results):
         nimg = results['nimg']
-        indice = (nimg - 1) // 2
+        # indice = (nimg - 1) // 2
+        indice = (nimg) // 2
+
         sampled_idxes = self._get_sample_index(indice, nimg)
         imgs = results['imgs']
         img_group = [imgs[p] for p in sampled_idxes]
@@ -131,8 +133,9 @@ class LoadImages(object):
         self.record_ori_shape = record_ori_shape
 
     def __call__(self, results):
+
         img_group = results['img_group']
-        img_group = [mmcv.load(img_fn) for img_fn in img_group]
+        img_group = [mmcv.imread(img_fn) for img_fn in img_group]
         results['img_group'] = img_group
         if self.record_ori_shape:
             results['ori_shape'] = img_group[0].shape

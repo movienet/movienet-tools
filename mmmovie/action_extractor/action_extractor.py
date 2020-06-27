@@ -54,8 +54,8 @@ class ParallelActionExtractor(object):
             self.gpu_ids = list(range(torch.cuda.device_count()))
         else:
             self.gpu_ids = gpu_ids
-        assert isinstance(gpu_ids, list)
-        self.ngpu = len(gpu_ids)
+        assert isinstance(self.gpu_ids, list)
+        self.ngpu = len(self.gpu_ids)
         self.model = FastRCNN(**cfg)
         mmcv.runner.load_checkpoint(
             self.model, weight_path, map_location="cpu")
@@ -86,7 +86,7 @@ class ParallelActionExtractor(object):
             for i in range(self.ngpu):
                 prog_bar.update()
         bbox_tracklet_ids = data_loader.dataset.bbox_tracklet_ids
-        shot_group_slice = DataLoader.dataset.shot_group_slice
+        shot_group_slice = data_loader.dataset.shot_group_slice
         ret = self._post_process(results, bbox_tracklet_ids, shot_group_slice)
         return ret
 
@@ -95,16 +95,20 @@ class ParallelActionExtractor(object):
         def _merge_result(_bbox, _score, _feat, _id):
             ret = []
             for key, grp in groupby(enumerate(_id), key=itemgetter(1)):
+                # from IPython import embed
+                # embed()
+                grp = [g[0] for g in list(grp)]
                 tracklet = _bbox[grp]
                 avg_score = _score[grp].mean(axis=0)
                 max_score = _score[grp].max(axis=0)
                 feat = _feat[grp].mean(axis=0)
                 ret.append(
-                    tracklet=tracklet,
-                    tracklet_id=key,
-                    avg_score=avg_score,
-                    max_score=max_score,
-                    feat=feat)
+                    dict(
+                        tracklet=tracklet,
+                        tracklet_id=key,
+                        avg_score=avg_score,
+                        max_score=max_score,
+                        feat=feat))
             return ret
 
         bboxes, scores, feats = [], [], []

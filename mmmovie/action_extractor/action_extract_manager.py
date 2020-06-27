@@ -15,8 +15,6 @@ class ActionExtractManager(object):
         tracklets = self._bbox_result_to_tracklets(result,
                                                    dataset.shot_group_slice,
                                                    dataset.sequence_centers)
-        from IPython import embed
-        embed()
         return tracklets
 
     def _bbox_result_to_tracklets(self, result, group, frame_ids):
@@ -35,4 +33,6 @@ class ActionExtractManager(object):
         dataset = ActionDataset(
             video, tracklet_file=tracklet_file, shot_file=shot_file)
         result = extractor.extract(dataset)
+        # from IPython import embed
+        # embed()
         return result

@@ -9,6 +9,8 @@ from mmmovie.action_extractor.src.video import VideoFileBackend
 from mmmovie.detector.parallel_persondetector import ParallelPersonDetector
 from mmmovie.action_extractor.action_extract_manager import ActionExtractManager
 from mmmovie.action_extractor.action_extractor import ParallelActionExtractor
+import torch
+import shutil
 
 
 def main(args):
@@ -18,6 +20,7 @@ def main(args):
         assert not args.tracklet_dir
         if args.temp_dir is None:
             args.temp_dir = tempfile.mkdtemp()
+            print(f'create temp dir {args.temp_dir}')
         args.tracklet_dir = args.temp_dir
         mmcv.mkdir_or_exist(args.temp_dir)
         detector = ParallelPersonDetector(
@@ -35,9 +38,15 @@ def main(args):
                 detector, video, shot_file, imgs_per_gpu=args.imgs_per_gpu)
             tracklet_file = osp.join(args.temp_dir, f"{movie_id}.pkl")
             mmcv.dump(tracklets, tracklet_file)
+        del detector
+        torch.cuda.empty_cache()
 
-    extractor = ParallelActionExtractor(args.extractor_cfg,
-                                        args.extractor_weight)
+    extractor = ParallelActionExtractor(
+        args.extractor_cfg,
+        args.extractor_weight,
+        gpu_ids=list(range(args.ngpu)))
+    mmcv.mkdir_or_exist(args.save_dir)
+
     for movie_id in movie_ids:
         shot_file = osp.join(args.movienet_root, 'shot', f"{movie_id}.txt")
         video = VideoFileBackend(
@@ -48,6 +57,10 @@ def main(args):
         result = manager.run_extract(extractor, video, shot_file,
                                      tracklet_file)
         mmcv.dump(result, osp.join(args.save_dir, f"{movie_id}.pkl"))
+
+    if args.detect:
+        shutil.rmtree(args.temp_dir)
+        print(f'deleted temp dir {args.temp_dir}')
 
 
 if __name__ == '__main__':
@@ -64,9 +77,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--extractor_cfg',
         type=str,
-        default=osp.join(
-            os.getcwd(),
-            'model/ava_fast_rcnn_nl_r50_c4_1x_kinetics_pretrain_crop.py'))
+        default=osp.join(os.getcwd(),
+                         'model/ava_fast_rcnn_nl_r50_c4_1x_kinetics.py'))
     parser.add_argument(
         '--arch',
         type=str,
@@ -81,9 +93,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--extractor_weight',
         type=str,
-        default=osp.join(
-            os.getcwd(),
-            'model/ava_fast_rcnn_nl_r50_c4_1x_kinetics_pretrain_crop.pth'),
+        default=osp.join(os.getcwd(),
+                         'model/ava_fast_rcnn_nl_r50_c4_1x_kinetics.pth'),
         help='the weight of the model')
     parser.add_argument('--tracklet_dir', default=None, type=str)
     parser.add_argument('--temp_dir', default=None, type=str)

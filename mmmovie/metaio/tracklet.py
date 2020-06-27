@@ -67,3 +67,23 @@ class ShotLevelTrackletSet(object):
         }
         id_based_indexing = None  # not implemented
         return frame_based_indexing, id_based_indexing
+
+    def get_bboxes(self, center_lst):
+        ret = []
+        for c in center_lst:
+            box = self.frame_based_indexing.get(c, None)
+            if box is None:
+                ret.append(None)
+            else:
+                ret.append(box[0])
+        return ret
+
+    def get_tids(self, center_lst):
+        ret = []
+        for c in center_lst:
+            box = self.frame_based_indexing.get(c, None)
+            if box is None:
+                ret.append(None)
+            else:
+                ret.append(box[1])
+        return ret
