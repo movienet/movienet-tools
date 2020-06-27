@@ -96,9 +96,12 @@ class ActionDataset(object):
                 ngroup = math.ceil(_nframe / self.seq_len)
                 overlap = math.floor(
                     (self.seq_len * ngroup - _nframe) / (ngroup - 1))
-                for i in range(_shot.start_frame, _shot.start_frame + _nframe,
-                               self.seq_len):
-                    _st = max(0, i - overlap)
+                # from IPython import embed
+                # embed()
+                for j, i in enumerate(
+                        range(_shot.start_frame, _shot.start_frame + _nframe,
+                              self.seq_len)):
+                    _st = max(_shot.start_frame, i - j * overlap)
                     _ed = min(_st + self.seq_len, _shot.end_frame)
                     _st = _ed - self.seq_len
                     ret_range.append([_st, _ed])

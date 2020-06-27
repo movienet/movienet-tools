@@ -11,11 +11,12 @@ class ActionExtractManager(object):
         dataset = ActionDataset(video, tracklet_file=None, shot_file=shot_file)
         img_list = dataset.get_det_infos()
         result = detector.batch_detect(img_list, '', imgs_per_gpu=imgs_per_gpu)
-        from IPython import embed
-        embed()
+
         tracklets = self._bbox_result_to_tracklets(result,
                                                    dataset.shot_group_slice,
                                                    dataset.sequence_centers)
+        from IPython import embed
+        embed()
         return tracklets
 
     def _bbox_result_to_tracklets(self, result, group, frame_ids):
@@ -23,6 +24,8 @@ class ActionExtractManager(object):
         for i, (st, ed) in enumerate(group):
             this_rst = result[st:ed]
             this_frame_ids = frame_ids[st:ed]
+            # from IPython import embed
+            # embed()
             tracklet_set = ShotLevelTrackletSet(
                 this_rst, this_frame_ids, id_prefix=f"shot_{i}")
             tracklets.append(tracklet_set)

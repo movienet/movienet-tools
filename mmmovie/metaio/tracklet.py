@@ -35,6 +35,7 @@ class ShotLevelTrackletSet(object):
         tset.append((self.frame_ids[0], self.bboxes[0], id_strings))
         tidx = len(self.bboxes[0])  # tracklet global id
         for i in range(1, len(self.bboxes)):
+
             last_bboxes = self.bboxes[i - 1]
             last_ids = tset[i - 1][2]
             this_bboxes = self.bboxes[i]
@@ -50,7 +51,7 @@ class ShotLevelTrackletSet(object):
 
     def _iou_bimatch(self, box1, box2):
         ious = bbox_overlaps(box2, box1)
-        match_result = bimatch(ious, self.thr)
+        match_result, _ = bimatch(ious, self.thr)
         linked_idx, new_idx = [], []
         for i, mi in enumerate(match_result):
             if mi == -1:

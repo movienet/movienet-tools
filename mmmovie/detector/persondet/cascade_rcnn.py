@@ -83,7 +83,8 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
                     img_meta,
                     proposals=None,
                     rescale=True,
-                    return_numpy=True):
+                    return_numpy=True,
+                    norm=False):
         x = self.extract_feat(img)
         proposal_list = self.simple_test_rpn(
             x, img_meta,
@@ -122,6 +123,14 @@ class CascadeRCNN(BaseDetector, RPNTestMixin):
             scale_factor,
             rescale=rescale,
             cfg=rcnn_test_cfg)
+        # do normalization
+        if norm:
+            ori_h, ori_w, _ = img_meta[0]['ori_shape']
+            det_bboxes[:, 0] = det_bboxes[:, 0] / ori_w
+            det_bboxes[:, 1] = det_bboxes[:, 1] / ori_h
+            det_bboxes[:, 2] = det_bboxes[:, 2] / ori_w
+            det_bboxes[:, 3] = det_bboxes[:, 3] / ori_h
+
         if return_numpy:
             bbox_result = bbox2result(det_bboxes, det_labels,
                                       self.bbox_head[-1].num_classes)

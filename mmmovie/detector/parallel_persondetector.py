@@ -69,16 +69,16 @@ class ParallelPersonDetector(object):
         dataset = CustomDataset(
             imglist, img_scale=self.img_scale, img_prefix=img_prefix)
         # build data loader
-        sampler = PaddedSampler(dataset, imgs_per_gpu, self.ngpu)
+        # sampler = PaddedSampler(dataset, imgs_per_gpu, self.ngpu)
         data_loader = DataLoader(
             dataset,
             batch_size=imgs_per_gpu * self.ngpu,
-            sampler=sampler,
+            sampler=None,
             num_workers=workers_per_gpu * self.ngpu,
             collate_fn=partial(collate, samples_per_gpu=imgs_per_gpu),
             pin_memory=False)
         results = self.multi_gpu_test(data_loader, conf_thr)
-        results = results[:len(dataset)]
+        # results = results[:len(dataset)]
         return results
 
     def multi_gpu_test(self, data_loader, conf_thr):
@@ -88,12 +88,15 @@ class ParallelPersonDetector(object):
 
         for i, data in enumerate(data_loader):
             with torch.no_grad():
-                result = self.model(return_numpy=False, rescale=True, **data)
+                result = self.model(
+                    norm=True, return_numpy=False, rescale=True, **data)
             bboxes.append(result['bbox'].detach().cpu().numpy())
             nboxes.append(result['nbox'].detach().cpu().numpy())
             # result = result[result[:, -1] > conf_thr]
             # results.append(result)
-            for _ in range(self.ngpu):
+            # from IPython import embed
+            # embed()
+            for _ in range(len(data['img_meta'].data)):
                 prog_bar.update()
 
         # unpack result
