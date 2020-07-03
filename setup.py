@@ -2,7 +2,7 @@ import os
 import platform
 import subprocess
 import time
-from setuptools import Extension, dist, find_packages, setup
+from setuptools import Extension, dist, find_namespace_packages, setup
 
 import Cython.Compiler.Options
 import numpy as np  # noqa: E402
@@ -135,13 +135,15 @@ def get_requirements(filename='requirements.txt'):
 if __name__ == '__main__':
     write_version_py()
     setup(
-        name='mmmovie',
+        name='movienet-tools',
         version=get_version(),
         description='Some tools for movie analysis',
         long_description=readme(),
         long_description_content_type='text/markdown',
         url='https://github.com/hqqasw/mmmovie',
-        packages=find_packages(exclude=('docs', 'tools', 'local', 'tests')),
+        packages=find_namespace_packages(
+            exclude=('docs', 'tools', 'local', 'tests')),
+        namespace_packages=("movienet", ),
         package_data={'mmmovie.ops': ['*/*.so']},
         classifiers=[
             'Development Status :: 4 - Beta',
