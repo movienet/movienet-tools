@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from mmmovie import PlaceExtractor
+from movienet.tools import PlaceExtractor
 
 if __name__ == '__main__':
     weight_path = './model/resnet50_places365.pth'

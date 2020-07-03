@@ -4,7 +4,7 @@ import os.path as osp
 import mmcv
 import numpy as np
 
-from mmmovie import FaceDetector, PersonDetector
+from movienet.tools import FaceDetector, PersonDetector
 
 
 class TestDetector(object):

@@ -3,8 +3,7 @@ import os.path as osp
 
 import cv2
 
-from mmmovie import (FaceExtractor, FeatureExtractor, PersonExtractor,
-                     PlaceExtractor)
+from movienet.tools import (FaceExtractor, PersonExtractor, PlaceExtractor)
 
 
 class TestExtractor(object):
@@ -44,44 +43,44 @@ class TestExtractor(object):
         feature = extractor.extract(img)
         assert int(feature.sum() * 100) == -222
 
-    @staticmethod
-    def test_extract_audio_feat_folder():
-        extractor = FeatureExtractor(
-            mode='audio',
-            data_root=osp.join(osp.dirname(__file__), 'data'),
-            list_file=osp.join(
-                osp.dirname(__file__), 'data/meta/list_test_folder.txt'))
-        extractor.extract()
-        assert len(
-            os.listdir(osp.join(osp.dirname(__file__),
-                                'data/aud_feat/test1'))) == 3
-        assert len(
-            os.listdir(osp.join(osp.dirname(__file__),
-                                'data/aud_feat/test2'))) == 3
+    # @staticmethod
+    # def test_extract_audio_feat_folder():
+    #     extractor = FeatureExtractor(
+    #         mode='audio',
+    #         data_root=osp.join(osp.dirname(__file__), 'data'),
+    #         list_file=osp.join(
+    #             osp.dirname(__file__), 'data/meta/list_test_folder.txt'))
+    #     extractor.extract()
+    #     assert len(
+    #         os.listdir(osp.join(osp.dirname(__file__),
+    #                             'data/aud_feat/test1'))) == 3
+    #     assert len(
+    #         os.listdir(osp.join(osp.dirname(__file__),
+    #                             'data/aud_feat/test2'))) == 3
 
-    @staticmethod
-    def test_extract_audio_feat_video1():
-        extractor = FeatureExtractor(
-            mode='audio',
-            data_root=osp.join(osp.dirname(__file__), 'data'),
-            list_file=osp.join(
-                osp.dirname(__file__), 'data/meta/list_test_video1.txt'))
-        extractor.extract()
-        assert len(
-            os.listdir(osp.join(osp.dirname(__file__),
-                                'data/aud_feat/test1'))) == 3
+    # @staticmethod
+    # def test_extract_audio_feat_video1():
+    #     extractor = FeatureExtractor(
+    #         mode='audio',
+    #         data_root=osp.join(osp.dirname(__file__), 'data'),
+    #         list_file=osp.join(
+    #             osp.dirname(__file__), 'data/meta/list_test_video1.txt'))
+    #     extractor.extract()
+    #     assert len(
+    #         os.listdir(osp.join(osp.dirname(__file__),
+    #                             'data/aud_feat/test1'))) == 3
 
-    @staticmethod
-    def test_extract_audio_feat_video2():
-        extractor = FeatureExtractor(
-            mode='audio',
-            data_root=osp.join(osp.dirname(__file__), 'data'),
-            src_video_path='shot_split_video/test2',
-            dst_wav_path='aud_wav/test2',
-            dst_stft_path='aud_feat/test2',
-            list_file=osp.join(
-                osp.dirname(__file__), 'data/meta/list_test_video2.txt'))
-        extractor.extract()
-        assert len(
-            os.listdir(osp.join(osp.dirname(__file__),
-                                'data/aud_feat/test2'))) == 3
+    # @staticmethod
+    # def test_extract_audio_feat_video2():
+    #     extractor = FeatureExtractor(
+    #         mode='audio',
+    #         data_root=osp.join(osp.dirname(__file__), 'data'),
+    #         src_video_path='shot_split_video/test2',
+    #         dst_wav_path='aud_wav/test2',
+    #         dst_stft_path='aud_feat/test2',
+    #         list_file=osp.join(
+    #             osp.dirname(__file__), 'data/meta/list_test_video2.txt'))
+    #     extractor.extract()
+    #     assert len(
+    #         os.listdir(osp.join(osp.dirname(__file__),
+    #                             'data/aud_feat/test2'))) == 3

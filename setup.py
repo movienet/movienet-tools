@@ -29,7 +29,7 @@ if PATCH:
 else:
     SHORT_VERSION = '{}.{}{}'.format(MAJOR, MINOR, SUFFIX)
 
-version_file = 'mmmovie/version.py'
+version_file = 'movienet/tools/version.py'
 
 
 def get_git_hash():
@@ -63,7 +63,7 @@ def get_hash():
         sha = get_git_hash()[:7]
     elif os.path.exists(version_file):
         try:
-            from mmmovie.version import __version__
+            from movienet.tools.version import __version__
             sha = __version__.split('+')[-1]
         except ImportError:
             raise ImportError('Unable to get git version')
@@ -140,11 +140,11 @@ if __name__ == '__main__':
         description='Some tools for movie analysis',
         long_description=readme(),
         long_description_content_type='text/markdown',
-        url='https://github.com/hqqasw/mmmovie',
+        url='https://github.com/movienet/movienet-tools',
         packages=find_namespace_packages(
-            exclude=('docs', 'tools', 'local', 'tests')),
+            exclude=('docs', 'tools', 'local', 'tests', 'model')),
         namespace_packages=("movienet", ),
-        package_data={'mmmovie.ops': ['*/*.so']},
+        package_data={'movie.tools.ops': ['*/*.so']},
         classifiers=[
             'Development Status :: 4 - Beta',
             'License :: OSI Approved :: Apache Software License',
@@ -160,43 +160,45 @@ if __name__ == '__main__':
         ext_modules=[
             make_cython_ext(
                 name='soft_nms_cpu',
-                module='mmmovie.detector.persondet.modules.core.ops.nms',
+                module='movienet.tools.detector.persondet.modules.core.ops.nms',
                 sources=['src/soft_nms_cpu.pyx']),
             make_cuda_ext(
                 name='nms_cpu',
-                module='mmmovie.detector.persondet.modules.core.ops.nms',
+                module='movienet.tools.detector.persondet.modules.core.ops.nms',
                 sources=['src/nms_cpu.cpp']),
             make_cuda_ext(
                 name='nms_cuda',
-                module='mmmovie.detector.persondet.modules.core.ops.nms',
+                module='movienet.tools.detector.persondet.modules.core.ops.nms',
                 sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
             make_cuda_ext(
                 name='roi_align_cuda',
-                module='mmmovie.detector.persondet.modules.core.ops.roi_align',
+                module=
+                'movienet.tools.detector.persondet.modules.core.ops.roi_align',
                 sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
             make_cuda_ext(
                 name='roi_pool_cuda',
-                module='mmmovie.detector.persondet.modules.core.ops.roi_pool',
+                module=
+                'movienet.tools.detector.persondet.modules.core.ops.roi_pool',
                 sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu']),
             make_cython_ext(
                 name='soft_nms_cpu',
-                module='mmmovie.action_extractor.core.ops.nms',
+                module='movienet.tools.action_extractor.core.ops.nms',
                 sources=['src/soft_nms_cpu.pyx']),
             make_cuda_ext(
                 name='nms_cpu',
-                module='mmmovie.action_extractor.core.ops.nms',
+                module='movienet.tools.action_extractor.core.ops.nms',
                 sources=['src/nms_cpu.cpp']),
             make_cuda_ext(
                 name='nms_cuda',
-                module='mmmovie.action_extractor.core.ops.nms',
+                module='movienet.tools.action_extractor.core.ops.nms',
                 sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
             make_cuda_ext(
                 name='roi_align_cuda',
-                module='mmmovie.action_extractor.core.ops.roi_align',
+                module='movienet.tools.action_extractor.core.ops.roi_align',
                 sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
             make_cuda_ext(
                 name='roi_pool_cuda',
-                module='mmmovie.action_extractor.core.ops.roi_pool',
+                module='movienet.tools.action_extractor.core.ops.roi_pool',
                 sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu'])
         ],
         cmdclass={'build_ext': BuildExtension},

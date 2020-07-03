@@ -1,6 +1,6 @@
 import mmcv
 import os
-from mmmovie.metaio import ShotList
+from movienet.tools.metaio import ShotList
 
 
 class SimpleFileGenerator(object):

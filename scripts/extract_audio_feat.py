@@ -1,7 +1,7 @@
 import argparse
 import os.path as osp
 
-from mmmovie import DistAudioExtractor
+from movienet.tools import DistAudioExtractor
 
 
 def main(args):
@@ -14,7 +14,7 @@ def main(args):
         args.aud_prefix,
         args.save_path,
         args.num_workers,
-        )
+    )
 
 
 if __name__ == '__main__':
@@ -29,8 +29,6 @@ if __name__ == '__main__':
     parser.add_argument(
         '--save_path', type=str, default=None, help='save path')
     parser.add_argument(
-        '--num_workers',
-        type=int, default=8,
-        help='number of workers for cpu')
+        '--num_workers', type=int, default=8, help='number of workers for cpu')
     args = parser.parse_args()
     main(args)

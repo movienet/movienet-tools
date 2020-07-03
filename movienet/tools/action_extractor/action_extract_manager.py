@@ -1,4 +1,4 @@
-from mmmovie.metaio.tracklet import ShotLevelTrackletSet
+from movienet.tools.metaio.tracklet import ShotLevelTrackletSet
 from .src.dataset import ActionDataset
 
 

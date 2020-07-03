@@ -1,7 +1,7 @@
 import os
 import os.path as osp
 
-from mmmovie import ShotDetector
+from movienet.tools import ShotDetector
 
 
 class TestShotDetector(object):

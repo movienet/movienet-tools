@@ -1,4 +1,4 @@
-from mmmovie.action_extractor.core.bbox2d.transforms import bbox2roi, bbox_mapping
+from movienet.tools.action_extractor.core.bbox2d.transforms import bbox2roi, bbox_mapping
 from ..core.post_processing import (merge_aug_proposals, merge_aug_bboxes,
                                     multiclass_nms)
 

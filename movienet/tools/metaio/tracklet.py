@@ -1,4 +1,4 @@
-from mmmovie.utils import bbox_overlaps, bimatch
+from movienet.tools.utils import bbox_overlaps, bimatch
 
 
 class ShotLevelTrackletSet(object):

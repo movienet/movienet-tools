@@ -1,6 +1,6 @@
 import numpy as np
 
-from mmmovie import AudioExtractor
+from movienet.tools import AudioExtractor
 
 if __name__ == '__main__':
     extractor = AudioExtractor()

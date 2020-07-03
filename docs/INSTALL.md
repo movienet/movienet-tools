@@ -13,7 +13,7 @@
 
     Make sure the cudatoolkit version is the same as your system's CUDA. Here we use CUDA 10.2. If you are not familiar with how to install Nvidia driver and CUDA, please see below.
 
-3. Build mmmovie
+3. Build movienet-tools
 
     ```python setup.py develop```
 

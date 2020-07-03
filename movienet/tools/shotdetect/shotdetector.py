@@ -46,7 +46,7 @@ class ShotDetector(object):
     frame.
 
     :Example:
-    >>> from mmmovie import ShotDetector
+    >>> from movienet.tools import ShotDetector
     >>> sdt = ShotDetector(print_list=True, begin_frame=0,end_frame=2000)
     >>> video_path = osp.join('sample.mp4')
     >>> out_dir = "./"

@@ -1,7 +1,6 @@
 import os.path as osp
 
-from mmmovie import ShotDetector
-
+from movienet.tools import ShotDetector
 
 if __name__ == '__main__':
     sdt = ShotDetector(

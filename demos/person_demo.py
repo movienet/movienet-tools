@@ -3,7 +3,7 @@ import time
 import cv2
 import numpy as np
 
-from mmmovie import PersonDetector, PersonExtractor
+from movienet.tools import PersonDetector, PersonExtractor
 
 if __name__ == '__main__':
     st = time.time()

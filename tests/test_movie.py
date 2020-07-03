@@ -4,8 +4,8 @@ import tempfile
 
 import pytest
 
-import mmmovie
-from mmmovie import MovieReader
+import movienet.tools
+from movienet.tools import MovieReader
 
 
 class TestMovie(object):
@@ -118,7 +118,7 @@ class TestMovie(object):
 
     def test_resize_video(self):
         out_file = osp.join(tempfile.gettempdir(), '.mmmovie_test.mp4')
-        mmmovie.resize_movie(
+        movienet.tools.resize_movie(
             self.video_path,
             out_file, (480, 360),
             log_level='error',
@@ -126,12 +126,12 @@ class TestMovie(object):
         v = MovieReader(out_file)
         assert v.resolution == (480, 360)
         os.remove(out_file)
-        mmmovie.resize_movie(
+        movienet.tools.resize_movie(
             self.video_path, out_file, ratio=2, log_level='error')
         v = MovieReader(out_file)
         assert v.resolution == (852, 480)
         os.remove(out_file)
-        mmmovie.resize_movie(
+        movienet.tools.resize_movie(
             self.video_path,
             out_file, (1000, 480),
             keep_ar=True,
@@ -139,7 +139,7 @@ class TestMovie(object):
         v = MovieReader(out_file)
         assert v.resolution == (852, 480)
         os.remove(out_file)
-        mmmovie.resize_movie(
+        movienet.tools.resize_movie(
             self.video_path,
             out_file,
             ratio=(3, 2),
@@ -148,13 +148,13 @@ class TestMovie(object):
         v = MovieReader(out_file)
         assert v.resolution == (1278, 480)
         os.remove(out_file)
-        mmmovie.resize_movie(
+        movienet.tools.resize_movie(
             self.video_path, out_file, size='240P', log_level='error')
         v = MovieReader(out_file)
         print(v.resolution)
         assert v.resolution == (352, 240)
         os.remove(out_file)
-        mmmovie.resize_movie(
+        movienet.tools.resize_movie(
             self.video_path,
             out_file,
             size='240P',
@@ -165,10 +165,12 @@ class TestMovie(object):
         os.remove(out_file)
 
     def test_timecode(self):
-        assert mmmovie.seconds_to_timecode(123) == '00:02:03.000'
-        assert mmmovie.seconds_to_timecode(123, precision=2) == '00:02:03.00'
-        assert mmmovie.seconds_to_timecode(123.1345, precision=0) == '00:02:03'
-        assert mmmovie.seconds_to_frames(2, framerate=24) == 48
-        assert mmmovie.frames_to_seconds(480, framerate=24) == 20
-        assert mmmovie.timecode_to_seconds('300s') == 300
-        assert mmmovie.timecode_to_seconds('00:02:03.000') == 123
+        assert movienet.tools.seconds_to_timecode(123) == '00:02:03.000'
+        assert movienet.tools.seconds_to_timecode(
+            123, precision=2) == '00:02:03.00'
+        assert movienet.tools.seconds_to_timecode(
+            123.1345, precision=0) == '00:02:03'
+        assert movienet.tools.seconds_to_frames(2, framerate=24) == 48
+        assert movienet.tools.frames_to_seconds(480, framerate=24) == 20
+        assert movienet.tools.timecode_to_seconds('300s') == 300
+        assert movienet.tools.timecode_to_seconds('00:02:03.000') == 123

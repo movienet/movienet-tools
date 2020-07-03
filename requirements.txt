@@ -1,6 +1,5 @@
 bs4
 cython
-fake_useragent
 librosa == 0.7.2
 lxml
 mmcv

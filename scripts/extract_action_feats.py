@@ -2,13 +2,13 @@ import argparse
 import os
 import os.path as osp
 import mmcv
-from mmmovie.utils import read_movie_list
+from movienet.tools.utils import read_movie_list
 import tempfile
-# from mmmovie.action_extractor.src.dataset import ActionDataset
-from mmmovie.action_extractor.src.video import VideoFileBackend
-from mmmovie.detector.parallel_persondetector import ParallelPersonDetector
-from mmmovie.action_extractor.action_extract_manager import ActionExtractManager
-from mmmovie.action_extractor.action_extractor import ParallelActionExtractor
+# from movienet.tools.action_extractor.src.dataset import ActionDataset
+from movienet.tools.action_extractor.src.video import VideoFileBackend
+from movienet.tools.detector.parallel_persondetector import ParallelPersonDetector
+from movienet.tools.action_extractor.action_extract_manager import ActionExtractManager
+from movienet.tools.action_extractor.action_extractor import ParallelActionExtractor
 import torch
 import shutil
 

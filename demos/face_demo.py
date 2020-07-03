@@ -3,7 +3,7 @@ import time
 import cv2
 import numpy as np
 
-from mmmovie import FaceDetector, FaceExtractor
+from movienet.tools import FaceDetector, FaceExtractor
 
 if __name__ == '__main__':
     # demo of face detection

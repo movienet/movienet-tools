@@ -16,7 +16,7 @@ from .persondet.cascade_rcnn import CascadeRCNN
 from .persondet.dataset import CustomDataset, DataProcessor
 from .persondet.retinanet import RetinaNet
 
-from mmmovie.utils import PaddedSampler, acc_list
+from movienet.tools.utils import PaddedSampler, acc_list
 
 
 class ParallelPersonDetector(object):

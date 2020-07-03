@@ -5,7 +5,7 @@ import pickle
 
 from mmcv.runner import get_dist_info, init_dist
 
-from mmmovie import DistPersonDetector
+from movienet.tools import DistPersonDetector
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Detect Person')

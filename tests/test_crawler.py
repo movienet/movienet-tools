@@ -1,6 +1,6 @@
 import os.path as osp
 
-from mmmovie import DoubanCrawler, IMDBCrawler, TMDBCrawler
+from movienet.tools import DoubanCrawler, IMDBCrawler, TMDBCrawler
 
 
 class TestCrawler(object):

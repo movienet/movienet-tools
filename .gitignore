@@ -3,7 +3,7 @@ tests/data/aud_stft
 tests/data/place_feat_raw
 tests/data/place_feat
 
-mmmovie/version.py
+movienet/tools/version.py
 local/
 
 tmp.py

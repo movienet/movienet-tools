@@ -3,7 +3,7 @@ from torchvision.transforms import Compose
 from .transforms import (Images2FixedLengthGroup, ImageGroupTransform,
                          BboxTransform, LoadImages)
 from .formating import Collect, OneSampleCollate
-from mmmovie.metaio import ShotList, ShotLevelTrackletSet
+from movienet.tools.metaio import ShotList, ShotLevelTrackletSet
 import math
 
 
