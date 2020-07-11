@@ -13,4 +13,9 @@ Please refer to [INSTALL.md](docs/INSTALL.md) for installation and dataset prepa
 ## Get Started
 🥳Please see [GETTING_STARTED.md](docs/GETTING_STARTED.md) for the basic usage.
 
+## Acknowledgement
+The structure of this code base follows codebased in [openmmlab](https://github.com/open-mmlab).
+The part of character detection are modified from [mmdetection](https://github.com/open-mmlab/mmdetection)
+and the part of action feature extraction are modified from [mmaction](https://github.com/open-mmlab/mmaction).
+Many thanks to these open-source codebases.
 
