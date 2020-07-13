@@ -11,7 +11,7 @@ some basic tools for movie analysis
 Please refer to [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation. Pretrained models and dataset are also explanined here.
 
 ## Get Started
-🥳Please see [GETTING_STARTED.md](docs/GETTING_STARTED.md) for the basic usage.
+🥳Please see [movienet-toils documentation](http://movienet.site/docs/movie-tools) for the basic usage.
 
 ## Acknowledgement
 The structure of ``movienet-tools`` follows that of codebased in [openmmlab](https://github.com/open-mmlab).
