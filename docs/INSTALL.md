@@ -15,7 +15,11 @@
 
 3. Build movienet-tools
 
+    Get into movienet-tools folder, run
     ```python setup.py develop```
+    or
+    ```python -m pip install -e . -U```
+    
 
 4. Dowload model weights
 
