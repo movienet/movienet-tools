@@ -1,6 +1,10 @@
-# movienet-tools
+**Updates**
 
-some basic tools for movie analysis
+[MovieNet Official Website](http://movienet.site/) is online now!
+
+# Introduction
+movienet-tools is an open source movie analysis toolbox based on PyTorch.
+It's part of [MovieNet](#!) project.
 
 ## Features
 - Basic video processing tools.
@@ -11,7 +15,7 @@ some basic tools for movie analysis
 Please refer to [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation. Pretrained models and dataset are also explanined here.
 
 ## Get Started
-🥳Please see [movienet-toils documentation](http://movienet.site/docs/movie-toolbox) for the basic usage.
+🥳Please see [movienet-toos documentation](http://movienet.site/docs/movie-toolbox/tools) for the basic usage.
 
 ## Acknowledgement
 The structure of ``movienet-tools`` follows that of codebased in [openmmlab](https://github.com/open-mmlab).
