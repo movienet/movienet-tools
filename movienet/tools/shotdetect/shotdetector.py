@@ -85,7 +85,7 @@ class ShotDetector(object):
         video_path = video_path
         stats_file_folder_path = osp.join(out_dir, 'shot_stats')
         os.makedirs(stats_file_folder_path, exist_ok=True)
-        video_prefix = video_path.split('.')[0].split('/')[-1]
+        video_prefix = video_path.rsplit('.', 1)[0].rsplit('/', 1)[-1]
         stats_file_path = osp.join(stats_file_folder_path,
                                    '{}.csv'.format(video_prefix))
 
