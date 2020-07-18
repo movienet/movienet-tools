@@ -23,3 +23,13 @@ The part of character detection are modified from [mmdetection](https://github.c
 and the part of action feature extraction are modified from [mmaction](https://github.com/open-mmlab/mmaction).
 Many thanks to these open-source codebases.
 
+## Citation
+If you use MovieNet dataset or this toolbox or benchmarks in your research, please cite this project.
+```
+@inproceedings{huang2020movie,
+	title={MovieNet: A Holistic Dataset for Movie Understanding},
+	author={Huang, Qingqiu and Xiong, Yu and Rao, Anyi and Wang, Jiaze and Lin, Dahua},
+	booktitle = {Proceedings of the European Conference on Computer Vision (ECCV)}, 
+	year={2020}
+}
+```
