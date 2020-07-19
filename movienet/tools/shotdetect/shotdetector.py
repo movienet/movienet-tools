@@ -58,6 +58,7 @@ class ShotDetector(object):
                  keep_resolution=False,
                  save_keyf=False,
                  save_keyf_txt=False,
+                 save_stat_csv=False,
                  split_video=False,
                  begin_time=None,
                  end_time=100.0,
@@ -67,13 +68,14 @@ class ShotDetector(object):
         self.keep_resolution = keep_resolution
         self.save_keyf = save_keyf
         self.save_keyf_txt = save_keyf_txt
+        self.save_stat_csv = save_stat_csv
         self.split_video = split_video
         self.begin_time = begin_time
         self.end_time = end_time
         self.begin_frame = begin_frame
         self.end_frame = end_frame
 
-    def shotdetect(self, video_path, out_dir):
+    def shotdetect(self, video_path, out_dir, show_progress=True):
         """Detect shots from a video.
 
         Args:
@@ -124,7 +126,8 @@ class ShotDetector(object):
                 video_manager.set_downscale_factor()
             video_manager.start()
             # Perform shot detection on video_manager.
-            shot_manager.detect_shots(frame_source=video_manager)
+            shot_manager.detect_shots(
+                frame_source=video_manager, show_progress=show_progress)
             # Obtain list of detected shots.
             shot_list = shot_manager.get_shot_list(base_timecode)
             # Each shot is a tuple of (start, end) FrameTimecodes.
@@ -160,7 +163,7 @@ class ShotDetector(object):
                                    suppress_output=True)
 
             # We only write to the stats file if a save is required:
-            if stats_manager.is_save_required():
+            if self.save_stat_csv and stats_manager.is_save_required():
                 with open(stats_file_path, 'w') as stats_file:
                     stats_manager.save_to_csv(stats_file, base_timecode)
         finally:

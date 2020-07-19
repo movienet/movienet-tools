@@ -182,5 +182,4 @@ def generate_images_txt(shot_list, output_dir, num_images=5):
         frames_list.append(frames_item[:-1])
 
     with open(output_dir, 'w') as f:
-        for frames in frames_list:
-            f.write('{}\n'.format(frames))
+        f.write('\n'.join(frames_list))
