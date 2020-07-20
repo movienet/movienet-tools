@@ -4,8 +4,8 @@
 
 # Introduction
 movienet-tools is an open source movie analysis toolbox based on PyTorch.
-It's part of [MovieNet](http://movienet.site/) project maintained by MovieNet Team from [MMLab, CUHK & NTU](http://mmlab.ie.cuhk.edu.hk).
-And it also one of [OpenMMLab](https://open-mmlab.github.io/index.html) projects.
+It's part of [MovieNet](http://movienet.site/) project maintained by MovieNet Team from [MMLab, CUHK](http://mmlab.ie.cuhk.edu.hk).
+And it is also one of [OpenMMLab](https://open-mmlab.github.io/index.html) projects.
 
 ## Features
 - Basic video processing tools.
