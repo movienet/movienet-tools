@@ -15,7 +15,7 @@ It's part of [MovieNet](#!) project.
 Please refer to [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation. Pretrained models and dataset are also explanined here.
 
 ## Get Started
-🥳Please see [movienet-toos documentation](http://docs.movienet.site/movie-toolbox/tools) for the basic usage.
+🥳Please see [movienet-tools documentation](http://docs.movienet.site/movie-toolbox/tools) for the basic usage.
 
 ## Acknowledgement
 The structure of ``movienet-tools`` follows that of codebased in [openmmlab](https://github.com/open-mmlab).
