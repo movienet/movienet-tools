@@ -26,7 +26,7 @@
 
 4. Dowload model weights
 
-    ```python tools/download_models.py```
+    ```python scripts/download_models.py```
 
 5. Run a demo to see if you install it correctly
 
