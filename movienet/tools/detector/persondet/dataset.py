@@ -1,4 +1,5 @@
 import os.path as osp
+import numpy as np
 
 import mmcv
 from torch.utils.data import Dataset
@@ -74,8 +75,14 @@ class CustomDataset(Dataset):
         return self.prepare_test_img(idx)
 
     def prepare_test_img(self, idx):
-        filename = osp.join(self.img_prefix, self.img_list[idx])
-        img = mmcv.imread(filename)
+        this_img = self.img_list[idx]
+        if isinstance(this_img, str):
+            filename = osp.join(self.img_prefix, this_img)
+            img = mmcv.imread(filename)
+        elif isinstance(this_img, np.ndarray):
+            filename = ''
+            img = this_img
+
         img_info = {}
         img_info['filename'] = filename
         img_info['img_prefix'] = self.img_prefix

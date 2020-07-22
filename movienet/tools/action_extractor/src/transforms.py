@@ -135,7 +135,9 @@ class LoadImages(object):
     def __call__(self, results):
 
         img_group = results['img_group']
-        img_group = [mmcv.imread(img_fn) for img_fn in img_group]
+        if isinstance(img_group[0], str):
+            img_group = [mmcv.imread(img_fn) for img_fn in img_group]
+        # else is np.array, image already loaded, do nothing.
         results['img_group'] = img_group
         if self.record_ori_shape:
             results['ori_shape'] = img_group[0].shape

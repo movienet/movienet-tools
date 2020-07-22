@@ -92,10 +92,6 @@ class ParallelPersonDetector(object):
                     norm=True, return_numpy=False, rescale=True, **data)
             bboxes.append(result['bbox'].detach().cpu().numpy())
             nboxes.append(result['nbox'].detach().cpu().numpy())
-            # result = result[result[:, -1] > conf_thr]
-            # results.append(result)
-            # from IPython import embed
-            # embed()
             for _ in range(len(data['img_meta'].data)):
                 prog_bar.update()
 

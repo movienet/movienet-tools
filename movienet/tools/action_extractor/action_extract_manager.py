@@ -22,8 +22,6 @@ class ActionExtractManager(object):
         for i, (st, ed) in enumerate(group):
             this_rst = result[st:ed]
             this_frame_ids = frame_ids[st:ed]
-            # from IPython import embed
-            # embed()
             tracklet_set = ShotLevelTrackletSet(
                 this_rst, this_frame_ids, id_prefix=f"shot_{i}")
             tracklets.append(tracklet_set)
@@ -32,7 +30,5 @@ class ActionExtractManager(object):
     def run_extract(self, extractor, video, shot_file, tracklet_file):
         dataset = ActionDataset(
             video, tracklet_file=tracklet_file, shot_file=shot_file)
-        result = extractor.extract(dataset)
-        # from IPython import embed
-        # embed()
+        result = extractor.extract(dataset, workers_per_gpu=1)
         return result

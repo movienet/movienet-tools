@@ -2,6 +2,7 @@ import mmcv
 from torchvision.transforms import Compose
 from .transforms import (Images2FixedLengthGroup, ImageGroupTransform,
                          BboxTransform, LoadImages)
+from .video import VideoMMCVBackend
 from .formating import Collect, OneSampleCollate
 from movienet.tools.metaio import ShotList, ShotLevelTrackletSet
 import math
@@ -51,6 +52,10 @@ class ActionDataset(object):
         ``decord``
         """
         self.video = video
+        if isinstance(self.video, VideoMMCVBackend):
+            self.video_cfg = self.video.to_config()
+        else:
+            self.video_cfg = None
         if shot_file is not None:
             self.shot_list = ShotList.from_file(shot_file)
         if tracklet_file is not None:
@@ -99,8 +104,6 @@ class ActionDataset(object):
                 ngroup = math.ceil(_nframe / self.seq_len)
                 overlap = math.floor(
                     (self.seq_len * ngroup - _nframe) / (ngroup - 1))
-                # from IPython import embed
-                # embed()
                 for j, i in enumerate(
                         range(_shot.start_frame, _shot.start_frame + _nframe,
                               self.seq_len)):
@@ -151,8 +154,15 @@ class ActionDataset(object):
                 sequence_centers, seq_stream)
 
     def __getitem__(self, idx):
+
         imgs = self.seq_stream[idx]
-        imgs = [self.video[i] for i in range(imgs[0], imgs[1])]
+        if isinstance(self.video_cfg, mmcv.Config):
+            if self.video_cfg.type == 'VideoMMCVBackend':
+                video = VideoMMCVBackend(**self.video_cfg.params)
+            imgs = [video[i] for i in range(imgs[0], imgs[1])]
+        else:
+            imgs = [self.video[i] for i in range(imgs[0], imgs[1])]
+
         results = dict(imgs=imgs, bboxes=self.bbox_stream[idx], nimg=len(imgs))
         return self.pipeline(results)
 

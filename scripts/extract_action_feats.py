@@ -5,10 +5,14 @@ import mmcv
 from movienet.tools.utils import read_movie_list
 import tempfile
 # from movienet.tools.action_extractor.src.dataset import ActionDataset
-from movienet.tools.action_extractor.src.video import VideoFileBackend
-from movienet.tools.detector.parallel_persondetector import ParallelPersonDetector
-from movienet.tools.action_extractor.action_extract_manager import ActionExtractManager
-from movienet.tools.action_extractor.action_extractor import ParallelActionExtractor
+from movienet.tools.action_extractor.src.video import (VideoFileBackend,
+                                                       VideoMMCVBackend)
+from movienet.tools.detector.parallel_persondetector import (
+    ParallelPersonDetector)
+from movienet.tools.action_extractor.action_extract_manager import (
+    ActionExtractManager)
+from movienet.tools.action_extractor.action_extractor import (
+    ParallelActionExtractor)
 import torch
 import shutil
 
@@ -30,10 +34,14 @@ def main(args):
             gpu_ids=list(range(args.ngpu)))
         for movie_id in movie_ids:
             shot_file = osp.join(args.movienet_root, 'shot', f"{movie_id}.txt")
-            video = VideoFileBackend(
-                'twolevel',
-                osp.join(args.movienet_root, 'frame', movie_id),
-                shot_file=shot_file)
+            # One could replace VideoFileBackend to other type of backends
+            # like VideoMMCVBackend.
+            # video = VideoFileBackend(
+            #     'twolevel',
+            #     osp.join(args.movienet_root, 'frame', movie_id),
+            #     shot_file=shot_file)
+            video = VideoMMCVBackend(
+                osp.join(args.movienet_root, 'video', f"{movie_id}.mp4"))
             tracklets = manager.run_detect(
                 detector, video, shot_file, imgs_per_gpu=args.imgs_per_gpu)
             tracklet_file = osp.join(args.temp_dir, f"{movie_id}.pkl")
@@ -49,10 +57,13 @@ def main(args):
 
     for movie_id in movie_ids:
         shot_file = osp.join(args.movienet_root, 'shot', f"{movie_id}.txt")
-        video = VideoFileBackend(
-            'twolevel',
-            osp.join(args.movienet_root, 'frame', movie_id),
-            shot_file=shot_file)
+        # video = VideoFileBackend(
+        #     'twolevel',
+        #     osp.join(args.movienet_root, 'frame', movie_id),
+        #     shot_file=shot_file)
+        video = VideoMMCVBackend(
+            osp.join(args.movienet_root, 'video', f"{movie_id}.mp4"))
+
         tracklet_file = osp.join(args.tracklet_dir, f"{movie_id}.pkl")
         result = manager.run_extract(extractor, video, shot_file,
                                      tracklet_file)

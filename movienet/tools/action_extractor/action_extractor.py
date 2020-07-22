@@ -95,8 +95,6 @@ class ParallelActionExtractor(object):
         def _merge_result(_bbox, _score, _feat, _id):
             ret = []
             for key, grp in groupby(enumerate(_id), key=itemgetter(1)):
-                # from IPython import embed
-                # embed()
                 grp = [g[0] for g in list(grp)]
                 tracklet = _bbox[grp]
                 avg_score = _score[grp].mean(axis=0)
@@ -116,10 +114,6 @@ class ParallelActionExtractor(object):
             bboxes.append(rst['bboxes'])
             scores.append(rst['score'])
             feats.append(rst['action_feature'])
-        # bboxes = np.concatenate(bboxes, axis=0)
-        # scores = np.concatenate(scores, axis=0)
-        # feats = np.concatenate(feats, axis=0)
-        # assert len(bboxes) == len(ids)
 
         shot_level_result = []
         for group in groups:

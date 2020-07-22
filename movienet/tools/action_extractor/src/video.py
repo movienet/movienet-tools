@@ -50,8 +50,24 @@ class VideoFileBackend(object):
 
 class VideoMMCVBackend(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, video_path):
+        self.video_path = video_path
+        self.video = mmcv.VideoReader(video_path)
+
+    def __getitem__(self, subscript):
+        if isinstance(subscript, slice):
+            return [
+                self.video[i]
+                for i in range(subscript.start, subscript.stop, subscript.step)
+            ]
+        else:
+            return self.video[subscript]
+
+    def to_config(self):
+        return mmcv.Config(
+            dict(
+                type='VideoMMCVBackend',
+                params=dict(video_path=self.video_path)))
 
 
 class VideoDecordBackend(object):

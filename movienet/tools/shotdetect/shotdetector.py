@@ -63,7 +63,8 @@ class ShotDetector(object):
                  begin_time=None,
                  end_time=100.0,
                  begin_frame=None,
-                 end_frame=1000):
+                 end_frame=1000, 
+                 show_progress=True):
         self.print_list = print_list
         self.keep_resolution = keep_resolution
         self.save_keyf = save_keyf
@@ -74,8 +75,9 @@ class ShotDetector(object):
         self.end_time = end_time
         self.begin_frame = begin_frame
         self.end_frame = end_frame
+        self.show_progress = show_progress
 
-    def shotdetect(self, video_path, out_dir, show_progress=True):
+    def shotdetect(self, video_path, out_dir):
         """Detect shots from a video.
 
         Args:
@@ -127,7 +129,7 @@ class ShotDetector(object):
             video_manager.start()
             # Perform shot detection on video_manager.
             shot_manager.detect_shots(
-                frame_source=video_manager, show_progress=show_progress)
+                frame_source=video_manager, show_progress=self.show_progress)
             # Obtain list of detected shots.
             shot_list = shot_manager.get_shot_list(base_timecode)
             # Each shot is a tuple of (start, end) FrameTimecodes.
