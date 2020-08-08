@@ -96,13 +96,13 @@ class Images2FixedLengthGroup(object):
     def _get_sample_index(self, indice, nimg):
         sampled_idxes = list()
         #
-        p = indice - self.step
+        p = max(0, indice - self.step)
         for i, ind in enumerate(
                 range(-2, -(self.scope_length + 1) // 2, -self.step)):
             sampled_idxes = [p + self.skip_offset] + sampled_idxes
             if p - self.step >= 0:
                 p -= self.step
-        p = indice
+        p = min(indice, nimg - 1)
         for i, ind in enumerate(
                 range(0, (self.scope_length + 1) // 2, self.step)):
             sampled_idxes.append(p + self.skip_offset)
