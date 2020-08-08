@@ -1,7 +1,7 @@
 import mmcv
 from torchvision.transforms import Compose
 from .transforms import (Images2FixedLengthGroup, ImageGroupTransform,
-                         BboxTransform, LoadImages)
+                         BboxTransform, LoadImages, NormBBox)
 from .video import VideoMMCVBackend
 from .formating import Collect, OneSampleCollate
 from movienet.tools.metaio import ShotList, ShotLevelTrackletSet
@@ -10,8 +10,8 @@ import math
 
 class ActionDataPreprocessor(object):
 
-    def __init__(self, gpu=0):
-        self.pipeline = self.build_data_pipline(gpu)
+    def __init__(self, gpu=0, require_normalized_bbox=True):
+        self.pipeline = self.build_data_pipline(gpu, require_normalized_bbox)
 
     def __call__(self, imgs, bboxes):
         results = dict(
@@ -22,7 +22,7 @@ class ActionDataPreprocessor(object):
         # results = self.pre_pipeline(results)
         return self.pipeline(results)
 
-    def build_data_pipline(self, gpu):
+    def build_data_pipline(self, gpu, require_normalized_bbox):
         pipeline = Compose([
             Images2FixedLengthGroup(32, 2, 0),
             ImageGroupTransform(
@@ -31,6 +31,7 @@ class ActionDataPreprocessor(object):
                 to_rgb=True,
                 size_divisor=32,
                 scale=(800, 256)),
+            NormBBox(input_normed=require_normalized_bbox),
             BboxTransform(),
             Collect(
                 keys=["img_group_0", "proposals"],
@@ -46,7 +47,12 @@ class ActionDataPreprocessor(object):
 
 class ActionDataset(object):
 
-    def __init__(self, video, tracklet_file=None, shot_file=None, seq_len=64):
+    def __init__(self,
+                 video,
+                 tracklet_file=None,
+                 shot_file=None,
+                 seq_len=64,
+                 tracklet_normed=True):
         """ 
         video: video frame pool, backend could be ``file``, ``mmcv`` or
         ``decord``
@@ -63,6 +69,7 @@ class ActionDataset(object):
         else:
             self.tracklet_list = None
         self.seq_len = seq_len
+        self.tracklet_normed = tracklet_normed
 
         (self.bbox_stream, self.bbox_tracklet_ids, self.shot_group_slice,
          self.sequence_centers, self.seq_stream) = self._init_stream()
@@ -81,6 +88,7 @@ class ActionDataset(object):
                 to_rgb=True,
                 size_divisor=32,
                 scale=(800, 256)),
+            NormBBox(input_normed=self.tracklet_normed),
             BboxTransform(),
             Collect(
                 keys=["img_group_0", "proposals"],

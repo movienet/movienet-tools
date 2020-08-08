@@ -26,6 +26,30 @@ def to_tensor(data):
             type(data)))
 
 
+class NormBBox(object):
+    """ Normalize bounding box to [0, 1).
+    """
+
+    def __init__(self, input_normed=True):
+        self.input_normed = input_normed
+
+    def __call__(self, results):
+        bboxes = results['bboxes']
+        if self.input_normed:
+            assert np.logical_and(bboxes <= 1, bboxes >= 0).all()
+            return results
+        height, width, _ = results['ori_shape']
+        if bboxes.shape[1] == 5:
+            bboxes = bboxes / np.array([width, height, width, height, 1.0],
+                                       dtype=np.float32)
+        else:
+            bboxes = bboxes / np.array([width, height, width, height],
+                                       dtype=np.float32)
+        results['bboxes'] = bboxes
+
+        return results
+
+
 class BboxTransform(object):
     """Preprocess gt bboxes.
     1. rescale bboxes according to image size

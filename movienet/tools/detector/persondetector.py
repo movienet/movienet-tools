@@ -17,13 +17,17 @@ from .persondet.cascade_rcnn import CascadeRCNN
 from .persondet.dataset import CustomDataset, DataProcessor
 from .persondet.retinanet import RetinaNet
 
+resources_dir = osp.join(osp.dirname(__file__), '../../../model')
+
 
 class PersonDetector(object):
 
     def __init__(self,
-                 arch,
-                 cfg_path,
-                 weight_path,
+                 arch='rcnn',
+                 cfg_path=osp.join(resources_dir,
+                                   'cascade_rcnn_x101_64x4d_fpn.json'),
+                 weight_path=osp.join(resources_dir,
+                                      'cascade_rcnn_x101_64x4d_fpn.pth'),
                  gpu=0,
                  img_scale=(1333, 800)):
         if arch == 'retina':

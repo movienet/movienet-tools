@@ -1,4 +1,5 @@
 import mmcv
+import os.path as osp
 from .detectors import FastRCNN
 import torch
 from .src import ActionDataPreprocessor
@@ -9,11 +10,19 @@ from torch.utils.data import DataLoader
 from functools import partial
 from itertools import groupby
 from operator import itemgetter
+resources_dir = osp.join(osp.dirname(__file__), '../../../model')
 
 
 class ActionExtractor(object):
 
-    def __init__(self, config_path, weight_path, gpu=0):
+    def __init__(
+            self,
+            config_path=osp.join(resources_dir,
+                                 'ava_fast_rcnn_nl_r50_c4_1x_kinetics.py'),
+            weight_path=osp.join(resources_dir,
+                                 'ava_fast_rcnn_nl_r50_c4_1x_kinetics.pth'),
+            gpu=0,
+            require_normalized_bbox=True):
 
         cfg = mmcv.Config.fromfile(config_path)
         self.cfg = cfg
@@ -21,16 +30,19 @@ class ActionExtractor(object):
         self.model = FastRCNN(**cfg)
         self.model.eval()
         self.model.cuda(gpu)
+        self.require_normalized_bbox = require_normalized_bbox
         mmcv.runner.load_checkpoint(
             self.model, weight_path, map_location=f"cuda:{gpu}")
-        self.data_preprocessor = ActionDataPreprocessor(gpu)
+        self.data_preprocessor = ActionDataPreprocessor(
+            gpu, require_normalized_bbox)
 
-    def extract(self, imgs, bboxes):
+    def extract(self, imgs, bboxes, bboxes_normed=True):
         """
         imgs: sequence of image
         bboxes: static tracklet, expressed by boxes within one frame.
         """
-        assert np.logical_and(bboxes <= 1, bboxes >= 0).all()
+        if self.require_normalized_bbox:
+            assert np.logical_and(bboxes <= 1, bboxes >= 0).all()
         data = self.data_preprocessor(imgs, bboxes)
         with torch.no_grad():
             scaled_bboxes, score, feature = self.model(rescale=True, **data)
