@@ -7,7 +7,15 @@ from setuptools import Extension, dist, find_namespace_packages, setup
 import Cython.Compiler.Options
 import numpy as np  # noqa: E402
 from Cython.Build import cythonize  # noqa: E402
-from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+# from torch.utils.cpp_extension import BuildExtension, CUDAExtension
+EXT_TYPE = ''
+try:
+    import torch
+    from torch.utils.cpp_extension import BuildExtension
+    EXT_TYPE = 'pytorch'
+except ModuleNotFoundError:
+    from Cython.Distutils import build_ext as BuildExtension
+    print('Skip building ext ops due to the absence of torch.')
 
 Cython.Compiler.Options.docstrings = False
 
@@ -200,6 +208,6 @@ if __name__ == '__main__':
                 name='roi_pool_cuda',
                 module='movienet.tools.action_extractor.core.ops.roi_pool',
                 sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu'])
-        ],
+        ] if EXT_TYPE else [],
         cmdclass={'build_ext': BuildExtension},
         zip_safe=False)
