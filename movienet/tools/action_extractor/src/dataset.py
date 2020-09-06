@@ -2,7 +2,7 @@ import mmcv
 from torchvision.transforms import Compose
 from .transforms import (Images2FixedLengthGroup, ImageGroupTransform,
                          BboxTransform, LoadImages, NormBBox)
-from .video import VideoMMCVBackend
+from .video import VideoMMCVBackend, VideoDecordBackend
 from .formating import Collect, OneSampleCollate
 from movienet.tools.metaio import ShotList, ShotLevelTrackletSet
 import math
@@ -167,6 +167,8 @@ class ActionDataset(object):
         if isinstance(self.video_cfg, mmcv.Config):
             if self.video_cfg.type == 'VideoMMCVBackend':
                 video = VideoMMCVBackend(**self.video_cfg.params)
+            elif self.video_cfg.type == 'VideoDecordBackend':
+                video = VideoDecordBackend(**self.video_cfg.params)
             imgs = [video[i] for i in range(imgs[0], imgs[1])]
         else:
             imgs = [self.video[i] for i in range(imgs[0], imgs[1])]

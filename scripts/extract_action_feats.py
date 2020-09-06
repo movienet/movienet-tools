@@ -6,7 +6,8 @@ from movienet.tools.utils import read_movie_list
 import tempfile
 # from movienet.tools.action_extractor.src.dataset import ActionDataset
 from movienet.tools.action_extractor.src.video import (VideoFileBackend,
-                                                       VideoMMCVBackend)
+                                                       VideoMMCVBackend,
+                                                       VideoDecordBackend)
 from movienet.tools.detector.parallel_persondetector import (
     ParallelPersonDetector)
 from movienet.tools.action_extractor.action_extract_manager import (
