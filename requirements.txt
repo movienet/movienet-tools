@@ -3,7 +3,7 @@ cython
 fake_useragent
 librosa == 0.7.2
 lxml
-mmcv
+mmcv == 1.0.3
 numba==0.48.0
 opencv-python
 PyHamcrest

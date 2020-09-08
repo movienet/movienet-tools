@@ -23,6 +23,8 @@
     
     ```python -m pip install -e . -U```
     
+    Note that if you want to install movienet-tools in a second anaconda environment,
+    you should delete the ``build`` folder before running setup.
 
 4. Dowload model weights
 

@@ -11,7 +11,7 @@ from Cython.Build import cythonize  # noqa: E402
 EXT_TYPE = ''
 try:
     import torch
-    from torch.utils.cpp_extension import BuildExtension
+    from torch.utils.cpp_extension import BuildExtension, CUDAExtension
     EXT_TYPE = 'pytorch'
 except ModuleNotFoundError:
     from Cython.Distutils import build_ext as BuildExtension
@@ -29,7 +29,7 @@ def readme():
 
 
 MAJOR = 0
-MINOR = 1
+MINOR = 2
 PATCH = ''
 SUFFIX = 'rc1'
 if PATCH:
@@ -140,74 +140,78 @@ def get_requirements(filename='requirements.txt'):
     return requires
 
 
-if __name__ == '__main__':
-    write_version_py()
-    setup(
-        name='movienet-tools',
-        version=get_version(),
-        description='Some tools for movie analysis',
-        long_description=readme(),
-        long_description_content_type='text/markdown',
-        url='https://github.com/movienet/movienet-tools',
-        packages=find_namespace_packages(
-            exclude=('docs', 'tools', 'local', 'tests', 'model')),
-        namespace_packages=("movienet", ),
-        package_data={'movie.tools.ops': ['*/*.so']},
-        classifiers=[
-            'Development Status :: 4 - Beta',
-            'License :: OSI Approved :: Apache Software License',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
-        ],
-        license='Apache License 2.0',
-        setup_requires=['pytest-runner', 'cython', 'numpy'],
-        tests_require=['pytest', 'xdoctest'],
-        install_requires=get_requirements(),
-        ext_modules=[
-            make_cython_ext(
-                name='soft_nms_cpu',
-                module='movienet.tools.detector.persondet.modules.core.ops.nms',
-                sources=['src/soft_nms_cpu.pyx']),
-            make_cuda_ext(
-                name='nms_cpu',
-                module='movienet.tools.detector.persondet.modules.core.ops.nms',
-                sources=['src/nms_cpu.cpp']),
-            make_cuda_ext(
-                name='nms_cuda',
-                module='movienet.tools.detector.persondet.modules.core.ops.nms',
-                sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
-            make_cuda_ext(
-                name='roi_align_cuda',
-                module=
-                'movienet.tools.detector.persondet.modules.core.ops.roi_align',
-                sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
-            make_cuda_ext(
-                name='roi_pool_cuda',
-                module=
-                'movienet.tools.detector.persondet.modules.core.ops.roi_pool',
-                sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu']),
-            make_cython_ext(
-                name='soft_nms_cpu',
-                module='movienet.tools.action_extractor.core.ops.nms',
-                sources=['src/soft_nms_cpu.pyx']),
-            make_cuda_ext(
-                name='nms_cpu',
-                module='movienet.tools.action_extractor.core.ops.nms',
-                sources=['src/nms_cpu.cpp']),
-            make_cuda_ext(
-                name='nms_cuda',
-                module='movienet.tools.action_extractor.core.ops.nms',
-                sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
-            make_cuda_ext(
-                name='roi_align_cuda',
-                module='movienet.tools.action_extractor.core.ops.roi_align',
-                sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
-            make_cuda_ext(
-                name='roi_pool_cuda',
-                module='movienet.tools.action_extractor.core.ops.roi_pool',
-                sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu'])
-        ] if EXT_TYPE else [],
-        cmdclass={'build_ext': BuildExtension},
-        zip_safe=False)
+print('EXT_TYPE', EXT_TYPE)
+ext_module_lst = []
+if EXT_TYPE == 'pytorch':
+    ext_module_lst = [
+        make_cython_ext(
+            name='soft_nms_cpu',
+            module='movienet.tools.detector.persondet.modules.core.ops.nms',
+            sources=['src/soft_nms_cpu.pyx']),
+        make_cuda_ext(
+            name='nms_cpu',
+            module='movienet.tools.detector.persondet.modules.core.ops.nms',
+            sources=['src/nms_cpu.cpp']),
+        make_cuda_ext(
+            name='nms_cuda',
+            module='movienet.tools.detector.persondet.modules.core.ops.nms',
+            sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
+        make_cuda_ext(
+            name='roi_align_cuda',
+            module=
+            'movienet.tools.detector.persondet.modules.core.ops.roi_align',
+            sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
+        make_cuda_ext(
+            name='roi_pool_cuda',
+            module=
+            'movienet.tools.detector.persondet.modules.core.ops.roi_pool',
+            sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu']),
+        make_cython_ext(
+            name='soft_nms_cpu',
+            module='movienet.tools.action_extractor.core.ops.nms',
+            sources=['src/soft_nms_cpu.pyx']),
+        make_cuda_ext(
+            name='nms_cpu',
+            module='movienet.tools.action_extractor.core.ops.nms',
+            sources=['src/nms_cpu.cpp']),
+        make_cuda_ext(
+            name='nms_cuda',
+            module='movienet.tools.action_extractor.core.ops.nms',
+            sources=['src/nms_cuda.cpp', 'src/nms_kernel.cu']),
+        make_cuda_ext(
+            name='roi_align_cuda',
+            module='movienet.tools.action_extractor.core.ops.roi_align',
+            sources=['src/roi_align_cuda.cpp', 'src/roi_align_kernel.cu']),
+        make_cuda_ext(
+            name='roi_pool_cuda',
+            module='movienet.tools.action_extractor.core.ops.roi_pool',
+            sources=['src/roi_pool_cuda.cpp', 'src/roi_pool_kernel.cu'])
+    ]
+print('EXT_MODULE_LIST', ext_module_lst)
+write_version_py()
+setup(
+    name='movienet-tools',
+    version=get_version(),
+    description='Some tools for movie analysis',
+    long_description=readme(),
+    long_description_content_type='text/markdown',
+    url='https://github.com/movienet/movienet-tools',
+    packages=find_namespace_packages(
+        exclude=('docs', 'tools', 'local', 'tests', 'model')),
+    namespace_packages=("movienet", ),
+    package_data={'movienet.tools.ops': ['*/*.so']},
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+    ],
+    license='Apache License 2.0',
+    setup_requires=['pytest-runner', 'cython', 'numpy'],
+    tests_require=['pytest', 'xdoctest'],
+    install_requires=get_requirements(),
+    ext_modules=ext_module_lst,
+    cmdclass={'build_ext': BuildExtension},
+    zip_safe=False)
