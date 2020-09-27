@@ -10,10 +10,15 @@ from mmcv.runner import load_checkpoint
 from .facedet.dataset import FaceDataProcessor
 from .facedet.mtcnn import MTCNN
 
+resources_dir = osp.join(osp.dirname(__file__), '../../../model')
+
 
 class FaceDetector(object):
 
-    def __init__(self, cfg_path, weight_path, gpu=0):
+    def __init__(self,
+                 cfg_path=osp.join(resources_dir, 'mtcnn.json'),
+                 weight_path=osp.join(resources_dir, 'mtcnnn.pth'),
+                 gpu=0):
         self.model = self.build_mtcnn(cfg_path, weight_path)
         self.model.eval()
         self.model.cuda(gpu)
