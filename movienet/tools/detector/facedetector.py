@@ -17,7 +17,7 @@ class FaceDetector(object):
 
     def __init__(self,
                  cfg_path=osp.join(resources_dir, 'mtcnn.json'),
-                 weight_path=osp.join(resources_dir, 'mtcnnn.pth'),
+                 weight_path=osp.join(resources_dir, 'mtcnn.pth'),
                  gpu=0):
         self.model = self.build_mtcnn(cfg_path, weight_path)
         self.model.eval()
