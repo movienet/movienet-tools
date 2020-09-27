@@ -197,7 +197,7 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/movienet/movienet-tools',
     packages=find_namespace_packages(
-        exclude=('docs', 'tools', 'local', 'tests', 'model')),
+        exclude=('docs', 'scripts', 'local', 'tests', 'model')),
     namespace_packages=("movienet", ),
     package_data={'movienet.tools.ops': ['*/*.so']},
     classifiers=[
