@@ -1,8 +1,3 @@
----
-order: 3
-title: Shot Detector
----
-
 ### Shot Detector
 
 To initialize a shot detector and to specify a source video path and an output path are all we need to detect shots in a video.

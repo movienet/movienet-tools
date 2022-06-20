@@ -1,8 +1,3 @@
----
-order: 4
-title: Feature Extractor
----
-
 ### Face Detector and Feature Extractor
 
 The face detector and Feature Extractor here are modified from [facenet-pytorch](https://github.com/timesler/facenet-pytorch). The detection model is MTCNN and the feature extraction model is InceptionResnetV1.

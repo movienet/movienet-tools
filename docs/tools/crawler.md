@@ -1,8 +1,3 @@
----
-order: 2
-title: Crawlers
----
-
 ### IMDb/TMDb Crawler
 
 [IMDb](https://www.imdb.com/) and [TMDb](https://www.themoviedb.org/) are two popular movie website that provide many meta data for movies.

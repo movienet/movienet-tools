@@ -1,7 +1,3 @@
----
-order: 2
----
-
 # Structure of a Movie
 
 ## Temporal Sturcture

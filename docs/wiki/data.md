@@ -1,7 +1,3 @@
----
-order: 3
----
-
 # Data in MovieNet
 
 ## ID
