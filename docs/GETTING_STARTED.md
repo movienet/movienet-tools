@@ -1,33 +1,25 @@
 ## Getting Started
-### Table of Contents
-1. [Shot Detector](#shot-detector)
-2. [Featur Extractor](#featur-extractor)
-3. [Crawler](#crawler)
+
+### Wiki
+
+MovieNet is a large scale and holistic dataset for comprehensive movie
+understanding. In MovieNet, we provide massive data and various annotation.
+
+- [Sturcture of a Movie](./wiki/structure)
+- [Data in MovieNet](./wiki/data)
+- [Annotation in MovieNet](./wiki/annotation)
 
 
-### Shot Detector
-##### Detect shot, extract keyframe, generate shot video
-```
-python demos/detect_shots.py
-```
+### Toolbox
+Movie toolbox provides many basic tools and functions for the researches on movie understanding,
+with which you can get started with your research easily.
 
-##### Prepare shot wav
-```
-python tools/prepare_shot_wav.py --listfile tests/data/videolist.txt --src_video_path tests/data --save_path tests/data/aud_wav --num_worker 2
-```
+Here we provide the following tools for movie understanding, which help to achieve, detect and represent some important middle-level entitties in a movie.
 
-### Featur Extractor
-
-#### Audio 
-
-##### Single
-```
-python demos/audio_demo.py
-```
-
-##### Distributed
-```
-python tools/extract_audio_feat.py --listfile tests/data/audlist.txt --aud_prefix tests/data/aud_wav --save_path tests/data/aud_stft --num_worker 2
-```
-
-### Crawler
+- [IMDb/TMDb Crawler](./tools/crawler)
+- [Shot Detector](./tools/shot_detector)
+- [Face Detector and Feature Extractor](./tools/extract_feature#face-detector-and-feature-extractor)
+- [Person Detector and Feature Extractor](./tools/extract_feature#person-detector-and-feature-extractor)
+- [Place Feature Extractor](./tools/extract_feature/#place-feature-extractor)
+- [Action Feature Extractor](./tools/extract_feature#action-feature-extractor)
+- [Audio Feature Extractor](./tools/extract_feature#audio-feature-extractor)

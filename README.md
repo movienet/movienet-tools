@@ -16,7 +16,7 @@ And it is also one of [OpenMMLab](https://open-mmlab.github.io/index.html) proje
 Please refer to [INSTALL.md](docs/INSTALL.md) for installation and dataset preparation. Pretrained models and dataset are also explanined here.
 
 ## Get Started
-Please see [movienet-tools documentation](http://docs.movienet.site/movie-toolbox/tools) for the basic usage.
+Please see [GETTING_STARTED.md](docs/GETTING_STARTED.md) for the wiki of movienet data and the basic usage of this toolbox.
 
 ## Acknowledgement
 The structure of ``movienet-tools`` follows that of codebased in [openmmlab](https://github.com/open-mmlab).
